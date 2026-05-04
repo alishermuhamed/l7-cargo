@@ -54,7 +54,7 @@ function OnboardingPage() {
         return
       }
 
-      await navigate({ href: redirectTo ?? '/tenants' })
+      await navigate({ href: redirectTo ?? '/' })
     } catch {
       toast.error(i18n.t('errors:unableToSaveYourName'))
     }
