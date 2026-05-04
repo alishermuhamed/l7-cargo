@@ -13,7 +13,6 @@ import {
   FormFieldItem,
   FormFieldLabel,
 } from '../../components/form'
-import { HeaderSlots } from '../../components/header/header-slots'
 import { TextField } from '../../components/text-field'
 import { authClient } from '../../lib/auth-client'
 import i18n from '../../lib/i18n'
@@ -61,44 +60,38 @@ function OnboardingPage() {
   }
 
   return (
-    <>
-      <HeaderSlots>
-        <HeaderSlots.Title>{i18n.t('auth:completeProfile')}</HeaderSlots.Title>
-      </HeaderSlots>
+    <Container size="1" pt="9" px="4">
+      <Card size="3">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <Flex direction="column" gap="5">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormFieldItem>
+                    <FormFieldLabel>{i18n.t('auth:yourName')}</FormFieldLabel>
 
-      <Container size="1" pt="9" px="4">
-        <Card size="3">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <Flex direction="column" gap="5">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormFieldItem>
-                      <FormFieldLabel>{i18n.t('auth:yourName')}</FormFieldLabel>
+                    <FormFieldControl>
+                      <TextField.Root
+                        placeholder={i18n.t('auth:yourNamePlaceholder')}
+                        autoComplete="name"
+                        {...field}
+                      />
+                    </FormFieldControl>
 
-                      <FormFieldControl>
-                        <TextField.Root
-                          placeholder={i18n.t('auth:yourNamePlaceholder')}
-                          autoComplete="name"
-                          {...field}
-                        />
-                      </FormFieldControl>
+                    <FormFieldError />
+                  </FormFieldItem>
+                )}
+              />
 
-                      <FormFieldError />
-                    </FormFieldItem>
-                  )}
-                />
-
-                <Button type="submit" loading={form.formState.isSubmitting}>
-                  {i18n.t('common:continue')}
-                </Button>
-              </Flex>
-            </form>
-          </Form>
-        </Card>
-      </Container>
-    </>
+              <Button type="submit" loading={form.formState.isSubmitting}>
+                {i18n.t('common:continue')}
+              </Button>
+            </Flex>
+          </form>
+        </Form>
+      </Card>
+    </Container>
   )
 }

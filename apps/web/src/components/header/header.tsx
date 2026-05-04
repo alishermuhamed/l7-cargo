@@ -1,12 +1,32 @@
 import './header.css'
 
-import { Box, Flex, Heading } from '@radix-ui/themes'
+import { ArrowLeftIcon, HamburgerMenuIcon } from '@radix-ui/react-icons'
+import { Box, Flex, Heading, IconButton } from '@radix-ui/themes'
+import { useCanGoBack, useMatches, useRouter } from '@tanstack/react-router'
 
-import { useHeaderConfigContext } from '../../hooks/use-header-config-context'
+import i18n from '../../lib/i18n'
 import { UserMenu } from '../user-menu'
 
-export function Header() {
-  const { config } = useHeaderConfigContext()
+interface HeaderProps {
+  onMenuClick: () => void
+}
+
+export function Header({ onMenuClick }: HeaderProps) {
+  const { title, fallbackTo } = useMatches({
+    select: (matches) =>
+      matches.reduce<{
+        title?: string
+        fallbackTo?: string
+      }>(
+        (resolved, match) => ({
+          title: match.staticData.title ?? resolved.title,
+          fallbackTo: match.staticData.fallbackTo ?? resolved.fallbackTo,
+        }),
+        {}
+      ),
+  })
+  const canGoBack = useCanGoBack()
+  const router = useRouter()
 
   return (
     <Flex
@@ -19,15 +39,47 @@ export function Header() {
       gap="3"
       className="header"
     >
-      {config.leftAction && <Box>{config.leftAction}</Box>}
+      {fallbackTo && (
+        <Flex width="36px" flexShrink="0" align="center" justify="center">
+          <IconButton
+            variant="ghost"
+            aria-label={i18n.t('common:back')}
+            onClick={() => {
+              if (canGoBack) {
+                router.history.back()
+                return
+              }
+
+              router.navigate({ to: fallbackTo, replace: true })
+            }}
+          >
+            <ArrowLeftIcon />
+          </IconButton>
+        </Flex>
+      )}
+
+      {!fallbackTo && onMenuClick && (
+        <Flex
+          display={{ initial: 'flex', md: 'none' }}
+          width="36px"
+          flexShrink="0"
+          align="center"
+          justify="center"
+        >
+          <IconButton
+            onClick={onMenuClick}
+            aria-label={i18n.t('common:navigation')}
+          >
+            <HamburgerMenuIcon />
+          </IconButton>
+        </Flex>
+      )}
 
       <Box flexGrow="1" minWidth="0">
         <Heading size="5" truncate>
-          {config.title}
+          {title ?? 'L7 Cargo'}
         </Heading>
       </Box>
-
-      {config.rightAction && <Box flexShrink="0">{config.rightAction}</Box>}
 
       <Box minWidth="36px" flexShrink="0">
         <UserMenu />
