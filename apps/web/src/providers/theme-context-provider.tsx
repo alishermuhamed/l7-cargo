@@ -48,7 +48,9 @@ export function ThemeContextProvider({ children }: PropsWithChildren) {
 
   return (
     <ThemeContext.Provider value={{ preference, setPreference }}>
-      <Theme appearance={appearance}>{children}</Theme>
+      <Theme accentColor="lime" radius="large" appearance={appearance}>
+        {children}
+      </Theme>
     </ThemeContext.Provider>
   )
 }
