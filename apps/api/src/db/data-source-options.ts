@@ -7,6 +7,9 @@ import { Account } from '../authentication/entities/account.entity'
 import { Session } from '../authentication/entities/session.entity'
 import { Verification } from '../authentication/entities/verification.entity'
 
+// Migrations
+import { AddBetterAuthEntities1777914172901 } from './migrations/1777914172901-add-better-auth-entities'
+
 export function buildDataSourceOptions(
   db: EnvConfig['database']
 ): DataSourceOptions {
@@ -24,6 +27,6 @@ export function buildDataSourceOptions(
     ssl: db.ssl ? { rejectUnauthorized: false } : undefined,
     synchronize: false,
     entities: [User, Account, Session, Verification],
-    migrations: [],
+    migrations: [AddBetterAuthEntities1777914172901],
   }
 }
