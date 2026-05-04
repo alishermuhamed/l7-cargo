@@ -1,0 +1,5 @@
+.header {
+  z-index: 1;
+  background: var(--color-panel-solid);
+  border-bottom: 1px solid var(--gray-6);
+}

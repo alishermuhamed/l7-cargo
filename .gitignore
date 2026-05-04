@@ -1,0 +1,27 @@
+# Dependencies
+node_modules
+
+# Logs
+*.log
+
+# Build output
+dist
+tsconfig.tsbuildinfo
+
+# Env
+.env
+
+# Editor directories and files
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Turbo
+.turbo

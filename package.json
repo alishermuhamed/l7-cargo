@@ -1,0 +1,22 @@
+{
+  "name": "l7-cargo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "packageManager": "npm@11.8.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "clear": "turbo run clear && rm -rf .turbo node_modules",
+    "format": "prettier --write"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.1",
+    "turbo": "^2.9.6"
+  }
+}

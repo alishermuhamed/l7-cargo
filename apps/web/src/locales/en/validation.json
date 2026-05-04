@@ -1,0 +1,45 @@
+{
+  "required": "Required",
+  "phoneNumber": {
+    "required": "Phone number is required"
+  },
+  "name": {
+    "required": "Name is required",
+    "tooLong": "Name must be 100 characters or less"
+  },
+  "currency": {
+    "required": "Currency is required"
+  },
+  "otpCode": {
+    "required": "OTP code is required"
+  },
+  "price": {
+    "invalid": "Default price must be a valid amount"
+  },
+  "images": {
+    "required": "Start and end images are required"
+  },
+  "startImage": {
+    "required": "Start image is required"
+  },
+  "endImage": {
+    "required": "End image is required"
+  },
+  "accessInstructions": {
+    "required": "Access instructions are required",
+    "tooLong": "Access instructions must be 1000 characters or less"
+  },
+  "cashCollected": {
+    "invalid": "Cash collected must be a valid amount"
+  },
+  "note": {
+    "tooLong": "Note must be 1000 characters or less"
+  },
+  "product": {
+    "required": "Product is required"
+  },
+  "quantity": {
+    "wholeNumber": "Quantity must be a whole number",
+    "minOne": "Quantity must be at least 1"
+  }
+}

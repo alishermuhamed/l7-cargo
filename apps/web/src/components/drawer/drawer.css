@@ -1,0 +1,17 @@
+.drawer-overlay {
+  z-index: 2;
+  background-color: var(--color-overlay);
+}
+
+.drawer {
+  z-index: 3;
+  background-color: var(--color-panel-solid);
+}
+
+.drawer-left {
+  border-right: 1px solid var(--gray-6);
+}
+
+.drawer-right {
+  border-left: 1px solid var(--gray-6);
+}

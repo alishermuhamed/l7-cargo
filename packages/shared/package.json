@@ -1,0 +1,31 @@
+{
+  "name": "@l7-cargo/shared",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc",
+    "clear": "rm -rf .turbo dist node_modules tsconfig.tsbuildinfo",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"No tests\""
+  },
+  "exports": {
+    "./types/*": {
+      "types": "./dist/types/*.d.ts",
+      "default": "./dist/types/*.js"
+    },
+    "./constants/*": {
+      "types": "./dist/constants/*.d.ts",
+      "default": "./dist/constants/*.js"
+    },
+    "./utils/*": {
+      "types": "./dist/utils/*.d.ts",
+      "default": "./dist/utils/*.js"
+    }
+  },
+  "devDependencies": {
+    "@l7-cargo/eslint-config": "*",
+    "typescript": "^5.9.3"
+  }
+}

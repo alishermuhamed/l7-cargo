@@ -1,0 +1,24 @@
+{
+  "name": "@l7-cargo/eslint-config",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clear": "rm -rf node_modules"
+  },
+  "exports": {
+    "./base": "./base.js",
+    "./web": "./web.js",
+    "./shared": "./shared.js",
+    "./api": "./api.js"
+  },
+  "dependencies": {
+    "@eslint/js": "^9.39.2",
+    "eslint": "^10.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "globals": "^16.5.0",
+    "typescript-eslint": "^8.54.0"
+  }
+}
