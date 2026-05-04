@@ -1,5 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, Card, Container, Flex, TextField } from '@radix-ui/themes'
+import { ArrowLeftIcon } from '@radix-ui/react-icons'
+import {
+  Button,
+  Card,
+  Container,
+  Flex,
+  IconButton,
+  TextField,
+} from '@radix-ui/themes'
 import {
   createFileRoute,
   Link as RouterLink,
@@ -16,14 +24,14 @@ import {
   FormFieldError,
   FormFieldItem,
   FormFieldLabel,
-} from '../../../components/form'
-import { HeaderSlots } from '../../../components/header/header-slots'
-import { UnsavedChangesBlocker } from '../../../components/unsaved-changes-blocker'
-import { authClient } from '../../../lib/auth-client'
-import i18n from '../../../lib/i18n'
-import { formatPhoneNumber } from '../../../lib/phone-number'
+} from '../../../../components/form'
+import { HeaderSlots } from '../../../../components/header/header-slots'
+import { UnsavedChangesBlocker } from '../../../../components/unsaved-changes-blocker'
+import { authClient } from '../../../../lib/auth-client'
+import i18n from '../../../../lib/i18n'
+import { formatPhoneNumber } from '../../../../lib/phone-number'
 
-export const Route = createFileRoute('/_authenticated/profile/edit')({
+export const Route = createFileRoute('/_authenticated/_menu/profile/edit')({
   component: EditProfilePage,
 })
 
@@ -71,6 +79,20 @@ function EditProfilePage() {
   return (
     <>
       <HeaderSlots>
+        <HeaderSlots.LeftAction>
+          <Flex width="36px" flexShrink="0" align="center" justify="center">
+            <IconButton
+              asChild
+              variant="ghost"
+              aria-label={i18n.t('common:back')}
+            >
+              <RouterLink to="/profile">
+                <ArrowLeftIcon />
+              </RouterLink>
+            </IconButton>
+          </Flex>
+        </HeaderSlots.LeftAction>
+
         <HeaderSlots.Title>{i18n.t('profile:editProfile')}</HeaderSlots.Title>
       </HeaderSlots>
 

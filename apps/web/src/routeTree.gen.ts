@@ -15,8 +15,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
 import { Route as AuthSignInRouteImport } from './routes/auth/sign-in'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
-import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile/index'
-import { Route as AuthenticatedProfileEditRouteImport } from './routes/_authenticated/profile/edit'
+import { Route as AuthenticatedMenuRouteRouteImport } from './routes/_authenticated/_menu/route'
+import { Route as AuthenticatedMenuProfileIndexRouteImport } from './routes/_authenticated/_menu/profile/index'
+import { Route as AuthenticatedMenuParcelsIndexRouteImport } from './routes/_authenticated/_menu/parcels/index'
+import { Route as AuthenticatedMenuAddressIndexRouteImport } from './routes/_authenticated/_menu/address/index'
+import { Route as AuthenticatedMenuProfileEditRouteImport } from './routes/_authenticated/_menu/profile/edit'
+import { Route as AuthenticatedMenuParcelsAddRouteImport } from './routes/_authenticated/_menu/parcels/add'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
@@ -47,17 +51,39 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedProfileIndexRoute =
-  AuthenticatedProfileIndexRouteImport.update({
+const AuthenticatedMenuRouteRoute = AuthenticatedMenuRouteRouteImport.update({
+  id: '/_menu',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMenuProfileIndexRoute =
+  AuthenticatedMenuProfileIndexRouteImport.update({
     id: '/profile/',
     path: '/profile/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    getParentRoute: () => AuthenticatedMenuRouteRoute,
   } as any)
-const AuthenticatedProfileEditRoute =
-  AuthenticatedProfileEditRouteImport.update({
+const AuthenticatedMenuParcelsIndexRoute =
+  AuthenticatedMenuParcelsIndexRouteImport.update({
+    id: '/parcels/',
+    path: '/parcels/',
+    getParentRoute: () => AuthenticatedMenuRouteRoute,
+  } as any)
+const AuthenticatedMenuAddressIndexRoute =
+  AuthenticatedMenuAddressIndexRouteImport.update({
+    id: '/address/',
+    path: '/address/',
+    getParentRoute: () => AuthenticatedMenuRouteRoute,
+  } as any)
+const AuthenticatedMenuProfileEditRoute =
+  AuthenticatedMenuProfileEditRouteImport.update({
     id: '/profile/edit',
     path: '/profile/edit',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    getParentRoute: () => AuthenticatedMenuRouteRoute,
+  } as any)
+const AuthenticatedMenuParcelsAddRoute =
+  AuthenticatedMenuParcelsAddRouteImport.update({
+    id: '/parcels/add',
+    path: '/parcels/add',
+    getParentRoute: () => AuthenticatedMenuRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -66,8 +92,11 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/verify': typeof AuthVerifyRoute
-  '/profile/edit': typeof AuthenticatedProfileEditRoute
-  '/profile/': typeof AuthenticatedProfileIndexRoute
+  '/parcels/add': typeof AuthenticatedMenuParcelsAddRoute
+  '/profile/edit': typeof AuthenticatedMenuProfileEditRoute
+  '/address/': typeof AuthenticatedMenuAddressIndexRoute
+  '/parcels/': typeof AuthenticatedMenuParcelsIndexRoute
+  '/profile/': typeof AuthenticatedMenuProfileIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,19 +104,26 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/verify': typeof AuthVerifyRoute
-  '/profile/edit': typeof AuthenticatedProfileEditRoute
-  '/profile': typeof AuthenticatedProfileIndexRoute
+  '/parcels/add': typeof AuthenticatedMenuParcelsAddRoute
+  '/profile/edit': typeof AuthenticatedMenuProfileEditRoute
+  '/address': typeof AuthenticatedMenuAddressIndexRoute
+  '/parcels': typeof AuthenticatedMenuParcelsIndexRoute
+  '/profile': typeof AuthenticatedMenuProfileIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
+  '/_authenticated/_menu': typeof AuthenticatedMenuRouteRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/verify': typeof AuthVerifyRoute
-  '/_authenticated/profile/edit': typeof AuthenticatedProfileEditRoute
-  '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
+  '/_authenticated/_menu/parcels/add': typeof AuthenticatedMenuParcelsAddRoute
+  '/_authenticated/_menu/profile/edit': typeof AuthenticatedMenuProfileEditRoute
+  '/_authenticated/_menu/address/': typeof AuthenticatedMenuAddressIndexRoute
+  '/_authenticated/_menu/parcels/': typeof AuthenticatedMenuParcelsIndexRoute
+  '/_authenticated/_menu/profile/': typeof AuthenticatedMenuProfileIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,7 +133,10 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/auth/sign-in'
     | '/auth/verify'
+    | '/parcels/add'
     | '/profile/edit'
+    | '/address/'
+    | '/parcels/'
     | '/profile/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -106,18 +145,25 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/auth/sign-in'
     | '/auth/verify'
+    | '/parcels/add'
     | '/profile/edit'
+    | '/address'
+    | '/parcels'
     | '/profile'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/_menu'
     | '/_authenticated/onboarding'
     | '/auth/sign-in'
     | '/auth/verify'
-    | '/_authenticated/profile/edit'
-    | '/_authenticated/profile/'
+    | '/_authenticated/_menu/parcels/add'
+    | '/_authenticated/_menu/profile/edit'
+    | '/_authenticated/_menu/address/'
+    | '/_authenticated/_menu/parcels/'
+    | '/_authenticated/_menu/profile/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -170,33 +216,81 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/profile/': {
-      id: '/_authenticated/profile/'
-      path: '/profile'
-      fullPath: '/profile/'
-      preLoaderRoute: typeof AuthenticatedProfileIndexRouteImport
+    '/_authenticated/_menu': {
+      id: '/_authenticated/_menu'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedMenuRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/profile/edit': {
-      id: '/_authenticated/profile/edit'
+    '/_authenticated/_menu/profile/': {
+      id: '/_authenticated/_menu/profile/'
+      path: '/profile'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof AuthenticatedMenuProfileIndexRouteImport
+      parentRoute: typeof AuthenticatedMenuRouteRoute
+    }
+    '/_authenticated/_menu/parcels/': {
+      id: '/_authenticated/_menu/parcels/'
+      path: '/parcels'
+      fullPath: '/parcels/'
+      preLoaderRoute: typeof AuthenticatedMenuParcelsIndexRouteImport
+      parentRoute: typeof AuthenticatedMenuRouteRoute
+    }
+    '/_authenticated/_menu/address/': {
+      id: '/_authenticated/_menu/address/'
+      path: '/address'
+      fullPath: '/address/'
+      preLoaderRoute: typeof AuthenticatedMenuAddressIndexRouteImport
+      parentRoute: typeof AuthenticatedMenuRouteRoute
+    }
+    '/_authenticated/_menu/profile/edit': {
+      id: '/_authenticated/_menu/profile/edit'
       path: '/profile/edit'
       fullPath: '/profile/edit'
-      preLoaderRoute: typeof AuthenticatedProfileEditRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      preLoaderRoute: typeof AuthenticatedMenuProfileEditRouteImport
+      parentRoute: typeof AuthenticatedMenuRouteRoute
+    }
+    '/_authenticated/_menu/parcels/add': {
+      id: '/_authenticated/_menu/parcels/add'
+      path: '/parcels/add'
+      fullPath: '/parcels/add'
+      preLoaderRoute: typeof AuthenticatedMenuParcelsAddRouteImport
+      parentRoute: typeof AuthenticatedMenuRouteRoute
     }
   }
 }
 
+interface AuthenticatedMenuRouteRouteChildren {
+  AuthenticatedMenuParcelsAddRoute: typeof AuthenticatedMenuParcelsAddRoute
+  AuthenticatedMenuProfileEditRoute: typeof AuthenticatedMenuProfileEditRoute
+  AuthenticatedMenuAddressIndexRoute: typeof AuthenticatedMenuAddressIndexRoute
+  AuthenticatedMenuParcelsIndexRoute: typeof AuthenticatedMenuParcelsIndexRoute
+  AuthenticatedMenuProfileIndexRoute: typeof AuthenticatedMenuProfileIndexRoute
+}
+
+const AuthenticatedMenuRouteRouteChildren: AuthenticatedMenuRouteRouteChildren =
+  {
+    AuthenticatedMenuParcelsAddRoute: AuthenticatedMenuParcelsAddRoute,
+    AuthenticatedMenuProfileEditRoute: AuthenticatedMenuProfileEditRoute,
+    AuthenticatedMenuAddressIndexRoute: AuthenticatedMenuAddressIndexRoute,
+    AuthenticatedMenuParcelsIndexRoute: AuthenticatedMenuParcelsIndexRoute,
+    AuthenticatedMenuProfileIndexRoute: AuthenticatedMenuProfileIndexRoute,
+  }
+
+const AuthenticatedMenuRouteRouteWithChildren =
+  AuthenticatedMenuRouteRoute._addFileChildren(
+    AuthenticatedMenuRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedMenuRouteRoute: typeof AuthenticatedMenuRouteRouteWithChildren
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
-  AuthenticatedProfileEditRoute: typeof AuthenticatedProfileEditRoute
-  AuthenticatedProfileIndexRoute: typeof AuthenticatedProfileIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedMenuRouteRoute: AuthenticatedMenuRouteRouteWithChildren,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
-  AuthenticatedProfileEditRoute: AuthenticatedProfileEditRoute,
-  AuthenticatedProfileIndexRoute: AuthenticatedProfileIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

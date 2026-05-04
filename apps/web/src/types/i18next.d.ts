@@ -4,6 +4,6 @@ declare module 'i18next' {
   interface CustomTypeOptions {
     strictKeyChecks: true
     // defaultNS: 'common'
-    resources: {}
+    resources: object
   }
 }

@@ -1,10 +1,7 @@
-import { Box } from '@radix-ui/themes'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
-import { Header } from '../../components/header/header'
 import { SessionContext } from '../../contexts/session'
 import { authClient } from '../../lib/auth-client'
-import { HeaderConfigContextProvider } from '../../providers/header-config-context-provider'
 
 const ONBOARDING_PATH = '/onboarding'
 
@@ -40,12 +37,7 @@ function AuthenticatedLayout() {
 
   return (
     <SessionContext.Provider value={{ session }}>
-      <HeaderConfigContextProvider>
-        <Box>
-          <Header />
-          <Outlet />
-        </Box>
-      </HeaderConfigContextProvider>
+      <Outlet />
     </SessionContext.Provider>
   )
 }
