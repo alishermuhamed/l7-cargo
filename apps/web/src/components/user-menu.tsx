@@ -1,4 +1,10 @@
-import { DesktopIcon, ExitIcon, MoonIcon, SunIcon } from '@radix-ui/react-icons'
+import {
+  DesktopIcon,
+  ExitIcon,
+  MoonIcon,
+  PersonIcon,
+  SunIcon,
+} from '@radix-ui/react-icons'
 import {
   Avatar,
   Box,
@@ -46,10 +52,7 @@ export function UserMenu() {
           radius="full"
           aria-label={i18n.t('profile:profile')}
         >
-          <Avatar
-            src={session.user.image ?? undefined}
-            fallback={session.user.name.charAt(0)}
-          />
+          <Avatar fallback={<PersonIcon width="20px" height="20px" />} />
         </IconButton>
       </DropdownMenu.Trigger>
 
