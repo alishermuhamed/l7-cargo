@@ -1,9 +1,11 @@
+import { Pencil1Icon, TrashIcon } from '@radix-ui/react-icons'
 import { Container, DataList, Flex, Text } from '@radix-ui/themes'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link as RouterLink } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { AlertDialog } from '../../../../../components/alert-dialog'
+import { Button } from '../../../../../components/button'
 import { CopyButton } from '../../../../../components/copy-button'
 import { ParcelStatusHistory } from '../../../../../features/parcels/components/parcel-status-history/parcel-status-history'
 import { deleteParcel } from '../../../../../lib/api/api.gen'
@@ -89,6 +91,33 @@ function ParcelPage() {
         </DataList.Root>
 
         <ParcelStatusHistory history={statusHistory} />
+
+        <Flex
+          direction={{ initial: 'column', xs: 'row' }}
+          justify="end"
+          gap="3"
+          align={{ initial: 'stretch', xs: 'center' }}
+        >
+          <Button asChild variant="soft" color="gray">
+            <RouterLink
+              to="/parcels/$parcelId/edit"
+              params={{ parcelId: initialParcel.id }}
+            >
+              <Pencil1Icon />
+              {i18n.t('common:edit')}
+            </RouterLink>
+          </Button>
+
+          <Button
+            type="button"
+            variant="soft"
+            color="red"
+            onClick={() => setIsDeleteDialogOpen(true)}
+          >
+            <TrashIcon />
+            {i18n.t('parcels:deleteParcelAction')}
+          </Button>
+        </Flex>
       </Flex>
 
       <AlertDialog

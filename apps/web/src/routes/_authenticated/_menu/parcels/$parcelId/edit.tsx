@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import z from 'zod'
 
-import { Button } from '../../../../components/button'
+import { Button } from '../../../../../components/button'
 import {
   Form,
   FormField,
@@ -14,72 +14,75 @@ import {
   FormFieldError,
   FormFieldItem,
   FormFieldLabel,
-} from '../../../../components/form'
-import { TextField } from '../../../../components/text-field'
-import { UnsavedChangesBlocker } from '../../../../components/unsaved-changes-blocker'
+} from '../../../../../components/form'
+import { TextField } from '../../../../../components/text-field'
+import { UnsavedChangesBlocker } from '../../../../../components/unsaved-changes-blocker'
 import {
-  createParcel,
-  type CreateParcelRequestDto,
-} from '../../../../lib/api/api.gen'
-import i18n from '../../../../lib/i18n'
+  updateParcel,
+  type UpdateParcelRequestDto,
+} from '../../../../../lib/api/api.gen'
+import { getParcelQueryOptions } from '../../../../../lib/api/queries'
+import i18n from '../../../../../lib/i18n'
 
-export const Route = createFileRoute('/_authenticated/_menu/parcels/add')({
+export const Route = createFileRoute(
+  '/_authenticated/_menu/parcels/$parcelId/edit'
+)({
   staticData: {
-    title: i18n.t('parcels:addParcel'),
+    title: i18n.t('parcels:editParcel'),
     fallbackTo: '/parcels',
   },
-  component: AddParcelPage,
+  loader: async ({ context: { queryClient }, params: { parcelId } }) => {
+    const initialParcel = await queryClient.ensureQueryData(
+      getParcelQueryOptions(parcelId)
+    )
+
+    return { initialParcel }
+  },
+  component: EditParcelPage,
 })
 
-const addParcelSchema = z.object({
-  trackingNumber: z
-    .string()
-    .trim()
-    .min(1, i18n.t('validation:trackingNumber.required')),
+const editParcelSchema = z.object({
   source: z.string(),
   description: z.string().trim(),
 })
 
-type AddParcelFormValues = z.infer<typeof addParcelSchema>
+type EditParcelFormValues = z.infer<typeof editParcelSchema>
 
-function AddParcelPage() {
+function EditParcelPage() {
   const navigate = useNavigate()
 
-  const form = useForm<AddParcelFormValues>({
-    resolver: zodResolver(addParcelSchema),
+  const { initialParcel } = Route.useLoaderData()
+
+  const form = useForm<EditParcelFormValues>({
+    resolver: zodResolver(editParcelSchema),
     defaultValues: {
-      trackingNumber: '',
-      source: '',
-      description: '',
+      source: initialParcel.source ?? '',
+      description: initialParcel.description ?? '',
     },
   })
 
-  const addParcelMutation = useMutation({
-    mutationFn: (dto: CreateParcelRequestDto) => createParcel(dto),
+  const editParcelMutation = useMutation({
+    mutationFn: (dto: UpdateParcelRequestDto) =>
+      updateParcel(initialParcel.id, dto),
   })
 
-  const navigateToParcels = (params?: {
+  const navigateToParcelDetails = (params?: {
     ignoreBlocker?: boolean
     replace?: boolean
   }) =>
     navigate({
-      to: '/parcels',
+      to: '/parcels/$parcelId',
+      params: { parcelId: initialParcel.id },
       ignoreBlocker: params?.ignoreBlocker ?? false,
       replace: params?.replace,
     })
 
-  const onSubmit = async ({
-    trackingNumber,
-    description,
-  }: AddParcelFormValues) => {
+  const onSubmit = async ({ description }: EditParcelFormValues) => {
     try {
-      await addParcelMutation.mutateAsync({
-        trackingNumber,
-        description: description || undefined,
-      })
-      await navigateToParcels({ ignoreBlocker: true, replace: true })
+      await editParcelMutation.mutateAsync({ description: description || null })
+      await navigateToParcelDetails({ ignoreBlocker: true, replace: true })
     } catch {
-      toast.error(i18n.t('parcels:unableToAddParcel'))
+      toast.error(i18n.t('parcels:unableToEditParcel'))
     }
   }
 
@@ -88,28 +91,6 @@ function AddParcelPage() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Flex direction="column" gap="4">
-            <FormField
-              control={form.control}
-              name="trackingNumber"
-              render={({ field }) => (
-                <FormFieldItem>
-                  <FormFieldLabel>
-                    {i18n.t('parcels:trackingNumber')} *
-                  </FormFieldLabel>
-
-                  <FormFieldControl>
-                    <TextField.Root
-                      placeholder={i18n.t('parcels:trackingNumberPlaceholder')}
-                      autoComplete="off"
-                      {...field}
-                    />
-                  </FormFieldControl>
-
-                  <FormFieldError />
-                </FormFieldItem>
-              )}
-            />
-
             <FormField
               control={form.control}
               name="description"
@@ -141,13 +122,13 @@ function AddParcelPage() {
                 type="button"
                 variant="soft"
                 color="gray"
-                onClick={() => navigateToParcels()}
+                onClick={() => navigateToParcelDetails()}
               >
                 {i18n.t('common:cancel')}
               </Button>
 
               <Button type="submit" loading={form.formState.isSubmitting}>
-                {i18n.t('common:add')}
+                {i18n.t('common:save')}
               </Button>
             </Flex>
           </Flex>

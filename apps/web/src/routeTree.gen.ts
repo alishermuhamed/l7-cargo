@@ -22,6 +22,7 @@ import { Route as AuthenticatedMenuAddressIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedMenuProfileEditRouteImport } from './routes/_authenticated/_menu/profile/edit'
 import { Route as AuthenticatedMenuParcelsAddRouteImport } from './routes/_authenticated/_menu/parcels/add'
 import { Route as AuthenticatedMenuParcelsParcelIdIndexRouteImport } from './routes/_authenticated/_menu/parcels/$parcelId/index'
+import { Route as AuthenticatedMenuParcelsParcelIdEditRouteImport } from './routes/_authenticated/_menu/parcels/$parcelId/edit'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
@@ -92,6 +93,12 @@ const AuthenticatedMenuParcelsParcelIdIndexRoute =
     path: '/parcels/$parcelId/',
     getParentRoute: () => AuthenticatedMenuRouteRoute,
   } as any)
+const AuthenticatedMenuParcelsParcelIdEditRoute =
+  AuthenticatedMenuParcelsParcelIdEditRouteImport.update({
+    id: '/parcels/$parcelId/edit',
+    path: '/parcels/$parcelId/edit',
+    getParentRoute: () => AuthenticatedMenuRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -104,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/address/': typeof AuthenticatedMenuAddressIndexRoute
   '/parcels/': typeof AuthenticatedMenuParcelsIndexRoute
   '/profile/': typeof AuthenticatedMenuProfileIndexRoute
+  '/parcels/$parcelId/edit': typeof AuthenticatedMenuParcelsParcelIdEditRoute
   '/parcels/$parcelId/': typeof AuthenticatedMenuParcelsParcelIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -117,6 +125,7 @@ export interface FileRoutesByTo {
   '/address': typeof AuthenticatedMenuAddressIndexRoute
   '/parcels': typeof AuthenticatedMenuParcelsIndexRoute
   '/profile': typeof AuthenticatedMenuProfileIndexRoute
+  '/parcels/$parcelId/edit': typeof AuthenticatedMenuParcelsParcelIdEditRoute
   '/parcels/$parcelId': typeof AuthenticatedMenuParcelsParcelIdIndexRoute
 }
 export interface FileRoutesById {
@@ -133,6 +142,7 @@ export interface FileRoutesById {
   '/_authenticated/_menu/address/': typeof AuthenticatedMenuAddressIndexRoute
   '/_authenticated/_menu/parcels/': typeof AuthenticatedMenuParcelsIndexRoute
   '/_authenticated/_menu/profile/': typeof AuthenticatedMenuProfileIndexRoute
+  '/_authenticated/_menu/parcels/$parcelId/edit': typeof AuthenticatedMenuParcelsParcelIdEditRoute
   '/_authenticated/_menu/parcels/$parcelId/': typeof AuthenticatedMenuParcelsParcelIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/address/'
     | '/parcels/'
     | '/profile/'
+    | '/parcels/$parcelId/edit'
     | '/parcels/$parcelId/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | '/address'
     | '/parcels'
     | '/profile'
+    | '/parcels/$parcelId/edit'
     | '/parcels/$parcelId'
   id:
     | '__root__'
@@ -176,6 +188,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_menu/address/'
     | '/_authenticated/_menu/parcels/'
     | '/_authenticated/_menu/profile/'
+    | '/_authenticated/_menu/parcels/$parcelId/edit'
     | '/_authenticated/_menu/parcels/$parcelId/'
   fileRoutesById: FileRoutesById
 }
@@ -278,6 +291,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMenuParcelsParcelIdIndexRouteImport
       parentRoute: typeof AuthenticatedMenuRouteRoute
     }
+    '/_authenticated/_menu/parcels/$parcelId/edit': {
+      id: '/_authenticated/_menu/parcels/$parcelId/edit'
+      path: '/parcels/$parcelId/edit'
+      fullPath: '/parcels/$parcelId/edit'
+      preLoaderRoute: typeof AuthenticatedMenuParcelsParcelIdEditRouteImport
+      parentRoute: typeof AuthenticatedMenuRouteRoute
+    }
   }
 }
 
@@ -287,6 +307,7 @@ interface AuthenticatedMenuRouteRouteChildren {
   AuthenticatedMenuAddressIndexRoute: typeof AuthenticatedMenuAddressIndexRoute
   AuthenticatedMenuParcelsIndexRoute: typeof AuthenticatedMenuParcelsIndexRoute
   AuthenticatedMenuProfileIndexRoute: typeof AuthenticatedMenuProfileIndexRoute
+  AuthenticatedMenuParcelsParcelIdEditRoute: typeof AuthenticatedMenuParcelsParcelIdEditRoute
   AuthenticatedMenuParcelsParcelIdIndexRoute: typeof AuthenticatedMenuParcelsParcelIdIndexRoute
 }
 
@@ -297,6 +318,8 @@ const AuthenticatedMenuRouteRouteChildren: AuthenticatedMenuRouteRouteChildren =
     AuthenticatedMenuAddressIndexRoute: AuthenticatedMenuAddressIndexRoute,
     AuthenticatedMenuParcelsIndexRoute: AuthenticatedMenuParcelsIndexRoute,
     AuthenticatedMenuProfileIndexRoute: AuthenticatedMenuProfileIndexRoute,
+    AuthenticatedMenuParcelsParcelIdEditRoute:
+      AuthenticatedMenuParcelsParcelIdEditRoute,
     AuthenticatedMenuParcelsParcelIdIndexRoute:
       AuthenticatedMenuParcelsParcelIdIndexRoute,
   }
