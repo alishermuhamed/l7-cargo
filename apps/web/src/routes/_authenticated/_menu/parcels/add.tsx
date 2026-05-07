@@ -16,17 +16,21 @@ import {
 } from '../../../../components/form'
 import { UnsavedChangesBlocker } from '../../../../components/unsaved-changes-blocker'
 import { createParcel } from '../../../../lib/api/api.gen'
+import i18n from '../../../../lib/i18n'
 
 export const Route = createFileRoute('/_authenticated/_menu/parcels/add')({
   staticData: {
-    title: 'Add Parcel',
+    title: i18n.t('parcels:addParcel'),
     fallbackTo: '/parcels',
   },
   component: AddParcelPage,
 })
 
 const addParcelSchema = z.object({
-  trackingNumber: z.string().trim().min(1, 'Tracking Number is required'),
+  trackingNumber: z
+    .string()
+    .trim()
+    .min(1, i18n.t('validation:trackingNumber.required')),
   source: z.string(),
   description: z.string().trim(),
 })
@@ -64,7 +68,7 @@ function AddParcelPage() {
       await addParcelMutation.mutateAsync(values)
       await navigateToParcels({ ignoreBlocker: true, replace: true })
     } catch {
-      toast.error('Unable to add parcel')
+      toast.error(i18n.t('parcels:unableToAddParcel'))
     }
   }
 
@@ -78,11 +82,13 @@ function AddParcelPage() {
               name="trackingNumber"
               render={({ field }) => (
                 <FormFieldItem>
-                  <FormFieldLabel>Tracking Number *</FormFieldLabel>
+                  <FormFieldLabel>
+                    {i18n.t('parcels:trackingNumber')} *
+                  </FormFieldLabel>
 
                   <FormFieldControl>
                     <TextField.Root
-                      placeholder="Enter tracking number"
+                      placeholder={i18n.t('parcels:trackingNumberPlaceholder')}
                       autoComplete="off"
                       {...field}
                     />
@@ -98,11 +104,13 @@ function AddParcelPage() {
               name="description"
               render={({ field }) => (
                 <FormFieldItem>
-                  <FormFieldLabel>Description</FormFieldLabel>
+                  <FormFieldLabel>
+                    {i18n.t('parcels:description')}
+                  </FormFieldLabel>
 
                   <FormFieldControl>
                     <TextField.Root
-                      placeholder="Enter description"
+                      placeholder={i18n.t('parcels:descriptionPlaceholder')}
                       autoComplete="off"
                       {...field}
                     />
@@ -120,11 +128,11 @@ function AddParcelPage() {
                 color="gray"
                 onClick={() => navigateToParcels()}
               >
-                Cancel
+                {i18n.t('parcels:cancel')}
               </Button>
 
               <Button type="submit" loading={form.formState.isSubmitting}>
-                Add
+                {i18n.t('parcels:add')}
               </Button>
             </Flex>
           </Flex>

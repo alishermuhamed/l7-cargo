@@ -6,7 +6,7 @@ import { formatPhoneNumber } from '../../../../lib/phone-number'
 
 export const Route = createFileRoute('/_authenticated/_menu/profile/')({
   staticData: {
-    title: 'Profile',
+    title: i18n.t('profile:profile'),
   },
   component: ProfilePage,
 })

@@ -1,0 +1,19 @@
+{
+  "back": "Back",
+  "navigation": "Navigation",
+  "navigationSidebarDescription": "Use this sidebar to move between app sections.",
+  "search": "Search",
+  "edit": "Edit",
+  "language": "Language",
+  "theme": "Theme",
+  "signOut": "Sign out",
+  "cancel": "Cancel",
+  "continue": "Continue",
+  "saveChanges": "Save changes",
+  "drawerTitle": "Drawer",
+  "drawerDescription": "Drawer content",
+  "discardChangesTitle": "Discard changes?",
+  "discardChangesDescription": "You have unsaved changes. If you leave now, they will be lost.",
+  "keepEditing": "Keep editing",
+  "discardChanges": "Discard changes"
+}

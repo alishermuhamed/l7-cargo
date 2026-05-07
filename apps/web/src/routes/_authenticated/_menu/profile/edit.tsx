@@ -24,7 +24,7 @@ import { formatPhoneNumber } from '../../../../lib/phone-number'
 
 export const Route = createFileRoute('/_authenticated/_menu/profile/edit')({
   staticData: {
-    title: 'Edit profile',
+    title: i18n.t('profile:editProfile'),
     fallbackTo: '/profile',
   },
   component: EditProfilePage,

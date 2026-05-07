@@ -15,17 +15,18 @@ import { useState } from 'react'
 
 import { SearchField } from '../../../../components/search-field/search-field'
 import { Select } from '../../../../components/select'
+import { PARCEL_STATUS_LABELS } from '../../../../features/parcels/lib/parcel-status-labels'
 import { useDebounce } from '../../../../hooks/use-debounce'
 import {
   type GetParcelsParams,
   ParcelStatus,
 } from '../../../../lib/api/api.gen'
 import { getParcelsQueryOptions } from '../../../../lib/api/queries'
-import { PARCEL_STATUS_LABELS } from '../../../../features/parcels/lib/parcel-status-labels'
+import i18n from '../../../../lib/i18n'
 
 export const Route = createFileRoute('/_authenticated/_menu/parcels/')({
   staticData: {
-    title: 'Parcels',
+    title: i18n.t('parcels:parcels'),
   },
   component: ParcelsPage,
 })
@@ -33,6 +34,7 @@ export const Route = createFileRoute('/_authenticated/_menu/parcels/')({
 function ParcelsPage() {
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<ParcelStatus | 'all'>('all')
+  const parcelStatuses = Object.values(ParcelStatus) as ParcelStatus[]
 
   const debouncedSearch = useDebounce(search, 500)
 
@@ -58,9 +60,9 @@ function ParcelsPage() {
             <Select.Trigger />
 
             <Select.Content>
-              <Select.Item value="all">All</Select.Item>
+              <Select.Item value="all">{i18n.t('parcels:all')}</Select.Item>
 
-              {Object.keys(ParcelStatus).map((s: ParcelStatus) => (
+              {parcelStatuses.map((s) => (
                 <Select.Item key={s} value={s}>
                   {PARCEL_STATUS_LABELS[s]}
                 </Select.Item>
@@ -70,7 +72,7 @@ function ParcelsPage() {
 
           <Button asChild>
             <Link to="/parcels/add">
-              <PlusIcon /> Add Parcel
+              <PlusIcon /> {i18n.t('parcels:addParcel')}
             </Link>
           </Button>
         </Flex>
@@ -98,12 +100,16 @@ function ParcelsPage() {
 
                       {!p.description && (
                         <Text color="gray" weight="light" size="2">
-                          No description
+                          {i18n.t('parcels:noDescription')}
                         </Text>
                       )}
                     </Box>
 
-                    <Text>{p.status ?? 'Waiting'}</Text>
+                    <Text>
+                      {p.status
+                        ? PARCEL_STATUS_LABELS[p.status]
+                        : i18n.t('parcels:waiting')}
+                    </Text>
                   </Flex>
                 </Link>
               </Card>
@@ -125,7 +131,7 @@ function ParcelsPage() {
           {!areParcelsLoading && parcels.length === 0 && (
             <Card>
               <Flex p="3" align="center" justify="center">
-                No parcels found
+                {i18n.t('parcels:noParcelsFound')}
               </Flex>
             </Card>
           )}
@@ -135,9 +141,15 @@ function ParcelsPage() {
           <Table.Root>
             <Table.Header>
               <Table.Row>
-                <Table.ColumnHeaderCell>Tracking Number</Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>Description</Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>
+                  {i18n.t('parcels:trackingNumber')}
+                </Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>
+                  {i18n.t('parcels:description')}
+                </Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>
+                  {i18n.t('parcels:status')}
+                </Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell />
               </Table.Row>
             </Table.Header>
@@ -150,9 +162,15 @@ function ParcelsPage() {
                       {p.trackingNumber}
                     </Table.RowHeaderCell>
 
-                    <Table.Cell>{p.description}</Table.Cell>
+                    <Table.Cell>
+                      {p.description ?? i18n.t('parcels:noDescription')}
+                    </Table.Cell>
 
-                    <Table.Cell>{p.status}</Table.Cell>
+                    <Table.Cell>
+                      {p.status
+                        ? PARCEL_STATUS_LABELS[p.status]
+                        : i18n.t('parcels:waiting')}
+                    </Table.Cell>
 
                     <Table.Cell align="right">
                       <Button asChild variant="ghost">
@@ -160,7 +178,7 @@ function ParcelsPage() {
                           to="/parcels/$parcelId"
                           params={{ parcelId: p.id }}
                         >
-                          Details <ArrowRightIcon />
+                          {i18n.t('parcels:details')} <ArrowRightIcon />
                         </Link>
                       </Button>
                     </Table.Cell>
@@ -190,7 +208,7 @@ function ParcelsPage() {
               {!areParcelsLoading && parcels.length === 0 && (
                 <Table.Row>
                   <Table.Cell align="center" colSpan={4}>
-                    No parcels found
+                    {i18n.t('parcels:noParcelsFound')}
                   </Table.Cell>
                 </Table.Row>
               )}

@@ -7,6 +7,8 @@ const NAMESPACES = [
   'validation',
   'auth',
   'nav',
+  'address',
+  'parcels',
   'profile',
   'errors',
 ] as const

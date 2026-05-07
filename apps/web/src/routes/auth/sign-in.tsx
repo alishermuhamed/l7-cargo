@@ -61,7 +61,7 @@ function SignInPage() {
         search: { phoneNumber, redirectTo },
       })
     } catch {
-      toast.error(i18n.t('add'))
+      toast.error(i18n.t('errors:unableToSendVerificationCode'))
     }
   }
 

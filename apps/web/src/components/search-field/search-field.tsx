@@ -4,6 +4,7 @@ import { Cross1Icon, MagnifyingGlassIcon } from '@radix-ui/react-icons'
 import { IconButton } from '@radix-ui/themes'
 import classNames from 'classnames'
 
+import i18n from '../../lib/i18n'
 import { TextField } from '../text-field'
 
 interface SearchFieldProps {
@@ -14,7 +15,7 @@ interface SearchFieldProps {
 export function SearchField({ value, onChange }: SearchFieldProps) {
   return (
     <TextField.Root
-      placeholder="Search"
+      placeholder={i18n.t('common:search')}
       value={value}
       onChange={(e) => onChange(e.target.value)}
     >

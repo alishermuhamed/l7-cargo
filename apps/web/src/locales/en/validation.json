@@ -1,0 +1,15 @@
+{
+  "phoneNumber": {
+    "required": "Phone number is required."
+  },
+  "otpCode": {
+    "required": "Verification code is required."
+  },
+  "trackingNumber": {
+    "required": "Tracking number is required."
+  },
+  "name": {
+    "required": "Name is required.",
+    "tooLong": "Name must be 100 characters or fewer."
+  }
+}

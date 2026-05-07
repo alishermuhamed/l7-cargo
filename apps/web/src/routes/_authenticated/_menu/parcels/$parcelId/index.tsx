@@ -6,12 +6,13 @@ import { useState } from 'react'
 import { AlertDialog } from '../../../../../components/alert-dialog'
 import { deleteParcel } from '../../../../../lib/api/api.gen'
 import { getParcelQueryOptions } from '../../../../../lib/api/queries'
+import i18n from '../../../../../lib/i18n'
 
 export const Route = createFileRoute(
   '/_authenticated/_menu/parcels/$parcelId/'
 )({
   staticData: {
-    title: 'Parcel Details',
+    title: i18n.t('parcels:parcelDetails'),
     fallbackTo: '/parcels',
   },
   loader: async ({ params: { parcelId }, context: { queryClient } }) => {
@@ -47,9 +48,9 @@ function ParcelPage() {
       <AlertDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
-        title="Delete Parcel"
-        description="Delete Parcel Description"
-        actionLabel="Delete"
+        title={i18n.t('parcels:deleteParcelTitle')}
+        description={i18n.t('parcels:deleteParcelDescription')}
+        actionLabel={i18n.t('parcels:deleteParcelAction')}
         actionColor="red"
         onAction={() => deleteParcelMutation.mutate()}
       />

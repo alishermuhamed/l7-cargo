@@ -23,19 +23,19 @@ export function NavBar({ onNavigate }: NavBarProps) {
         >
           <RouterLinkWrapper>
             <RouterLink onClick={onNavigate} to="/parcels">
-              <Text size="3">Parcels</Text>
+              <Text size="3">{i18n.t('nav:parcels')}</Text>
             </RouterLink>
           </RouterLinkWrapper>
 
           <RouterLinkWrapper>
             <RouterLink onClick={onNavigate} to="/address">
-              <Text size="3">Address</Text>
+              <Text size="3">{i18n.t('nav:address')}</Text>
             </RouterLink>
           </RouterLinkWrapper>
 
           <RouterLinkWrapper>
             <RouterLink onClick={onNavigate} to="/profile">
-              <Text size="3">Profile</Text>
+              <Text size="3">{i18n.t('nav:profile')}</Text>
             </RouterLink>
           </RouterLinkWrapper>
         </Flex>
