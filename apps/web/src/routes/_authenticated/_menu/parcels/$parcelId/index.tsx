@@ -2,6 +2,7 @@ import { Pencil1Icon, TrashIcon } from '@radix-ui/react-icons'
 import { Container, DataList, Flex, Text } from '@radix-ui/themes'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link as RouterLink } from '@tanstack/react-router'
+import BigNumber from 'bignumber.js'
 import { useState } from 'react'
 
 import { AlertDialog } from '../../../../../components/alert-dialog'
@@ -75,7 +76,9 @@ function ParcelPage() {
             <DataList.Label>{i18n.t('parcels:weight')}</DataList.Label>
             <DataList.Value>
               {parcel.weightKg !== null
-                ? i18n.t('parcels:weightValue', { weight: parcel.weightKg })
+                ? i18n.t('parcels:weightValue', {
+                    weight: new BigNumber(parcel.weightKg).toFixed(),
+                  })
                 : '-'}
             </DataList.Value>
           </DataList.Item>

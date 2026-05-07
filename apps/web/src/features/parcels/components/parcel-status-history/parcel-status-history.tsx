@@ -26,7 +26,7 @@ export function ParcelStatusHistory({ history }: ParcelStatusHistoryProps) {
           const isKnown = entry !== undefined
 
           return (
-            <Flex asChild gap="3">
+            <Flex asChild key={status} gap="3">
               <li>
                 <Flex width="20px" direction="column" align="center">
                   <Box
