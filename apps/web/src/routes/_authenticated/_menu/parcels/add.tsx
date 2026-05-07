@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, Container, Flex } from '@radix-ui/themes'
+import { Container, Flex } from '@radix-ui/themes'
 import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import z from 'zod'
 
+import { Button } from '../../../../components/button'
 import {
   Form,
   FormField,
@@ -124,13 +125,11 @@ function AddParcelPage() {
 
             <Flex
               direction={{ initial: 'column-reverse', xs: 'row' }}
-              align={{ initial: 'stretch', xs: 'center' }}
-              justify={{ initial: 'center', xs: 'end' }}
+              justify="end"
               gap="3"
             >
               <Button
                 type="button"
-                size={{ initial: '3', xs: '2' }}
                 variant="soft"
                 color="gray"
                 onClick={() => navigateToParcels()}
@@ -138,11 +137,7 @@ function AddParcelPage() {
                 {i18n.t('parcels:cancel')}
               </Button>
 
-              <Button
-                type="submit"
-                size={{ initial: '3', xs: '2' }}
-                loading={form.formState.isSubmitting}
-              >
+              <Button type="submit" loading={form.formState.isSubmitting}>
                 {i18n.t('parcels:add')}
               </Button>
             </Flex>

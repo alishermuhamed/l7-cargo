@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, Card, Container, Flex, TextField } from '@radix-ui/themes'
+import { Card, Container, Flex, TextField } from '@radix-ui/themes'
 import {
   createFileRoute,
   Link as RouterLink,
@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import z from 'zod'
 
+import { Button } from '../../../../components/button'
 import {
   Form,
   FormField,
@@ -72,11 +73,11 @@ function EditProfilePage() {
   }
 
   return (
-    <Container size="1" pt="9" px="4">
+    <Container size="1" p="4">
       <Card size="3">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <Flex direction="column" gap="5">
+            <Flex direction="column" gap="4">
               <FormField
                 control={form.control}
                 name="name"
@@ -115,7 +116,11 @@ function EditProfilePage() {
                 )}
               />
 
-              <Flex justify="between" gap="3">
+              <Flex
+                direction={{ initial: 'column-reverse', xs: 'row' }}
+                justify="end"
+                gap="3"
+              >
                 <Button asChild variant="soft" color="gray">
                   <RouterLink to="/profile">
                     {i18n.t('common:cancel')}
@@ -123,7 +128,7 @@ function EditProfilePage() {
                 </Button>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  {i18n.t('common:saveChanges')}
+                  {i18n.t('common:save')}
                 </Button>
               </Flex>
             </Flex>

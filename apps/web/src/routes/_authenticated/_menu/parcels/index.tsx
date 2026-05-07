@@ -3,7 +3,6 @@ import './index.css'
 import { ArrowRightIcon, PlusIcon } from '@radix-ui/react-icons'
 import {
   Box,
-  Button,
   Card,
   Container,
   Flex,
@@ -15,6 +14,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 
+import { Button } from '../../../../components/button'
 import { SearchField } from '../../../../components/search-field/search-field'
 import { Select } from '../../../../components/select'
 import { PARCEL_STATUS_LABELS } from '../../../../features/parcels/lib/parcel-status-labels'
@@ -55,6 +55,7 @@ function ParcelsPage() {
         <Flex
           direction={{ initial: 'column-reverse', xs: 'row' }}
           align={{ initial: 'stretch', xs: 'center' }}
+          justify="between"
           gap="3"
         >
           <Flex align="center" gap="3">
@@ -86,21 +87,13 @@ function ParcelsPage() {
             </Box>
           </Flex>
 
-          <Box
-            ml={{ initial: '0', xs: 'auto' }}
-            width={{ initial: '100%', xs: 'auto' }}
-            flexShrink="0"
-          >
-            <Button
-              asChild
-              className="add-parcel-button"
-              size={{ initial: '3', xs: '2' }}
-            >
+          <Flex direction={{ initial: 'column', xs: 'row' }} flexShrink="0">
+            <Button asChild>
               <Link to="/parcels/add">
                 <PlusIcon /> {i18n.t('parcels:addParcel')}
               </Link>
             </Button>
-          </Box>
+          </Flex>
         </Flex>
 
         <Flex

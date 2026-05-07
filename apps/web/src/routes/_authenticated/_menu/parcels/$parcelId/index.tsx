@@ -41,7 +41,7 @@ function ParcelPage() {
 
   return (
     <Container p="4">
-      <Flex direction="column" gap="6">
+      <Flex direction="column" gap="4">
         {JSON.stringify(parcel)}
       </Flex>
 

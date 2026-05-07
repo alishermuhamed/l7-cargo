@@ -1,6 +1,8 @@
-import { Button, Card, Container, DataList, Flex } from '@radix-ui/themes'
+import { Pencil1Icon } from '@radix-ui/react-icons'
+import { Card, Container, DataList, Flex } from '@radix-ui/themes'
 import { createFileRoute, Link as RouterLink } from '@tanstack/react-router'
 
+import { Button } from '../../../../components/button'
 import i18n from '../../../../lib/i18n'
 import { formatPhoneNumber } from '../../../../lib/phone-number'
 
@@ -17,9 +19,9 @@ function ProfilePage() {
   const phoneNumber = formatPhoneNumber(session.user.phoneNumber ?? '')
 
   return (
-    <Container size="1" pt="9" px="4">
+    <Container size="1" p="4">
       <Card size="3">
-        <Flex direction="column" gap="5">
+        <Flex direction="column" gap="4">
           <DataList.Root>
             <DataList.Item>
               <DataList.Label>{i18n.t('profile:name')}</DataList.Label>
@@ -32,9 +34,10 @@ function ProfilePage() {
             </DataList.Item>
           </DataList.Root>
 
-          <Flex justify="end">
+          <Flex direction={{ initial: 'column', xs: 'row' }} justify="end">
             <Button asChild>
               <RouterLink to="/profile/edit">
+                <Pencil1Icon />
                 {i18n.t('profile:editProfile')}
               </RouterLink>
             </Button>
