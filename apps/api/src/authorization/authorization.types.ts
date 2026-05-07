@@ -1,11 +1,10 @@
 import type { ExtractSubjectType, MongoAbility } from '@casl/ability'
 
+import { Parcel } from '../parcels/entities/parcel.entity'
+
 export type Action = 'create' | 'read' | 'update' | 'delete'
 
-// TODO remove
-class SomeSubject {}
-
-export type Subject = SomeSubject | typeof SomeSubject
+export type Subject = Parcel | typeof Parcel
 
 export type SubjectClass = ExtractSubjectType<Subject>
 

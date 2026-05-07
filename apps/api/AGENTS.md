@@ -20,3 +20,4 @@ This file defines instructions for coding agents working in `apps/api`.
 - Import DTO classes and mappers only at controller level within their own module.
 - Every method/function must have an explicit return type.
 - To generate/create migrations, use `apps/api/skills/create-db-migration/SKILL.md`.
+- Do not write tests unless explicitly asked to.

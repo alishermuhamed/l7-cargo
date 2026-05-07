@@ -9,6 +9,7 @@ import { AuthenticationGuard } from './common/guards/authentication.guard'
 import { ConfigModule } from './config/config.module'
 import { ContextModule } from './context/context.module'
 import { DbModule } from './db/db.module'
+import { ParcelsModule } from './parcels/parcels.module'
 import { UsersModule } from './users/users.module'
 
 @Module({
@@ -24,6 +25,7 @@ import { UsersModule } from './users/users.module'
     ContextModule,
     AuthenticationModule,
     UsersModule,
+    ParcelsModule,
     AuthorizationModule,
   ],
   controllers: [AppController],

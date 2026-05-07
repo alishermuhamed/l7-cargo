@@ -21,6 +21,7 @@ import { Route as AuthenticatedMenuParcelsIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedMenuAddressIndexRouteImport } from './routes/_authenticated/_menu/address/index'
 import { Route as AuthenticatedMenuProfileEditRouteImport } from './routes/_authenticated/_menu/profile/edit'
 import { Route as AuthenticatedMenuParcelsAddRouteImport } from './routes/_authenticated/_menu/parcels/add'
+import { Route as AuthenticatedMenuParcelsParcelIdIndexRouteImport } from './routes/_authenticated/_menu/parcels/$parcelId/index'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
@@ -85,6 +86,12 @@ const AuthenticatedMenuParcelsAddRoute =
     path: '/parcels/add',
     getParentRoute: () => AuthenticatedMenuRouteRoute,
   } as any)
+const AuthenticatedMenuParcelsParcelIdIndexRoute =
+  AuthenticatedMenuParcelsParcelIdIndexRouteImport.update({
+    id: '/parcels/$parcelId/',
+    path: '/parcels/$parcelId/',
+    getParentRoute: () => AuthenticatedMenuRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -97,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/address/': typeof AuthenticatedMenuAddressIndexRoute
   '/parcels/': typeof AuthenticatedMenuParcelsIndexRoute
   '/profile/': typeof AuthenticatedMenuProfileIndexRoute
+  '/parcels/$parcelId/': typeof AuthenticatedMenuParcelsParcelIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -109,6 +117,7 @@ export interface FileRoutesByTo {
   '/address': typeof AuthenticatedMenuAddressIndexRoute
   '/parcels': typeof AuthenticatedMenuParcelsIndexRoute
   '/profile': typeof AuthenticatedMenuProfileIndexRoute
+  '/parcels/$parcelId': typeof AuthenticatedMenuParcelsParcelIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -124,6 +133,7 @@ export interface FileRoutesById {
   '/_authenticated/_menu/address/': typeof AuthenticatedMenuAddressIndexRoute
   '/_authenticated/_menu/parcels/': typeof AuthenticatedMenuParcelsIndexRoute
   '/_authenticated/_menu/profile/': typeof AuthenticatedMenuProfileIndexRoute
+  '/_authenticated/_menu/parcels/$parcelId/': typeof AuthenticatedMenuParcelsParcelIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/address/'
     | '/parcels/'
     | '/profile/'
+    | '/parcels/$parcelId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/address'
     | '/parcels'
     | '/profile'
+    | '/parcels/$parcelId'
   id:
     | '__root__'
     | '/'
@@ -164,6 +176,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_menu/address/'
     | '/_authenticated/_menu/parcels/'
     | '/_authenticated/_menu/profile/'
+    | '/_authenticated/_menu/parcels/$parcelId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -258,6 +271,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMenuParcelsAddRouteImport
       parentRoute: typeof AuthenticatedMenuRouteRoute
     }
+    '/_authenticated/_menu/parcels/$parcelId/': {
+      id: '/_authenticated/_menu/parcels/$parcelId/'
+      path: '/parcels/$parcelId'
+      fullPath: '/parcels/$parcelId/'
+      preLoaderRoute: typeof AuthenticatedMenuParcelsParcelIdIndexRouteImport
+      parentRoute: typeof AuthenticatedMenuRouteRoute
+    }
   }
 }
 
@@ -267,6 +287,7 @@ interface AuthenticatedMenuRouteRouteChildren {
   AuthenticatedMenuAddressIndexRoute: typeof AuthenticatedMenuAddressIndexRoute
   AuthenticatedMenuParcelsIndexRoute: typeof AuthenticatedMenuParcelsIndexRoute
   AuthenticatedMenuProfileIndexRoute: typeof AuthenticatedMenuProfileIndexRoute
+  AuthenticatedMenuParcelsParcelIdIndexRoute: typeof AuthenticatedMenuParcelsParcelIdIndexRoute
 }
 
 const AuthenticatedMenuRouteRouteChildren: AuthenticatedMenuRouteRouteChildren =
@@ -276,6 +297,8 @@ const AuthenticatedMenuRouteRouteChildren: AuthenticatedMenuRouteRouteChildren =
     AuthenticatedMenuAddressIndexRoute: AuthenticatedMenuAddressIndexRoute,
     AuthenticatedMenuParcelsIndexRoute: AuthenticatedMenuParcelsIndexRoute,
     AuthenticatedMenuProfileIndexRoute: AuthenticatedMenuProfileIndexRoute,
+    AuthenticatedMenuParcelsParcelIdIndexRoute:
+      AuthenticatedMenuParcelsParcelIdIndexRoute,
   }
 
 const AuthenticatedMenuRouteRouteWithChildren =
