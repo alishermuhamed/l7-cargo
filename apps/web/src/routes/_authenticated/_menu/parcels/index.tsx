@@ -1,3 +1,5 @@
+import './index.css'
+
 import { ArrowRightIcon, PlusIcon } from '@radix-ui/react-icons'
 import {
   Box,
@@ -49,32 +51,56 @@ function ParcelsPage() {
 
   return (
     <Container p="4">
-      <Flex direction="column" gap="6">
-        <Flex align="center" gap="3">
-          <SearchField value={search} onChange={setSearch} />
+      <Flex direction="column" gap="4">
+        <Flex
+          direction={{ initial: 'column-reverse', xs: 'row' }}
+          align={{ initial: 'stretch', xs: 'center' }}
+          gap="3"
+        >
+          <Flex align="center" gap="3">
+            <Box maxWidth="250px">
+              <SearchField value={search} onChange={setSearch} />
+            </Box>
 
-          <Select.Root
-            value={status}
-            onValueChange={(s) => setStatus(s as ParcelStatus | 'all')}
+            <Box
+              width="150px"
+              flexGrow={{ initial: '1', xs: '0' }}
+              flexShrink="0"
+            >
+              <Select.Root
+                value={status}
+                onValueChange={(s) => setStatus(s as ParcelStatus | 'all')}
+              >
+                <Select.Trigger className="status-filter" />
+
+                <Select.Content>
+                  <Select.Item value="all">{i18n.t('parcels:all')}</Select.Item>
+
+                  {parcelStatuses.map((s) => (
+                    <Select.Item key={s} value={s}>
+                      {PARCEL_STATUS_LABELS[s]}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
+            </Box>
+          </Flex>
+
+          <Box
+            ml={{ initial: '0', xs: 'auto' }}
+            width={{ initial: '100%', xs: 'auto' }}
+            flexShrink="0"
           >
-            <Select.Trigger />
-
-            <Select.Content>
-              <Select.Item value="all">{i18n.t('parcels:all')}</Select.Item>
-
-              {parcelStatuses.map((s) => (
-                <Select.Item key={s} value={s}>
-                  {PARCEL_STATUS_LABELS[s]}
-                </Select.Item>
-              ))}
-            </Select.Content>
-          </Select.Root>
-
-          <Button asChild>
-            <Link to="/parcels/add">
-              <PlusIcon /> {i18n.t('parcels:addParcel')}
-            </Link>
-          </Button>
+            <Button
+              asChild
+              className="add-parcel-button"
+              size={{ initial: '3', xs: '2' }}
+            >
+              <Link to="/parcels/add">
+                <PlusIcon /> {i18n.t('parcels:addParcel')}
+              </Link>
+            </Button>
+          </Box>
         </Flex>
 
         <Flex

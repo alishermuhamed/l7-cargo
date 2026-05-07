@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, Container, Flex, TextField } from '@radix-ui/themes'
+import { Button, Container, Flex } from '@radix-ui/themes'
 import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
@@ -14,6 +14,7 @@ import {
   FormFieldItem,
   FormFieldLabel,
 } from '../../../../components/form'
+import { TextField } from '../../../../components/text-field'
 import { UnsavedChangesBlocker } from '../../../../components/unsaved-changes-blocker'
 import { createParcel } from '../../../../lib/api/api.gen'
 import i18n from '../../../../lib/i18n'
@@ -76,7 +77,7 @@ function AddParcelPage() {
     <Container p="4">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Flex direction="column" gap="6">
+          <Flex direction="column" gap="4">
             <FormField
               control={form.control}
               name="trackingNumber"
@@ -121,9 +122,15 @@ function AddParcelPage() {
               )}
             />
 
-            <Flex align="center" justify="end" gap="3">
+            <Flex
+              direction={{ initial: 'column-reverse', xs: 'row' }}
+              align={{ initial: 'stretch', xs: 'center' }}
+              justify={{ initial: 'center', xs: 'end' }}
+              gap="3"
+            >
               <Button
                 type="button"
+                size={{ initial: '3', xs: '2' }}
                 variant="soft"
                 color="gray"
                 onClick={() => navigateToParcels()}
@@ -131,7 +138,11 @@ function AddParcelPage() {
                 {i18n.t('parcels:cancel')}
               </Button>
 
-              <Button type="submit" loading={form.formState.isSubmitting}>
+              <Button
+                type="submit"
+                size={{ initial: '3', xs: '2' }}
+                loading={form.formState.isSubmitting}
+              >
                 {i18n.t('parcels:add')}
               </Button>
             </Flex>
