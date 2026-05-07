@@ -1,6 +1,11 @@
 import { queryOptions } from '@tanstack/react-query'
 
-import { getParcel, getParcels, type GetParcelsParams } from './api.gen'
+import {
+  getParcel,
+  getParcels,
+  type GetParcelsParams,
+  getParcelStatusHistory,
+} from './api.gen'
 
 // Parcels
 
@@ -11,6 +16,8 @@ export const parcelsKeys = {
     [...parcelsKeys.lists(), params ?? {}] as const,
   details: () => [...parcelsKeys.all, 'detail'] as const,
   detail: (parcelId: string) => [...parcelsKeys.details(), parcelId] as const,
+  statusHistory: (parcelId: string) =>
+    [...parcelsKeys.detail(parcelId), 'statusHistory'] as const,
 }
 
 export const getParcelsQueryOptions = (params?: GetParcelsParams) =>
@@ -23,4 +30,10 @@ export const getParcelQueryOptions = (parcelId: string) =>
   queryOptions({
     queryKey: parcelsKeys.detail(parcelId),
     queryFn: () => getParcel(parcelId),
+  })
+
+export const getParcelStatusHistoryQueryOptions = (parcelId: string) =>
+  queryOptions({
+    queryKey: parcelsKeys.statusHistory(parcelId),
+    queryFn: () => getParcelStatusHistory(parcelId),
   })

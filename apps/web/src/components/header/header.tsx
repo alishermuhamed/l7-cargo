@@ -1,10 +1,11 @@
 import './header.css'
 
 import { ArrowLeftIcon, HamburgerMenuIcon } from '@radix-ui/react-icons'
-import { Box, Flex, Heading, IconButton } from '@radix-ui/themes'
+import { Box, Flex, Heading } from '@radix-ui/themes'
 import { useCanGoBack, useMatches, useRouter } from '@tanstack/react-router'
 
 import i18n from '../../lib/i18n'
+import { IconButton } from '../icon-button'
 import { UserMenu } from '../user-menu'
 
 interface HeaderProps {
@@ -43,6 +44,7 @@ export function Header({ onMenuClick }: HeaderProps) {
         <Flex width="36px" flexShrink="0" align="center" justify="center">
           <IconButton
             variant="ghost"
+            tooltip={i18n.t('common:back')}
             aria-label={i18n.t('common:back')}
             onClick={() => {
               if (canGoBack) {
@@ -68,6 +70,7 @@ export function Header({ onMenuClick }: HeaderProps) {
         >
           <IconButton
             onClick={onMenuClick}
+            tooltip={i18n.t('common:navigation')}
             aria-label={i18n.t('common:navigation')}
           >
             <HamburgerMenuIcon />

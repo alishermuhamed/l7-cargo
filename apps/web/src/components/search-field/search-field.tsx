@@ -1,10 +1,10 @@
 import './search-field.css'
 
 import { Cross1Icon, MagnifyingGlassIcon } from '@radix-ui/react-icons'
-import { IconButton } from '@radix-ui/themes'
 import classNames from 'classnames'
 
 import i18n from '../../lib/i18n'
+import { IconButton } from '../icon-button'
 import { TextField } from '../text-field'
 
 interface SearchFieldProps {
@@ -26,8 +26,11 @@ export function SearchField({ value, onChange }: SearchFieldProps) {
       <TextField.Slot>
         <IconButton
           className={classNames('search-field-cross', !value && 'hidden')}
+          tooltip={i18n.t('common:clear')}
+          aria-label={i18n.t('common:clear')}
           size="1"
           variant="ghost"
+          color="gray"
           onClick={() => onChange('')}
         >
           <Cross1Icon width={12} height={12} />

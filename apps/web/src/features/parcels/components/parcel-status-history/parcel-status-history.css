@@ -1,0 +1,22 @@
+.parcel-status-history__timeline {
+  list-style: none;
+  padding: 0;
+}
+
+.parcel-status-history__marker {
+  border-radius: 999px;
+  border: 2px solid var(--gray-6);
+}
+
+.parcel-status-history__marker--done {
+  border: 2px solid var(--accent-6);
+  background-color: var(--accent-9);
+}
+
+.parcel-status-history__line {
+  background-color: var(--gray-6);
+}
+
+.parcel-status-history__line--done {
+  background-color: var(--accent-6);
+}

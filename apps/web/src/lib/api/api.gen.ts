@@ -86,6 +86,13 @@ export interface GetParcelResponseDto {
   notes: string | null
 }
 
+export interface GetParcelStatusHistoryResponseDto {
+  id: string
+  parcelId: string
+  createdAt: string
+  status: ParcelStatus
+}
+
 export interface UpdateParcelRequestDto {
   /** @nullable */
   source?: string | null
@@ -316,4 +323,21 @@ export const deleteParcel = async (
     ...options,
     method: 'DELETE',
   })
+}
+
+export const getGetParcelStatusHistoryUrl = (parcelId: string) => {
+  return `/parcels/${parcelId}/status-history`
+}
+
+export const getParcelStatusHistory = async (
+  parcelId: string,
+  options?: RequestInit
+): Promise<GetParcelStatusHistoryResponseDto[]> => {
+  return customFetch<GetParcelStatusHistoryResponseDto[]>(
+    getGetParcelStatusHistoryUrl(parcelId),
+    {
+      ...options,
+      method: 'GET',
+    }
+  )
 }

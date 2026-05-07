@@ -7,10 +7,12 @@ import { Account } from '../authentication/entities/account.entity'
 import { Session } from '../authentication/entities/session.entity'
 import { Verification } from '../authentication/entities/verification.entity'
 import { Parcel } from '../parcels/entities/parcel.entity'
+import { ParcelStatusHistory } from '../parcels/entities/parcel-status-history.entity'
 
 // Migrations
 import { AddBetterAuthEntities1777914172901 } from './migrations/1777914172901-add-better-auth-entities'
 import { AddParcels1777992156801 } from './migrations/1777992156801-add-parcels'
+import { AddParcelStatusHistory1778165216012 } from './migrations/1778165216012-add-parcel-status-history'
 
 export function buildDataSourceOptions(
   db: EnvConfig['database']
@@ -28,7 +30,18 @@ export function buildDataSourceOptions(
     database: db.name,
     ssl: db.ssl ? { rejectUnauthorized: false } : undefined,
     synchronize: false,
-    entities: [User, Account, Session, Verification, Parcel],
-    migrations: [AddBetterAuthEntities1777914172901, AddParcels1777992156801],
+    entities: [
+      User,
+      Account,
+      Session,
+      Verification,
+      Parcel,
+      ParcelStatusHistory,
+    ],
+    migrations: [
+      AddBetterAuthEntities1777914172901,
+      AddParcels1777992156801,
+      AddParcelStatusHistory1778165216012,
+    ],
   }
 }

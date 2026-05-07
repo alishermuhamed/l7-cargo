@@ -5,14 +5,7 @@ import {
   PersonIcon,
   SunIcon,
 } from '@radix-ui/react-icons'
-import {
-  Avatar,
-  Box,
-  DropdownMenu,
-  Flex,
-  IconButton,
-  Text,
-} from '@radix-ui/themes'
+import { Avatar, Box, DropdownMenu, Flex, Text } from '@radix-ui/themes'
 import { useQueryClient } from '@tanstack/react-query'
 import { Link as RouterLink, useNavigate } from '@tanstack/react-router'
 
@@ -27,6 +20,7 @@ import i18n, {
   SUPPORTED_LANGUAGES,
 } from '../lib/i18n'
 import { formatPhoneNumber } from '../lib/phone-number'
+import { IconButton } from './icon-button'
 
 export function UserMenu() {
   const queryClient = useQueryClient()

@@ -16,8 +16,11 @@ import { ContextService } from '../context/context.service'
 import { CreateParcelRequestDto } from './dtos/create-parcel-request.dto'
 import { CreateParcelResponseDto } from './dtos/create-parcel-response.dto'
 import { GetParcelResponseDto } from './dtos/get-parcel-response.dto'
+import { GetParcelStatusHistoryResponseDto } from './dtos/get-parcel-status-history-response.dto'
 import { GetParcelsQueryDto } from './dtos/get-parcels-query.dto'
 import { UpdateParcelRequestDto } from './dtos/update-parcel-request.dto'
+import { ParcelStatusHistoryMapper } from './parcel-status-history.mapper'
+import { ParcelStatusHistoryService } from './parcel-status-history.service'
 import { ParcelsMapper } from './parcels.mapper'
 import { ParcelsPolicy } from './parcels.policy'
 import { ParcelsService } from './parcels.service'
@@ -29,7 +32,8 @@ export class ParcelsController {
   constructor(
     private readonly parcelsPolicy: ParcelsPolicy,
     private readonly contextService: ContextService,
-    private readonly parcelsService: ParcelsService
+    private readonly parcelsService: ParcelsService,
+    private readonly parcelStatusHistoryService: ParcelStatusHistoryService
   ) {}
 
   @Post()
@@ -87,6 +91,22 @@ export class ParcelsController {
     })
 
     return ParcelsMapper.toGetParcelResponseDto(parcel)
+  }
+
+  @Get(`:${PARCEL_ID_PARAM}/status-history`)
+  async getParcelStatusHistory(
+    @Param(PARCEL_ID_PARAM, ParseUUIDPipe) parcelId: string
+  ): Promise<GetParcelStatusHistoryResponseDto[]> {
+    await this.parcelsPolicy.checkCanRead(parcelId)
+
+    const statusHistory = await this.parcelStatusHistoryService.find({
+      where: { parcelId },
+      order: { createdAt: 'ASC' },
+    })
+
+    return statusHistory.map((history) =>
+      ParcelStatusHistoryMapper.toGetParcelStatusHistoryResponseDto(history)
+    )
   }
 
   @Patch(`:${PARCEL_ID_PARAM}`)
