@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import i18n from '../../../../lib/i18n'
 
-export const Route = createFileRoute('/_authenticated/_client-menu/address/')({
+export const Route = createFileRoute('/_authenticated/_client/address/')({
   staticData: {
     title: i18n.t('nav:address'),
   },

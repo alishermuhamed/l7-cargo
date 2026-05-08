@@ -23,7 +23,7 @@ import {
 } from '../../../../lib/api/api.gen'
 import i18n from '../../../../lib/i18n'
 
-export const Route = createFileRoute('/_authenticated/_client-menu/parcels/add')({
+export const Route = createFileRoute('/_authenticated/_client/parcels/add')({
   staticData: {
     title: i18n.t('parcels:addParcel'),
     fallbackTo: '/parcels',

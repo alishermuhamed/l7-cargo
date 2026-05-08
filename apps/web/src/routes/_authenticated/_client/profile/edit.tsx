@@ -23,7 +23,7 @@ import { authClient } from '../../../../lib/auth-client'
 import i18n from '../../../../lib/i18n'
 import { formatPhoneNumber } from '../../../../lib/phone-number'
 
-export const Route = createFileRoute('/_authenticated/_client-menu/profile/edit')({
+export const Route = createFileRoute('/_authenticated/_client/profile/edit')({
   staticData: {
     title: i18n.t('profile:editProfile'),
     fallbackTo: '/profile',

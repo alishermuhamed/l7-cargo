@@ -18,7 +18,7 @@ import i18n from '../../../../../lib/i18n'
 import { formatMoneyAmount } from '../../../../../lib/money'
 
 export const Route = createFileRoute(
-  '/_authenticated/_client-menu/parcels/$parcelId/'
+  '/_authenticated/_client/parcels/$parcelId/'
 )({
   staticData: {
     title: i18n.t('parcels:parcelDetails'),
