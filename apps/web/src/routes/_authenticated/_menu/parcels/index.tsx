@@ -17,6 +17,8 @@ import { useState } from 'react'
 import { Button } from '../../../../components/button'
 import { SearchField } from '../../../../components/search-field/search-field'
 import { Select } from '../../../../components/select'
+import { ParcelStatusBadge } from '../../../../features/parcels/components/parcel-status-badge'
+import { ReadyForPickupBalance } from '../../../../features/parcels/components/ready-for-pickup-balance'
 import { PARCEL_STATUS_LABELS } from '../../../../features/parcels/lib/parcel-status-labels'
 import { useDebounce } from '../../../../hooks/use-debounce'
 import {
@@ -52,6 +54,8 @@ function ParcelsPage() {
   return (
     <Container p="4">
       <Flex direction="column" gap="4">
+        <ReadyForPickupBalance />
+
         <Flex
           direction={{ initial: 'column-reverse', xs: 'row' }}
           align={{ initial: 'stretch', xs: 'center' }}
@@ -124,11 +128,7 @@ function ParcelsPage() {
                       )}
                     </Box>
 
-                    <Text>
-                      {p.status
-                        ? PARCEL_STATUS_LABELS[p.status]
-                        : i18n.t('parcels:waiting')}
-                    </Text>
+                    <ParcelStatusBadge status={p.status} />
                   </Flex>
                 </Link>
               </Card>
@@ -186,9 +186,7 @@ function ParcelsPage() {
                     </Table.Cell>
 
                     <Table.Cell>
-                      {p.status
-                        ? PARCEL_STATUS_LABELS[p.status]
-                        : i18n.t('parcels:waiting')}
+                      <ParcelStatusBadge status={p.status} />
                     </Table.Cell>
 
                     <Table.Cell align="right">

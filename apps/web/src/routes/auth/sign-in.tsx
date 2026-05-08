@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, Card, Container, Flex, Heading } from '@radix-ui/themes'
+import { Card, Container, Flex, Heading } from '@radix-ui/themes'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import PhoneInput from 'react-phone-number-input/input'
 import { z } from 'zod'
 
+import { Button } from '../../components/button'
 import {
   Form,
   FormField,

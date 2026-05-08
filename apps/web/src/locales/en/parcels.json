@@ -15,6 +15,7 @@
   "descriptionPlaceholder": "Enter description",
   "noDescription": "No description",
   "noParcelsFound": "No parcels found",
+  "readyForPickupOwed": "You owe {{amount}} for parcels ready for pickup",
   "waiting": "Waiting",
   "details": "Details",
   "unableToAddParcel": "Unable to add parcel",

@@ -1,7 +1,8 @@
-import { AlertDialog as RadixAlertDialog, Button, Flex } from '@radix-ui/themes'
+import { AlertDialog as RadixAlertDialog, Flex } from '@radix-ui/themes'
 import type { ComponentProps } from 'react'
 
 import i18n from '../lib/i18n'
+import { Button } from './button'
 
 type ButtonColor = ComponentProps<typeof Button>['color']
 
@@ -37,7 +38,12 @@ export function AlertDialog({
           {description}
         </RadixAlertDialog.Description>
 
-        <Flex mt="5" justify="end" gap="3">
+        <Flex
+          mt="5"
+          direction={{ initial: 'column-reverse', xs: 'row' }}
+          justify="end"
+          gap="3"
+        >
           <RadixAlertDialog.Cancel>
             <Button variant="soft" color="gray" onClick={onCancel}>
               {cancelLabel ?? i18n.t('common:cancel')}

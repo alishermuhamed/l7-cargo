@@ -1,6 +1,7 @@
-import { Button, DropdownMenu, Flex } from '@radix-ui/themes'
+import { DropdownMenu, Flex } from '@radix-ui/themes'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
+import { Button } from '../../components/button'
 import { useLocaleContext } from '../../hooks/use-locale-context'
 import { authClient } from '../../lib/auth-client'
 import {

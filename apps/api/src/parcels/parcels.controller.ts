@@ -75,7 +75,10 @@ export class ParcelsController {
         ]
       : { status, ...policyWhere }
 
-    const parcels = await this.parcelsService.find({ where })
+    const parcels = await this.parcelsService.find({
+      where,
+      order: { createdAt: 'DESC' },
+    })
 
     return parcels.map((p) => ParcelsMapper.toGetParcelResponseDto(p))
   }

@@ -1,14 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Pencil1Icon, ReloadIcon } from '@radix-ui/react-icons'
-import {
-  Box,
-  Button,
-  Card,
-  Container,
-  Flex,
-  Heading,
-  Text,
-} from '@radix-ui/themes'
+import { Box, Card, Container, Flex, Heading, Text } from '@radix-ui/themes'
 import {
   createFileRoute,
   Link as RouterLink,
@@ -20,6 +12,7 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
 
+import { Button } from '../../components/button'
 import {
   Form,
   FormField,
