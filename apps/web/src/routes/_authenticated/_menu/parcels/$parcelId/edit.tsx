@@ -1,7 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Container, Flex } from '@radix-ui/themes'
 import { useMutation } from '@tanstack/react-query'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  Link as RouterLink,
+  useNavigate,
+} from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import z from 'zod'
@@ -66,21 +70,15 @@ function EditParcelPage() {
       updateParcel(initialParcel.id, dto),
   })
 
-  const navigateToParcelDetails = (params?: {
-    ignoreBlocker?: boolean
-    replace?: boolean
-  }) =>
-    navigate({
-      to: '/parcels/$parcelId',
-      params: { parcelId: initialParcel.id },
-      ignoreBlocker: params?.ignoreBlocker ?? false,
-      replace: params?.replace,
-    })
-
   const onSubmit = async ({ description }: EditParcelFormValues) => {
     try {
       await editParcelMutation.mutateAsync({ description: description || null })
-      await navigateToParcelDetails({ ignoreBlocker: true, replace: true })
+      await navigate({
+        to: '/parcels/$parcelId',
+        params: { parcelId: initialParcel.id },
+        ignoreBlocker: true,
+        replace: true,
+      })
     } catch {
       toast.error(i18n.t('parcels:unableToEditParcel'))
     }
@@ -118,13 +116,14 @@ function EditParcelPage() {
               justify="end"
               gap="3"
             >
-              <Button
-                type="button"
-                variant="soft"
-                color="gray"
-                onClick={() => navigateToParcelDetails()}
-              >
-                {i18n.t('common:cancel')}
+              <Button asChild variant="soft" color="gray">
+                <RouterLink
+                  to="/parcels/$parcelId"
+                  params={{ parcelId: initialParcel.id }}
+                  replace
+                >
+                  {i18n.t('common:cancel')}
+                </RouterLink>
               </Button>
 
               <Button type="submit" loading={form.formState.isSubmitting}>

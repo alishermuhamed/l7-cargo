@@ -122,7 +122,7 @@ function EditProfilePage() {
                 gap="3"
               >
                 <Button asChild variant="soft" color="gray">
-                  <RouterLink to="/profile">
+                  <RouterLink to="/profile" replace>
                     {i18n.t('common:cancel')}
                   </RouterLink>
                 </Button>
