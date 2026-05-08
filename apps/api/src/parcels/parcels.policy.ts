@@ -24,14 +24,15 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
   defineRules(builder: AbilityBuilder<Ability>, user: User): void {
     const { can } = builder
 
+    if (user.role === 'admin') {
+      can(['create', 'read', 'update', 'delete'], Parcel)
+      return
+    }
+
     can('create', Parcel)
     can('read', Parcel, { userId: user.id })
     can('update', Parcel, ['source', 'description'], { userId: user.id })
     can('delete', Parcel, { userId: user.id })
-
-    // if (user.role === 'admin') {
-    //   can(['create', 'read', 'update', 'delete'], Parcel)
-    // }
   }
 
   checkCanCreate(): void {
@@ -81,7 +82,12 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
   }
 
   getFindOptionsWhere(): FindOptionsWhere<Parcel> {
-    const userId = this.contextService.getUserIdOrThrow()
-    return { userId }
+    const user = this.contextService.getUserOrThrow()
+
+    if (user.role === 'admin') {
+      return {}
+    }
+
+    return { userId: user.id }
   }
 }

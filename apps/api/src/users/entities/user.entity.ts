@@ -3,6 +3,7 @@ import { Entity, Index } from 'typeorm'
 import { BaseEntity } from '../../db/base.entity'
 import { BooleanColumn } from '../../db/columns/boolean-column'
 import { TextColumn } from '../../db/columns/text-column'
+import { DEFAULT_USER_ROLE, type UserRole } from '../user-role'
 
 @Entity()
 export class User extends BaseEntity {
@@ -24,4 +25,7 @@ export class User extends BaseEntity {
 
   @BooleanColumn({ nullable: true })
   phoneNumberVerified!: boolean | null
+
+  @TextColumn({ default: DEFAULT_USER_ROLE })
+  role!: UserRole
 }

@@ -13,6 +13,7 @@ import { ParcelStatusHistory } from '../parcels/entities/parcel-status-history.e
 import { AddBetterAuthEntities1777914172901 } from './migrations/1777914172901-add-better-auth-entities'
 import { AddParcels1777992156801 } from './migrations/1777992156801-add-parcels'
 import { AddParcelStatusHistory1778165216012 } from './migrations/1778165216012-add-parcel-status-history'
+import { AddUserRole1778267733853 } from './migrations/1778267733853-add-user-role'
 
 export function buildDataSourceOptions(
   db: EnvConfig['database']
@@ -42,6 +43,7 @@ export function buildDataSourceOptions(
       AddBetterAuthEntities1777914172901,
       AddParcels1777992156801,
       AddParcelStatusHistory1778165216012,
+      AddUserRole1778267733853,
     ],
   }
 }

@@ -10,6 +10,7 @@ import parsePhoneNumberFromString from 'libphonenumber-js'
 
 import { ConfigService } from '../config/config.service'
 import { BetterAuthTypeOrmAdapter } from '../db/adapters/better-auth-typeorm.adapter'
+import { DEFAULT_USER_ROLE } from '../users/user-role'
 import { OtpDeliveryService } from './otp/otp-delivery.service'
 
 function createBetterAuth({
@@ -50,6 +51,16 @@ function createBetterAuth({
         },
       }),
     ],
+    user: {
+      additionalFields: {
+        role: {
+          type: 'string',
+          defaultValue: DEFAULT_USER_ROLE,
+          required: false,
+          input: false,
+        },
+      },
+    },
     database: (options: BetterAuthOptions) => typeOrmAdapter.build(options),
     advanced: {
       database: {
