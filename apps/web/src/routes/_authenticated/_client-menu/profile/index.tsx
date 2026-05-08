@@ -6,7 +6,7 @@ import { Button } from '../../../../components/button'
 import i18n from '../../../../lib/i18n'
 import { formatPhoneNumber } from '../../../../lib/phone-number'
 
-export const Route = createFileRoute('/_authenticated/_menu/profile/')({
+export const Route = createFileRoute('/_authenticated/_client-menu/profile/')({
   staticData: {
     title: i18n.t('profile:profile'),
   },

@@ -9,7 +9,7 @@ import { Header } from '../../../components/header/header'
 import { NavBar } from '../../../components/nav-bar/nav-bar'
 import i18n from '../../../lib/i18n'
 
-export const Route = createFileRoute('/_authenticated/_menu')({
+export const Route = createFileRoute('/_authenticated/_client-menu')({
   staticData: {
     title: 'L7 Cargo',
   },

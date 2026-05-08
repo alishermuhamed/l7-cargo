@@ -15,14 +15,14 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
 import { Route as AuthSignInRouteImport } from './routes/auth/sign-in'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
-import { Route as AuthenticatedMenuRouteRouteImport } from './routes/_authenticated/_menu/route'
-import { Route as AuthenticatedMenuProfileIndexRouteImport } from './routes/_authenticated/_menu/profile/index'
-import { Route as AuthenticatedMenuParcelsIndexRouteImport } from './routes/_authenticated/_menu/parcels/index'
-import { Route as AuthenticatedMenuAddressIndexRouteImport } from './routes/_authenticated/_menu/address/index'
-import { Route as AuthenticatedMenuProfileEditRouteImport } from './routes/_authenticated/_menu/profile/edit'
-import { Route as AuthenticatedMenuParcelsAddRouteImport } from './routes/_authenticated/_menu/parcels/add'
-import { Route as AuthenticatedMenuParcelsParcelIdIndexRouteImport } from './routes/_authenticated/_menu/parcels/$parcelId/index'
-import { Route as AuthenticatedMenuParcelsParcelIdEditRouteImport } from './routes/_authenticated/_menu/parcels/$parcelId/edit'
+import { Route as AuthenticatedClientMenuRouteRouteImport } from './routes/_authenticated/_client-menu/route'
+import { Route as AuthenticatedClientMenuProfileIndexRouteImport } from './routes/_authenticated/_client-menu/profile/index'
+import { Route as AuthenticatedClientMenuParcelsIndexRouteImport } from './routes/_authenticated/_client-menu/parcels/index'
+import { Route as AuthenticatedClientMenuAddressIndexRouteImport } from './routes/_authenticated/_client-menu/address/index'
+import { Route as AuthenticatedClientMenuProfileEditRouteImport } from './routes/_authenticated/_client-menu/profile/edit'
+import { Route as AuthenticatedClientMenuParcelsAddRouteImport } from './routes/_authenticated/_client-menu/parcels/add'
+import { Route as AuthenticatedClientMenuParcelsParcelIdIndexRouteImport } from './routes/_authenticated/_client-menu/parcels/$parcelId/index'
+import { Route as AuthenticatedClientMenuParcelsParcelIdEditRouteImport } from './routes/_authenticated/_client-menu/parcels/$parcelId/edit'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
@@ -53,51 +53,52 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedMenuRouteRoute = AuthenticatedMenuRouteRouteImport.update({
-  id: '/_menu',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedMenuProfileIndexRoute =
-  AuthenticatedMenuProfileIndexRouteImport.update({
+const AuthenticatedClientMenuRouteRoute =
+  AuthenticatedClientMenuRouteRouteImport.update({
+    id: '/_client-menu',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedClientMenuProfileIndexRoute =
+  AuthenticatedClientMenuProfileIndexRouteImport.update({
     id: '/profile/',
     path: '/profile/',
-    getParentRoute: () => AuthenticatedMenuRouteRoute,
+    getParentRoute: () => AuthenticatedClientMenuRouteRoute,
   } as any)
-const AuthenticatedMenuParcelsIndexRoute =
-  AuthenticatedMenuParcelsIndexRouteImport.update({
+const AuthenticatedClientMenuParcelsIndexRoute =
+  AuthenticatedClientMenuParcelsIndexRouteImport.update({
     id: '/parcels/',
     path: '/parcels/',
-    getParentRoute: () => AuthenticatedMenuRouteRoute,
+    getParentRoute: () => AuthenticatedClientMenuRouteRoute,
   } as any)
-const AuthenticatedMenuAddressIndexRoute =
-  AuthenticatedMenuAddressIndexRouteImport.update({
+const AuthenticatedClientMenuAddressIndexRoute =
+  AuthenticatedClientMenuAddressIndexRouteImport.update({
     id: '/address/',
     path: '/address/',
-    getParentRoute: () => AuthenticatedMenuRouteRoute,
+    getParentRoute: () => AuthenticatedClientMenuRouteRoute,
   } as any)
-const AuthenticatedMenuProfileEditRoute =
-  AuthenticatedMenuProfileEditRouteImport.update({
+const AuthenticatedClientMenuProfileEditRoute =
+  AuthenticatedClientMenuProfileEditRouteImport.update({
     id: '/profile/edit',
     path: '/profile/edit',
-    getParentRoute: () => AuthenticatedMenuRouteRoute,
+    getParentRoute: () => AuthenticatedClientMenuRouteRoute,
   } as any)
-const AuthenticatedMenuParcelsAddRoute =
-  AuthenticatedMenuParcelsAddRouteImport.update({
+const AuthenticatedClientMenuParcelsAddRoute =
+  AuthenticatedClientMenuParcelsAddRouteImport.update({
     id: '/parcels/add',
     path: '/parcels/add',
-    getParentRoute: () => AuthenticatedMenuRouteRoute,
+    getParentRoute: () => AuthenticatedClientMenuRouteRoute,
   } as any)
-const AuthenticatedMenuParcelsParcelIdIndexRoute =
-  AuthenticatedMenuParcelsParcelIdIndexRouteImport.update({
+const AuthenticatedClientMenuParcelsParcelIdIndexRoute =
+  AuthenticatedClientMenuParcelsParcelIdIndexRouteImport.update({
     id: '/parcels/$parcelId/',
     path: '/parcels/$parcelId/',
-    getParentRoute: () => AuthenticatedMenuRouteRoute,
+    getParentRoute: () => AuthenticatedClientMenuRouteRoute,
   } as any)
-const AuthenticatedMenuParcelsParcelIdEditRoute =
-  AuthenticatedMenuParcelsParcelIdEditRouteImport.update({
+const AuthenticatedClientMenuParcelsParcelIdEditRoute =
+  AuthenticatedClientMenuParcelsParcelIdEditRouteImport.update({
     id: '/parcels/$parcelId/edit',
     path: '/parcels/$parcelId/edit',
-    getParentRoute: () => AuthenticatedMenuRouteRoute,
+    getParentRoute: () => AuthenticatedClientMenuRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -106,13 +107,13 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/verify': typeof AuthVerifyRoute
-  '/parcels/add': typeof AuthenticatedMenuParcelsAddRoute
-  '/profile/edit': typeof AuthenticatedMenuProfileEditRoute
-  '/address/': typeof AuthenticatedMenuAddressIndexRoute
-  '/parcels/': typeof AuthenticatedMenuParcelsIndexRoute
-  '/profile/': typeof AuthenticatedMenuProfileIndexRoute
-  '/parcels/$parcelId/edit': typeof AuthenticatedMenuParcelsParcelIdEditRoute
-  '/parcels/$parcelId/': typeof AuthenticatedMenuParcelsParcelIdIndexRoute
+  '/parcels/add': typeof AuthenticatedClientMenuParcelsAddRoute
+  '/profile/edit': typeof AuthenticatedClientMenuProfileEditRoute
+  '/address/': typeof AuthenticatedClientMenuAddressIndexRoute
+  '/parcels/': typeof AuthenticatedClientMenuParcelsIndexRoute
+  '/profile/': typeof AuthenticatedClientMenuProfileIndexRoute
+  '/parcels/$parcelId/edit': typeof AuthenticatedClientMenuParcelsParcelIdEditRoute
+  '/parcels/$parcelId/': typeof AuthenticatedClientMenuParcelsParcelIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -120,30 +121,30 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/verify': typeof AuthVerifyRoute
-  '/parcels/add': typeof AuthenticatedMenuParcelsAddRoute
-  '/profile/edit': typeof AuthenticatedMenuProfileEditRoute
-  '/address': typeof AuthenticatedMenuAddressIndexRoute
-  '/parcels': typeof AuthenticatedMenuParcelsIndexRoute
-  '/profile': typeof AuthenticatedMenuProfileIndexRoute
-  '/parcels/$parcelId/edit': typeof AuthenticatedMenuParcelsParcelIdEditRoute
-  '/parcels/$parcelId': typeof AuthenticatedMenuParcelsParcelIdIndexRoute
+  '/parcels/add': typeof AuthenticatedClientMenuParcelsAddRoute
+  '/profile/edit': typeof AuthenticatedClientMenuProfileEditRoute
+  '/address': typeof AuthenticatedClientMenuAddressIndexRoute
+  '/parcels': typeof AuthenticatedClientMenuParcelsIndexRoute
+  '/profile': typeof AuthenticatedClientMenuProfileIndexRoute
+  '/parcels/$parcelId/edit': typeof AuthenticatedClientMenuParcelsParcelIdEditRoute
+  '/parcels/$parcelId': typeof AuthenticatedClientMenuParcelsParcelIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
-  '/_authenticated/_menu': typeof AuthenticatedMenuRouteRouteWithChildren
+  '/_authenticated/_client-menu': typeof AuthenticatedClientMenuRouteRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/verify': typeof AuthVerifyRoute
-  '/_authenticated/_menu/parcels/add': typeof AuthenticatedMenuParcelsAddRoute
-  '/_authenticated/_menu/profile/edit': typeof AuthenticatedMenuProfileEditRoute
-  '/_authenticated/_menu/address/': typeof AuthenticatedMenuAddressIndexRoute
-  '/_authenticated/_menu/parcels/': typeof AuthenticatedMenuParcelsIndexRoute
-  '/_authenticated/_menu/profile/': typeof AuthenticatedMenuProfileIndexRoute
-  '/_authenticated/_menu/parcels/$parcelId/edit': typeof AuthenticatedMenuParcelsParcelIdEditRoute
-  '/_authenticated/_menu/parcels/$parcelId/': typeof AuthenticatedMenuParcelsParcelIdIndexRoute
+  '/_authenticated/_client-menu/parcels/add': typeof AuthenticatedClientMenuParcelsAddRoute
+  '/_authenticated/_client-menu/profile/edit': typeof AuthenticatedClientMenuProfileEditRoute
+  '/_authenticated/_client-menu/address/': typeof AuthenticatedClientMenuAddressIndexRoute
+  '/_authenticated/_client-menu/parcels/': typeof AuthenticatedClientMenuParcelsIndexRoute
+  '/_authenticated/_client-menu/profile/': typeof AuthenticatedClientMenuProfileIndexRoute
+  '/_authenticated/_client-menu/parcels/$parcelId/edit': typeof AuthenticatedClientMenuParcelsParcelIdEditRoute
+  '/_authenticated/_client-menu/parcels/$parcelId/': typeof AuthenticatedClientMenuParcelsParcelIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -179,17 +180,17 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
-    | '/_authenticated/_menu'
+    | '/_authenticated/_client-menu'
     | '/_authenticated/onboarding'
     | '/auth/sign-in'
     | '/auth/verify'
-    | '/_authenticated/_menu/parcels/add'
-    | '/_authenticated/_menu/profile/edit'
-    | '/_authenticated/_menu/address/'
-    | '/_authenticated/_menu/parcels/'
-    | '/_authenticated/_menu/profile/'
-    | '/_authenticated/_menu/parcels/$parcelId/edit'
-    | '/_authenticated/_menu/parcels/$parcelId/'
+    | '/_authenticated/_client-menu/parcels/add'
+    | '/_authenticated/_client-menu/profile/edit'
+    | '/_authenticated/_client-menu/address/'
+    | '/_authenticated/_client-menu/parcels/'
+    | '/_authenticated/_client-menu/profile/'
+    | '/_authenticated/_client-menu/parcels/$parcelId/edit'
+    | '/_authenticated/_client-menu/parcels/$parcelId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -242,100 +243,106 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/_menu': {
-      id: '/_authenticated/_menu'
+    '/_authenticated/_client-menu': {
+      id: '/_authenticated/_client-menu'
       path: ''
       fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedMenuRouteRouteImport
+      preLoaderRoute: typeof AuthenticatedClientMenuRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/_menu/profile/': {
-      id: '/_authenticated/_menu/profile/'
+    '/_authenticated/_client-menu/profile/': {
+      id: '/_authenticated/_client-menu/profile/'
       path: '/profile'
       fullPath: '/profile/'
-      preLoaderRoute: typeof AuthenticatedMenuProfileIndexRouteImport
-      parentRoute: typeof AuthenticatedMenuRouteRoute
+      preLoaderRoute: typeof AuthenticatedClientMenuProfileIndexRouteImport
+      parentRoute: typeof AuthenticatedClientMenuRouteRoute
     }
-    '/_authenticated/_menu/parcels/': {
-      id: '/_authenticated/_menu/parcels/'
+    '/_authenticated/_client-menu/parcels/': {
+      id: '/_authenticated/_client-menu/parcels/'
       path: '/parcels'
       fullPath: '/parcels/'
-      preLoaderRoute: typeof AuthenticatedMenuParcelsIndexRouteImport
-      parentRoute: typeof AuthenticatedMenuRouteRoute
+      preLoaderRoute: typeof AuthenticatedClientMenuParcelsIndexRouteImport
+      parentRoute: typeof AuthenticatedClientMenuRouteRoute
     }
-    '/_authenticated/_menu/address/': {
-      id: '/_authenticated/_menu/address/'
+    '/_authenticated/_client-menu/address/': {
+      id: '/_authenticated/_client-menu/address/'
       path: '/address'
       fullPath: '/address/'
-      preLoaderRoute: typeof AuthenticatedMenuAddressIndexRouteImport
-      parentRoute: typeof AuthenticatedMenuRouteRoute
+      preLoaderRoute: typeof AuthenticatedClientMenuAddressIndexRouteImport
+      parentRoute: typeof AuthenticatedClientMenuRouteRoute
     }
-    '/_authenticated/_menu/profile/edit': {
-      id: '/_authenticated/_menu/profile/edit'
+    '/_authenticated/_client-menu/profile/edit': {
+      id: '/_authenticated/_client-menu/profile/edit'
       path: '/profile/edit'
       fullPath: '/profile/edit'
-      preLoaderRoute: typeof AuthenticatedMenuProfileEditRouteImport
-      parentRoute: typeof AuthenticatedMenuRouteRoute
+      preLoaderRoute: typeof AuthenticatedClientMenuProfileEditRouteImport
+      parentRoute: typeof AuthenticatedClientMenuRouteRoute
     }
-    '/_authenticated/_menu/parcels/add': {
-      id: '/_authenticated/_menu/parcels/add'
+    '/_authenticated/_client-menu/parcels/add': {
+      id: '/_authenticated/_client-menu/parcels/add'
       path: '/parcels/add'
       fullPath: '/parcels/add'
-      preLoaderRoute: typeof AuthenticatedMenuParcelsAddRouteImport
-      parentRoute: typeof AuthenticatedMenuRouteRoute
+      preLoaderRoute: typeof AuthenticatedClientMenuParcelsAddRouteImport
+      parentRoute: typeof AuthenticatedClientMenuRouteRoute
     }
-    '/_authenticated/_menu/parcels/$parcelId/': {
-      id: '/_authenticated/_menu/parcels/$parcelId/'
+    '/_authenticated/_client-menu/parcels/$parcelId/': {
+      id: '/_authenticated/_client-menu/parcels/$parcelId/'
       path: '/parcels/$parcelId'
       fullPath: '/parcels/$parcelId/'
-      preLoaderRoute: typeof AuthenticatedMenuParcelsParcelIdIndexRouteImport
-      parentRoute: typeof AuthenticatedMenuRouteRoute
+      preLoaderRoute: typeof AuthenticatedClientMenuParcelsParcelIdIndexRouteImport
+      parentRoute: typeof AuthenticatedClientMenuRouteRoute
     }
-    '/_authenticated/_menu/parcels/$parcelId/edit': {
-      id: '/_authenticated/_menu/parcels/$parcelId/edit'
+    '/_authenticated/_client-menu/parcels/$parcelId/edit': {
+      id: '/_authenticated/_client-menu/parcels/$parcelId/edit'
       path: '/parcels/$parcelId/edit'
       fullPath: '/parcels/$parcelId/edit'
-      preLoaderRoute: typeof AuthenticatedMenuParcelsParcelIdEditRouteImport
-      parentRoute: typeof AuthenticatedMenuRouteRoute
+      preLoaderRoute: typeof AuthenticatedClientMenuParcelsParcelIdEditRouteImport
+      parentRoute: typeof AuthenticatedClientMenuRouteRoute
     }
   }
 }
 
-interface AuthenticatedMenuRouteRouteChildren {
-  AuthenticatedMenuParcelsAddRoute: typeof AuthenticatedMenuParcelsAddRoute
-  AuthenticatedMenuProfileEditRoute: typeof AuthenticatedMenuProfileEditRoute
-  AuthenticatedMenuAddressIndexRoute: typeof AuthenticatedMenuAddressIndexRoute
-  AuthenticatedMenuParcelsIndexRoute: typeof AuthenticatedMenuParcelsIndexRoute
-  AuthenticatedMenuProfileIndexRoute: typeof AuthenticatedMenuProfileIndexRoute
-  AuthenticatedMenuParcelsParcelIdEditRoute: typeof AuthenticatedMenuParcelsParcelIdEditRoute
-  AuthenticatedMenuParcelsParcelIdIndexRoute: typeof AuthenticatedMenuParcelsParcelIdIndexRoute
+interface AuthenticatedClientMenuRouteRouteChildren {
+  AuthenticatedClientMenuParcelsAddRoute: typeof AuthenticatedClientMenuParcelsAddRoute
+  AuthenticatedClientMenuProfileEditRoute: typeof AuthenticatedClientMenuProfileEditRoute
+  AuthenticatedClientMenuAddressIndexRoute: typeof AuthenticatedClientMenuAddressIndexRoute
+  AuthenticatedClientMenuParcelsIndexRoute: typeof AuthenticatedClientMenuParcelsIndexRoute
+  AuthenticatedClientMenuProfileIndexRoute: typeof AuthenticatedClientMenuProfileIndexRoute
+  AuthenticatedClientMenuParcelsParcelIdEditRoute: typeof AuthenticatedClientMenuParcelsParcelIdEditRoute
+  AuthenticatedClientMenuParcelsParcelIdIndexRoute: typeof AuthenticatedClientMenuParcelsParcelIdIndexRoute
 }
 
-const AuthenticatedMenuRouteRouteChildren: AuthenticatedMenuRouteRouteChildren =
+const AuthenticatedClientMenuRouteRouteChildren: AuthenticatedClientMenuRouteRouteChildren =
   {
-    AuthenticatedMenuParcelsAddRoute: AuthenticatedMenuParcelsAddRoute,
-    AuthenticatedMenuProfileEditRoute: AuthenticatedMenuProfileEditRoute,
-    AuthenticatedMenuAddressIndexRoute: AuthenticatedMenuAddressIndexRoute,
-    AuthenticatedMenuParcelsIndexRoute: AuthenticatedMenuParcelsIndexRoute,
-    AuthenticatedMenuProfileIndexRoute: AuthenticatedMenuProfileIndexRoute,
-    AuthenticatedMenuParcelsParcelIdEditRoute:
-      AuthenticatedMenuParcelsParcelIdEditRoute,
-    AuthenticatedMenuParcelsParcelIdIndexRoute:
-      AuthenticatedMenuParcelsParcelIdIndexRoute,
+    AuthenticatedClientMenuParcelsAddRoute:
+      AuthenticatedClientMenuParcelsAddRoute,
+    AuthenticatedClientMenuProfileEditRoute:
+      AuthenticatedClientMenuProfileEditRoute,
+    AuthenticatedClientMenuAddressIndexRoute:
+      AuthenticatedClientMenuAddressIndexRoute,
+    AuthenticatedClientMenuParcelsIndexRoute:
+      AuthenticatedClientMenuParcelsIndexRoute,
+    AuthenticatedClientMenuProfileIndexRoute:
+      AuthenticatedClientMenuProfileIndexRoute,
+    AuthenticatedClientMenuParcelsParcelIdEditRoute:
+      AuthenticatedClientMenuParcelsParcelIdEditRoute,
+    AuthenticatedClientMenuParcelsParcelIdIndexRoute:
+      AuthenticatedClientMenuParcelsParcelIdIndexRoute,
   }
 
-const AuthenticatedMenuRouteRouteWithChildren =
-  AuthenticatedMenuRouteRoute._addFileChildren(
-    AuthenticatedMenuRouteRouteChildren,
+const AuthenticatedClientMenuRouteRouteWithChildren =
+  AuthenticatedClientMenuRouteRoute._addFileChildren(
+    AuthenticatedClientMenuRouteRouteChildren,
   )
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedMenuRouteRoute: typeof AuthenticatedMenuRouteRouteWithChildren
+  AuthenticatedClientMenuRouteRoute: typeof AuthenticatedClientMenuRouteRouteWithChildren
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedMenuRouteRoute: AuthenticatedMenuRouteRouteWithChildren,
+  AuthenticatedClientMenuRouteRoute:
+    AuthenticatedClientMenuRouteRouteWithChildren,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
 }
 

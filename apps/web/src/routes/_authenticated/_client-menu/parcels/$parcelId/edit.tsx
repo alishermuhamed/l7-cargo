@@ -29,7 +29,7 @@ import { getParcelQueryOptions } from '../../../../../lib/api/queries'
 import i18n from '../../../../../lib/i18n'
 
 export const Route = createFileRoute(
-  '/_authenticated/_menu/parcels/$parcelId/edit'
+  '/_authenticated/_client-menu/parcels/$parcelId/edit'
 )({
   staticData: {
     title: i18n.t('parcels:editParcel'),

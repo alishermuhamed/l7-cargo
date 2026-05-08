@@ -28,7 +28,7 @@ import {
 import { getParcelsQueryOptions } from '../../../../lib/api/queries'
 import i18n from '../../../../lib/i18n'
 
-export const Route = createFileRoute('/_authenticated/_menu/parcels/')({
+export const Route = createFileRoute('/_authenticated/_client-menu/parcels/')({
   staticData: {
     title: i18n.t('parcels:parcels'),
   },
