@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { ClientNavBar } from '../../../components/client-nav-bar/client-nav-bar'
 import { Drawer } from '../../../components/drawer/drawer'
 import { Header } from '../../../components/header/header'
+import { UserRole } from '../../../lib/api/api.gen'
 import i18n from '../../../lib/i18n'
 
 export const Route = createFileRoute('/_authenticated/_client')({
@@ -14,7 +15,7 @@ export const Route = createFileRoute('/_authenticated/_client')({
     title: 'L7 Cargo',
   },
   beforeLoad: async ({ context: { session } }) => {
-    if (session.user.role === 'admin') {
+    if (session.user.role === UserRole.admin) {
       throw redirect({
         to: '/admin/parcels',
         replace: true,

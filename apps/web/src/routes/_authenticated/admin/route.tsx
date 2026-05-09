@@ -7,11 +7,12 @@ import { useState } from 'react'
 import { AdminNavBar } from '../../../components/admin-nav-bar/admin-nav-bar'
 import { Drawer } from '../../../components/drawer/drawer'
 import { Header } from '../../../components/header/header'
+import { UserRole } from '../../../lib/api/api.gen'
 import i18n from '../../../lib/i18n'
 
 export const Route = createFileRoute('/_authenticated/admin')({
   beforeLoad: ({ context: { session } }) => {
-    if (session.user.role !== 'admin') {
+    if (session.user.role !== UserRole.admin) {
       throw redirect({
         to: '/parcels',
         replace: true,

@@ -40,6 +40,21 @@ export interface PhoneResetPasswordDto {
   newPassword: string
 }
 
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
+export const UserRole = {
+  admin: 'admin',
+  client: 'client',
+} as const
+
+export interface GetUserResponseDto {
+  role: UserRole
+  id: string
+  name: string
+  /** @nullable */
+  phoneNumber: string | null
+}
+
 export interface CreateParcelRequestDto {
   /** @minLength 1 */
   trackingNumber: string
@@ -104,14 +119,25 @@ export interface SuccessResponseDto {
   success: boolean
 }
 
-export type GetParcelsParams = {
+export type GetUsersParams = {
   /**
-   * Maximum number of items to return
    * @minimum 0
    */
   limit?: number
   /**
-   * Number of items to skip before starting to collect the result set
+   * @minimum 0
+   */
+  offset?: number
+  role?: UserRole
+  search?: string
+}
+
+export type GetParcelsParams = {
+  /**
+   * @minimum 0
+   */
+  limit?: number
+  /**
    * @minimum 0
    */
   offset?: number
@@ -245,6 +271,30 @@ export const signOut = async (options?: RequestInit): Promise<void> => {
   return customFetch<void>(getSignOutUrl(), {
     ...options,
     method: 'POST',
+  })
+}
+
+export const getGetUsersUrl = (params?: GetUsersParams) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0 ? `/users?${stringifiedParams}` : `/users`
+}
+
+export const getUsers = async (
+  params?: GetUsersParams,
+  options?: RequestInit
+): Promise<GetUserResponseDto[]> => {
+  return customFetch<GetUserResponseDto[]>(getGetUsersUrl(params), {
+    ...options,
+    method: 'GET',
   })
 }
 

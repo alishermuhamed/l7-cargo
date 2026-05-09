@@ -2,27 +2,29 @@ import { ApiPropertyOptional } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
 import { IsInt, IsOptional, Min } from 'class-validator'
 
+const DEFAULT_LIMIT = 10
+const DEFAULT_OFFSET = 0
+
 export class PaginationParamsDto {
   @ApiPropertyOptional({
     type: Number,
     minimum: 0,
-    description: 'Maximum number of items to return',
+    default: DEFAULT_LIMIT,
   })
   @IsOptional()
   @Transform(({ value }) => (value === undefined ? undefined : Number(value)))
   @IsInt()
   @Min(0)
-  limit?: number
+  limit: number = DEFAULT_LIMIT
 
   @ApiPropertyOptional({
     type: Number,
     minimum: 0,
-    description:
-      'Number of items to skip before starting to collect the result set',
+    default: DEFAULT_OFFSET,
   })
   @IsOptional()
   @Transform(({ value }) => (value === undefined ? undefined : Number(value)))
   @IsInt()
   @Min(0)
-  offset?: number
+  offset: number = DEFAULT_OFFSET
 }

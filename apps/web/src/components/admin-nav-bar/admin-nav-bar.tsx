@@ -28,8 +28,8 @@ export function AdminNavBar({ onNavigate }: AdminNavBarProps) {
           </RouterLinkWrapper>
 
           <RouterLinkWrapper>
-            <RouterLink onClick={onNavigate} to="/admin/customers">
-              <Text size="3">{i18n.t('nav:customers')}</Text>
+            <RouterLink onClick={onNavigate} to="/admin/clients">
+              <Text size="3">{i18n.t('nav:clients')}</Text>
             </RouterLink>
           </RouterLinkWrapper>
         </Flex>
