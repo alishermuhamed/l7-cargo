@@ -9,6 +9,7 @@ const NAMESPACES = [
   'nav',
   'address',
   'parcels',
+  'clients',
   'profile',
   'errors',
 ] as const

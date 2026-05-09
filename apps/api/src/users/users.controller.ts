@@ -20,13 +20,17 @@ export class UsersController {
   ): Promise<GetUserResponseDto[]> {
     this.usersPolicy.checkCanList()
 
+    const baseWhere = { role }
+
+    const where = search
+      ? [
+          { ...baseWhere, name: ILike(`%${search}%`) },
+          { ...baseWhere, phoneNumber: ILike(`%${search}%`) },
+        ]
+      : baseWhere
+
     const users = await this.usersService.find({
-      where: search
-        ? [
-            { name: ILike(`%${search}%`), role },
-            { phoneNumber: ILike(`%${search}%`), role },
-          ]
-        : undefined,
+      where,
       order: { createdAt: 'DESC' },
       take: limit,
       skip: offset,
