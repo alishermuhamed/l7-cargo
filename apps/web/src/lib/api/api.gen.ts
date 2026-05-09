@@ -106,10 +106,12 @@ export interface SuccessResponseDto {
 
 export type GetParcelsParams = {
   /**
+   * Maximum number of items to return
    * @minimum 0
    */
   limit?: number
   /**
+   * Number of items to skip before starting to collect the result set
    * @minimum 0
    */
   offset?: number

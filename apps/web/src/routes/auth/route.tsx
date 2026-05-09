@@ -15,7 +15,10 @@ export const Route = createFileRoute('/auth')({
     const session = await authClient.getSession()
 
     if (session.data) {
-      throw redirect({ to: '/' })
+      throw redirect({
+        to: '/parcels',
+        replace: true,
+      })
     }
   },
   component: AuthLayout,

@@ -55,7 +55,9 @@ const RESEND_OTP_DELAY_SECONDS = 60
 
 function VerifyPage() {
   const navigate = useNavigate()
+
   const { phoneNumber, redirectTo } = Route.useSearch()
+
   const [secondsUntilResend, setSecondsUntilResend] = useState(
     RESEND_OTP_DELAY_SECONDS
   )
@@ -92,7 +94,7 @@ function VerifyPage() {
         return
       }
 
-      await navigate({ href: redirectTo ?? '/' })
+      await navigate({ to: redirectTo ?? '/' })
     } catch {
       toast.error(i18n.t('errors:invalidOrExpiredCode'))
     }

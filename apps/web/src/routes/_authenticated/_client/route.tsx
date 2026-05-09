@@ -1,7 +1,7 @@
 import './route.css'
 
 import { Box, Flex } from '@radix-ui/themes'
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { ClientNavBar } from '../../../components/client-nav-bar/client-nav-bar'
@@ -12,6 +12,14 @@ import i18n from '../../../lib/i18n'
 export const Route = createFileRoute('/_authenticated/_client')({
   staticData: {
     title: 'L7 Cargo',
+  },
+  beforeLoad: async ({ context: { session } }) => {
+    if (session.user.role === 'admin') {
+      throw redirect({
+        to: '/admin/parcels',
+        replace: true,
+      })
+    }
   },
   component: ClientLayout,
 })

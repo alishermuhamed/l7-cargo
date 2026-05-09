@@ -1,7 +1,7 @@
 import './route.css'
 
 import { Box, Flex } from '@radix-ui/themes'
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { AdminNavBar } from '../../../components/admin-nav-bar/admin-nav-bar'
@@ -10,6 +10,14 @@ import { Header } from '../../../components/header/header'
 import i18n from '../../../lib/i18n'
 
 export const Route = createFileRoute('/_authenticated/admin')({
+  beforeLoad: ({ context: { session } }) => {
+    if (session.user.role !== 'admin') {
+      throw redirect({
+        to: '/parcels',
+        replace: true,
+      })
+    }
+  },
   component: AdminLayout,
 })
 
