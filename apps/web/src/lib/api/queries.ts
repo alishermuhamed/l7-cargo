@@ -5,7 +5,44 @@ import {
   getParcels,
   type GetParcelsParams,
   getParcelStatusHistory,
+  getUsers,
+  type GetUsersParams,
 } from './api.gen'
+
+// Users
+
+export const usersKeys = {
+  all: ['users'] as const,
+  lists: () => [...usersKeys.all, 'list'] as const,
+  list: (params?: GetUsersParams) =>
+    [...usersKeys.lists(), params ?? {}] as const,
+}
+
+export const getUsersQueryOptions = (params?: GetUsersParams) =>
+  queryOptions({
+    queryKey: usersKeys.list(params),
+    queryFn: () => getUsers(params),
+  })
+
+export const getUsersInfiniteQueryOptions = (params?: GetUsersParams) =>
+  infiniteQueryOptions({
+    queryKey: usersKeys.list(params),
+    initialPageParam: 0,
+    queryFn: ({ pageParam = 0 }) =>
+      getUsers({
+        ...params,
+        offset: pageParam,
+      }),
+    getNextPageParam: (lastPage, allPages) => {
+      const pageSize = params?.limit ?? 10
+
+      if (lastPage.length < pageSize) {
+        return undefined
+      }
+
+      return allPages.reduce((total, page) => total + page.length, 0)
+    },
+  })
 
 // Parcels
 
