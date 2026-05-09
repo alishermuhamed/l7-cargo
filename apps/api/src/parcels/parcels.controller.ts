@@ -56,7 +56,7 @@ export class ParcelsController {
 
   @Get()
   async getParcels(
-    @Query() { search, status }: GetParcelsQueryDto
+    @Query() { search, status, limit, offset }: GetParcelsQueryDto
   ): Promise<GetParcelResponseDto[]> {
     const policyWhere = this.parcelsPolicy.getFindOptionsWhere()
 
@@ -78,6 +78,8 @@ export class ParcelsController {
     const parcels = await this.parcelsService.find({
       where,
       order: { createdAt: 'DESC' },
+      take: limit,
+      skip: offset,
     })
 
     return parcels.map((p) => ParcelsMapper.toGetParcelResponseDto(p))

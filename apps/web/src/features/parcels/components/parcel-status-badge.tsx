@@ -19,8 +19,12 @@ const PARCEL_STATUS_BADGE_COLORS: Record<ParcelStatus, ParcelStatusBadgeColor> =
   }
 
 export function ParcelStatusBadge({ status }: ParcelStatusBadgeProps) {
-  if (status == null) {
-    return <Badge color="gray">{i18n.t('parcels:waiting')}</Badge>
+  if (!status) {
+    return (
+      <Badge color="gray" radius="full">
+        {i18n.t('parcels:waiting')}
+      </Badge>
+    )
   }
 
   return (

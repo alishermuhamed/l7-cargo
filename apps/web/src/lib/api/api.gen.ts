@@ -87,10 +87,10 @@ export interface GetParcelResponseDto {
 }
 
 export interface GetParcelStatusHistoryResponseDto {
+  status: ParcelStatus
   id: string
   parcelId: string
   createdAt: string
-  status: ParcelStatus
 }
 
 export interface UpdateParcelRequestDto {
@@ -105,6 +105,14 @@ export interface SuccessResponseDto {
 }
 
 export type GetParcelsParams = {
+  /**
+   * @minimum 0
+   */
+  limit?: number
+  /**
+   * @minimum 0
+   */
+  offset?: number
   status?: ParcelStatus
   search?: string
 }

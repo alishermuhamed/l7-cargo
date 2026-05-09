@@ -1,4 +1,4 @@
-import { queryOptions } from '@tanstack/react-query'
+import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
 
 import {
   getParcel,
@@ -24,6 +24,26 @@ export const getParcelsQueryOptions = (params?: GetParcelsParams) =>
   queryOptions({
     queryKey: parcelsKeys.list(params),
     queryFn: () => getParcels(params),
+  })
+
+export const getParcelsInfiniteQueryOptions = (params?: GetParcelsParams) =>
+  infiniteQueryOptions({
+    queryKey: parcelsKeys.list(params),
+    initialPageParam: 0,
+    queryFn: ({ pageParam = 0 }) =>
+      getParcels({
+        ...params,
+        offset: pageParam,
+      }),
+    getNextPageParam: (lastPage, allPages) => {
+      const pageSize = params?.limit ?? 10
+
+      if (lastPage.length < pageSize) {
+        return undefined
+      }
+
+      return allPages.reduce((total, page) => total + page.length, 0)
+    },
   })
 
 export const getParcelQueryOptions = (parcelId: string) =>

@@ -1,0 +1,9 @@
+.client-nav-bar-link {
+  border-radius: var(--radius-3);
+}
+
+/* .active class is added by Tanstack Router */
+.client-nav-bar-link.active {
+  background-color: var(--accent-4);
+  color: var(--accent-12);
+}
