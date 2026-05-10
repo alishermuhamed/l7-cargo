@@ -49,6 +49,11 @@ function AdminClientDetailsPage() {
         <Card size="3">
           <DataList.Root>
             <DataList.Item>
+              <DataList.Label>{i18n.t('clients:id')}</DataList.Label>
+              <DataList.Value>{client.clientId}</DataList.Value>
+            </DataList.Item>
+
+            <DataList.Item>
               <DataList.Label>{i18n.t('profile:name')}</DataList.Label>
               <DataList.Value>{client.name}</DataList.Value>
             </DataList.Item>

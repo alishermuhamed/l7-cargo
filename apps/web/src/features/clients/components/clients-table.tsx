@@ -59,6 +59,9 @@ export function ClientsTable({ search }: ClientsTableProps) {
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeaderCell>
+              {i18n.t('clients:id')}
+            </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>
               {i18n.t('profile:name')}
             </Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>
@@ -72,6 +75,8 @@ export function ClientsTable({ search }: ClientsTableProps) {
           {clients.length > 0 &&
             clients.map((client) => (
               <Table.Row key={client.id}>
+                <Table.Cell>{client.clientId}</Table.Cell>
+
                 <Table.RowHeaderCell>{client.name}</Table.RowHeaderCell>
 
                 <Table.Cell>
@@ -93,6 +98,10 @@ export function ClientsTable({ search }: ClientsTableProps) {
 
           {isPageLoading && (
             <Table.Row>
+              <Table.Cell>
+                <Skeleton />
+              </Table.Cell>
+
               <Table.RowHeaderCell>
                 <Skeleton />
               </Table.RowHeaderCell>
@@ -100,12 +109,16 @@ export function ClientsTable({ search }: ClientsTableProps) {
               <Table.Cell>
                 <Skeleton />
               </Table.Cell>
+
+              <Table.Cell>
+                <Skeleton width="90px" />
+              </Table.Cell>
             </Table.Row>
           )}
 
           {!isPageLoading && clients.length === 0 && (
             <Table.Row>
-              <Table.Cell align="center" colSpan={3}>
+              <Table.Cell align="center" colSpan={4}>
                 {i18n.t('clients:noClientsFound')}
               </Table.Cell>
             </Table.Row>

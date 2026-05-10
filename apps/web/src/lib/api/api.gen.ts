@@ -48,6 +48,7 @@ export const UserRole = {
 } as const
 
 export interface GetUserResponseDto {
+  clientId: number
   role: UserRole
   id: string
   name: string

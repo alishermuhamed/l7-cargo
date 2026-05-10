@@ -60,6 +60,10 @@ export function ClientCardsList({ search }: ClientCardsListProps) {
                   </Text>
 
                   <Text as="p" color="gray" size="2" truncate>
+                    {i18n.t('clients:id')}: {client.clientId}
+                  </Text>
+
+                  <Text as="p" color="gray" size="2" truncate>
                     {formatPhoneNumber(client.phoneNumber ?? '')}
                   </Text>
                 </Box>

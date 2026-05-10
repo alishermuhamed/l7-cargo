@@ -5,6 +5,7 @@ export class UsersMapper {
   static toGetUserResponseDto(user: User): GetUserResponseDto {
     return {
       id: user.id,
+      clientId: user.clientId,
       name: user.name,
       phoneNumber: user.phoneNumber,
       role: user.role,
