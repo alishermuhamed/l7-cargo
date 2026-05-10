@@ -97,7 +97,7 @@ function AdminParcelPage() {
                     to="/admin/clients/$clientId"
                     params={{ clientId: owner.id }}
                   >
-                    {owner.name}
+                    {owner.name} (ID: {owner.clientId})
                   </RouterLink>
                 </Text>
               ) : (
