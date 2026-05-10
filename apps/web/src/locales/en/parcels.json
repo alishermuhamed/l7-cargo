@@ -6,6 +6,7 @@
   "all": "All",
   "status": "Status",
   "trackingNumber": "Tracking number",
+  "owner": "Owner",
   "weight": "Weight",
   "weightValue": "{{weight}} kg",
   "deliveryFee": "Delivery fee",

@@ -17,6 +17,7 @@ import { deleteParcel } from '../../../../../lib/api/api.gen'
 import {
   getParcelQueryOptions,
   getParcelStatusHistoryQueryOptions,
+  getUserQueryOptions,
 } from '../../../../../lib/api/queries'
 import i18n from '../../../../../lib/i18n'
 import { formatMoneyAmount } from '../../../../../lib/money'
@@ -47,6 +48,10 @@ function AdminParcelPage() {
   const { data: parcel } = useQuery({
     ...getParcelQueryOptions(initialParcel.id),
     initialData: initialParcel,
+  })
+  const { data: owner } = useQuery({
+    ...getUserQueryOptions(parcel.userId ?? ''),
+    enabled: parcel.userId !== null,
   })
   const { data: statusHistory } = useQuery({
     ...getParcelStatusHistoryQueryOptions(initialParcel.id),
@@ -81,6 +86,24 @@ function AdminParcelPage() {
           <DataList.Item>
             <DataList.Label>{i18n.t('parcels:description')}</DataList.Label>
             <DataList.Value>{parcel.description ?? '-'}</DataList.Value>
+          </DataList.Item>
+
+          <DataList.Item>
+            <DataList.Label>{i18n.t('parcels:owner')}</DataList.Label>
+            <DataList.Value>
+              {owner ? (
+                <Text asChild weight="medium">
+                  <RouterLink
+                    to="/admin/clients/$clientId"
+                    params={{ clientId: owner.id }}
+                  >
+                    {owner.name}
+                  </RouterLink>
+                </Text>
+              ) : (
+                '-'
+              )}
+            </DataList.Value>
           </DataList.Item>
 
           <DataList.Item>
