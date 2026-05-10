@@ -113,6 +113,10 @@ export interface UpdateParcelRequestDto {
   source?: string | null
   /** @nullable */
   description?: string | null
+  /** @nullable */
+  weightKg?: string | null
+  /** @nullable */
+  deliveryFee?: string | null
 }
 
 export interface SuccessResponseDto {

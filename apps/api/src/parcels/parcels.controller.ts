@@ -121,11 +121,14 @@ export class ParcelsController {
   ): Promise<SuccessResponseDto> {
     await this.parcelsPolicy.checkCanUpdate(parcelId, updateParcelRequestDto)
 
-    const { source, description } = updateParcelRequestDto
+    const { source, description, weightKg, deliveryFee } =
+      updateParcelRequestDto
 
     await this.parcelsService.update(parcelId, {
       source,
       description,
+      weightKg,
+      deliveryFee,
     })
 
     return new SuccessResponseDto()

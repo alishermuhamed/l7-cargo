@@ -1,10 +1,19 @@
+import { Pencil1Icon, TrashIcon } from '@radix-ui/react-icons'
 import { Container, DataList, Flex, Text } from '@radix-ui/themes'
-import { useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import {
+  createFileRoute,
+  Link as RouterLink,
+  useNavigate,
+} from '@tanstack/react-router'
 import BigNumber from 'bignumber.js'
+import { useState } from 'react'
 
+import { AlertDialog } from '../../../../../components/alert-dialog'
+import { Button } from '../../../../../components/button'
 import { CopyButton } from '../../../../../components/copy-button'
 import { ParcelStatusHistory } from '../../../../../features/parcels/components/parcel-status-history/parcel-status-history'
+import { deleteParcel } from '../../../../../lib/api/api.gen'
 import {
   getParcelQueryOptions,
   getParcelStatusHistoryQueryOptions,
@@ -31,7 +40,9 @@ export const Route = createFileRoute(
 })
 
 function AdminParcelPage() {
+  const navigate = useNavigate()
   const { initialParcel, initialStatusHistory } = Route.useLoaderData()
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   const { data: parcel } = useQuery({
     ...getParcelQueryOptions(initialParcel.id),
@@ -40,6 +51,17 @@ function AdminParcelPage() {
   const { data: statusHistory } = useQuery({
     ...getParcelStatusHistoryQueryOptions(initialParcel.id),
     initialData: initialStatusHistory,
+  })
+
+  const deleteParcelMutation = useMutation({
+    mutationFn: () => deleteParcel(initialParcel.id),
+    onSuccess: async () => {
+      await navigate({
+        to: '/admin/parcels',
+        replace: true,
+        ignoreBlocker: true,
+      })
+    },
   })
 
   return (
@@ -83,7 +105,44 @@ function AdminParcelPage() {
         </DataList.Root>
 
         <ParcelStatusHistory history={statusHistory} />
+
+        <Flex
+          direction={{ initial: 'column', xs: 'row' }}
+          justify="end"
+          gap="3"
+          align={{ initial: 'stretch', xs: 'center' }}
+        >
+          <Button asChild variant="soft" color="gray">
+            <RouterLink
+              to="/admin/parcels/$parcelId/edit"
+              params={{ parcelId: initialParcel.id }}
+            >
+              <Pencil1Icon />
+              {i18n.t('common:edit')}
+            </RouterLink>
+          </Button>
+
+          <Button
+            type="button"
+            variant="soft"
+            color="red"
+            onClick={() => setIsDeleteDialogOpen(true)}
+          >
+            <TrashIcon />
+            {i18n.t('parcels:deleteParcelAction')}
+          </Button>
+        </Flex>
       </Flex>
+
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title={i18n.t('parcels:deleteParcelTitle')}
+        description={i18n.t('parcels:deleteParcelDescription')}
+        actionLabel={i18n.t('parcels:deleteParcelAction')}
+        actionColor="red"
+        onAction={() => deleteParcelMutation.mutate()}
+      />
     </Container>
   )
 }

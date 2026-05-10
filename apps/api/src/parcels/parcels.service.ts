@@ -53,11 +53,18 @@ export class ParcelsService {
     {
       source,
       description,
-    }: { source?: string | null; description?: string | null }
+      weightKg,
+      deliveryFee,
+    }: {
+      source?: string | null
+      description?: string | null
+      weightKg?: string | null
+      deliveryFee?: string | null
+    }
   ): Promise<void> {
     await this.parcelsRepository.update(
       { id: parcelId },
-      { source, description }
+      { source, description, weightKg, deliveryFee }
     )
   }
 

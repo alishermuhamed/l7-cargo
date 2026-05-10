@@ -6,6 +6,7 @@ import {
   Link as RouterLink,
   useNavigate,
 } from '@tanstack/react-router'
+import BigNumber from 'bignumber.js'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import z from 'zod'
@@ -19,6 +20,7 @@ import {
   FormFieldItem,
   FormFieldLabel,
 } from '../../../../../components/form'
+import { MoneyTextField } from '../../../../../components/money-text-field'
 import { TextField } from '../../../../../components/text-field'
 import { UnsavedChangesBlocker } from '../../../../../components/unsaved-changes-blocker'
 import {
@@ -27,13 +29,19 @@ import {
 } from '../../../../../lib/api/api.gen'
 import { getParcelQueryOptions } from '../../../../../lib/api/queries'
 import i18n from '../../../../../lib/i18n'
+import {
+  isValidMoneyAmount,
+  normalizeMoneyAmount,
+} from '../../../../../lib/money'
+
+const WEIGHT_KG_PATTERN = /^(?:0|[1-9]\d{0,3})(?:\.\d{1,3})?$/
 
 export const Route = createFileRoute(
-  '/_authenticated/_client/parcels/$parcelId/edit'
+  '/_authenticated/admin/parcels/$parcelId/edit'
 )({
   staticData: {
     title: i18n.t('parcels:editParcel'),
-    fallbackTo: '/parcels',
+    fallbackTo: '/admin/parcels',
   },
   loader: async ({ context: { queryClient }, params: { parcelId } }) => {
     const initialParcel = await queryClient.ensureQueryData(
@@ -42,26 +50,38 @@ export const Route = createFileRoute(
 
     return { initialParcel }
   },
-  component: EditParcelPage,
+  component: EditAdminParcelPage,
 })
 
-const editParcelSchema = z.object({
-  source: z.string(),
-  description: z.string().trim(),
+const editAdminParcelSchema = z.object({
+  weightKg: z
+    .string()
+    .trim()
+    .refine(
+      (value) => value === '' || WEIGHT_KG_PATTERN.test(value),
+      'Enter a valid weight'
+    ),
+  deliveryFee: z
+    .string()
+    .trim()
+    .refine(
+      (value) => value === '' || isValidMoneyAmount(value),
+      'Enter a valid delivery fee'
+    ),
 })
 
-type EditParcelFormValues = z.infer<typeof editParcelSchema>
+type EditAdminParcelFormValues = z.infer<typeof editAdminParcelSchema>
 
-function EditParcelPage() {
+function EditAdminParcelPage() {
   const navigate = useNavigate()
 
   const { initialParcel } = Route.useLoaderData()
 
-  const form = useForm<EditParcelFormValues>({
-    resolver: zodResolver(editParcelSchema),
+  const form = useForm<EditAdminParcelFormValues>({
+    resolver: zodResolver(editAdminParcelSchema),
     defaultValues: {
-      source: initialParcel.source ?? '',
-      description: initialParcel.description ?? '',
+      weightKg: initialParcel.weightKg ?? '',
+      deliveryFee: initialParcel.deliveryFee ?? '',
     },
   })
 
@@ -70,13 +90,19 @@ function EditParcelPage() {
       updateParcel(initialParcel.id, dto),
   })
 
-  const onSubmit = async ({ description }: EditParcelFormValues) => {
+  const onSubmit = async ({
+    weightKg,
+    deliveryFee,
+  }: EditAdminParcelFormValues) => {
     try {
       await editParcelMutation.mutateAsync({
-        description: description === '' ? null : description,
+        weightKg: weightKg === '' ? null : new BigNumber(weightKg).toFixed(),
+        deliveryFee:
+          deliveryFee === '' ? null : normalizeMoneyAmount(deliveryFee),
       })
+
       await navigate({
-        to: '/parcels/$parcelId',
+        to: '/admin/parcels/$parcelId',
         params: { parcelId: initialParcel.id },
         ignoreBlocker: true,
         replace: true,
@@ -93,16 +119,38 @@ function EditParcelPage() {
           <Flex direction="column" gap="4">
             <FormField
               control={form.control}
-              name="description"
+              name="weightKg"
               render={({ field }) => (
                 <FormFieldItem>
-                  <FormFieldLabel>
-                    {i18n.t('parcels:description')}
-                  </FormFieldLabel>
+                  <FormFieldLabel>{i18n.t('parcels:weight')}</FormFieldLabel>
 
                   <FormFieldControl>
                     <TextField.Root
-                      placeholder={i18n.t('parcels:descriptionPlaceholder')}
+                      placeholder="Enter weight"
+                      autoComplete="off"
+                      inputMode="decimal"
+                      {...field}
+                    />
+                  </FormFieldControl>
+
+                  <FormFieldError />
+                </FormFieldItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="deliveryFee"
+              render={({ field }) => (
+                <FormFieldItem>
+                  <FormFieldLabel>
+                    {i18n.t('parcels:deliveryFee')}
+                  </FormFieldLabel>
+
+                  <FormFieldControl>
+                    <MoneyTextField
+                      currency="KZT"
+                      placeholder="Enter delivery fee"
                       autoComplete="off"
                       {...field}
                     />
@@ -120,7 +168,7 @@ function EditParcelPage() {
             >
               <Button asChild variant="soft" color="gray">
                 <RouterLink
-                  to="/parcels/$parcelId"
+                  to="/admin/parcels/$parcelId"
                   params={{ parcelId: initialParcel.id }}
                   replace
                 >

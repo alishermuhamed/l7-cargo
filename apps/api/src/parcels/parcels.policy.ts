@@ -53,21 +53,26 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
 
   async checkCanUpdate(
     parcelId: string,
-    { source, description }: UpdateParcelRequestDto
+    updateParcelRequestDto: UpdateParcelRequestDto
   ): Promise<void> {
     const parcel = await this.parcelsService.findOneOrThrow({
       where: { id: parcelId },
     })
 
-    if (source !== undefined && !this.ability.can('update', parcel, 'source')) {
-      throw new ForbiddenException()
-    }
+    const updateFields: Array<keyof UpdateParcelRequestDto> = [
+      'source',
+      'description',
+      'weightKg',
+      'deliveryFee',
+    ]
 
-    if (
-      description !== undefined &&
-      !this.ability.can('update', parcel, 'description')
-    ) {
-      throw new ForbiddenException()
+    for (const field of updateFields) {
+      if (
+        updateParcelRequestDto[field] !== undefined &&
+        !this.ability.can('update', parcel, field)
+      ) {
+        throw new ForbiddenException()
+      }
     }
   }
 
