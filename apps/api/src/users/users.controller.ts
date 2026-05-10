@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common'
+import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common'
 import { ILike } from 'typeorm'
 
 import { GetUserResponseDto } from './dtos/get-user-response.dto'
@@ -13,6 +13,19 @@ export class UsersController {
     private readonly usersPolicy: UsersPolicy,
     private readonly usersService: UsersService
   ) {}
+
+  @Get(':userId')
+  async getUser(
+    @Param('userId', ParseUUIDPipe) userId: string
+  ): Promise<GetUserResponseDto> {
+    await this.usersPolicy.checkCanRead(userId)
+
+    const user = await this.usersService.findOneOrThrow({
+      where: { id: userId },
+    })
+
+    return UsersMapper.toGetUserResponseDto(user)
+  }
 
   @Get()
   async getUsers(

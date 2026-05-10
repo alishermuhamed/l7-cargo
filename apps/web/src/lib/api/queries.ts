@@ -5,6 +5,7 @@ import {
   getParcels,
   type GetParcelsParams,
   getParcelStatusHistory,
+  getUser,
   getUsers,
   type GetUsersParams,
 } from './api.gen'
@@ -16,12 +17,20 @@ export const usersKeys = {
   lists: () => [...usersKeys.all, 'list'] as const,
   list: (params?: GetUsersParams) =>
     [...usersKeys.lists(), params ?? {}] as const,
+  details: () => [...usersKeys.all, 'detail'] as const,
+  detail: (userId: string) => [...usersKeys.details(), userId] as const,
 }
 
 export const getUsersQueryOptions = (params?: GetUsersParams) =>
   queryOptions({
     queryKey: usersKeys.list(params),
     queryFn: () => getUsers(params),
+  })
+
+export const getUserQueryOptions = (userId: string) =>
+  queryOptions({
+    queryKey: usersKeys.detail(userId),
+    queryFn: () => getUser(userId),
   })
 
 export const getUsersInfiniteQueryOptions = (params?: GetUsersParams) =>

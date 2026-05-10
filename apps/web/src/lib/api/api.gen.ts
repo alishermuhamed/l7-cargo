@@ -143,6 +143,7 @@ export type GetParcelsParams = {
   offset?: number
   status?: ParcelStatus
   search?: string
+  userId?: string
 }
 
 export const getGetHealthUrl = () => {
@@ -271,6 +272,20 @@ export const signOut = async (options?: RequestInit): Promise<void> => {
   return customFetch<void>(getSignOutUrl(), {
     ...options,
     method: 'POST',
+  })
+}
+
+export const getGetUserUrl = (userId: string) => {
+  return `/users/${userId}`
+}
+
+export const getUser = async (
+  userId: string,
+  options?: RequestInit
+): Promise<GetUserResponseDto> => {
+  return customFetch<GetUserResponseDto>(getGetUserUrl(userId), {
+    ...options,
+    method: 'GET',
   })
 }
 

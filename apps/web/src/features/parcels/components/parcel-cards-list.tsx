@@ -14,15 +14,23 @@ const PARCELS_PAGE_SIZE = 10
 interface ParcelCardsListProps {
   search: string
   status?: ParcelStatus
+  userId?: string
+  isAdminPage?: boolean
 }
 
-export function ParcelCardsList({ search, status }: ParcelCardsListProps) {
+export function ParcelCardsList({
+  search,
+  status,
+  userId,
+  isAdminPage = false,
+}: ParcelCardsListProps) {
   const debouncedSearch = useDebounce(search, 500)
 
   const params: GetParcelsParams = {
     limit: PARCELS_PAGE_SIZE,
     search: debouncedSearch.length === 0 ? undefined : debouncedSearch,
     status,
+    userId,
   }
 
   const {
@@ -50,7 +58,12 @@ export function ParcelCardsList({ search, status }: ParcelCardsListProps) {
       {parcels.length > 0 &&
         parcels.map((p) => (
           <Card key={p.id} asChild>
-            <Link to="/parcels/$parcelId" params={{ parcelId: p.id }}>
+            <Link
+              to={
+                isAdminPage ? '/admin/parcels/$parcelId' : '/parcels/$parcelId'
+              }
+              params={{ parcelId: p.id }}
+            >
               <Flex p="2" align="center" justify="between">
                 <Box>
                   <Text as="p" weight="bold">

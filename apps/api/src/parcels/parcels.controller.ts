@@ -56,24 +56,24 @@ export class ParcelsController {
 
   @Get()
   async getParcels(
-    @Query() { search, status, limit, offset }: GetParcelsQueryDto
+    @Query() { search, status, userId, limit, offset }: GetParcelsQueryDto
   ): Promise<GetParcelResponseDto[]> {
     const policyWhere = this.parcelsPolicy.getFindOptionsWhere()
+
+    const baseWhere = { status, userId, ...policyWhere }
 
     const where = search
       ? [
           {
-            status,
             trackingNumber: ILike(`%${search}%`),
-            ...policyWhere,
+            ...baseWhere,
           },
           {
-            status,
             description: ILike(`%${search}%`),
-            ...policyWhere,
+            ...baseWhere,
           },
         ]
-      : { status, ...policyWhere }
+      : baseWhere
 
     const parcels = await this.parcelsService.find({
       where,

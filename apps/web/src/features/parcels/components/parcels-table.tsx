@@ -17,9 +17,16 @@ const PARCELS_PAGE_SIZE = 20
 interface ParcelsTableProps {
   search: string
   status?: ParcelStatus
+  userId?: string
+  isAdminPage?: boolean
 }
 
-export function ParcelsTable({ search, status }: ParcelsTableProps) {
+export function ParcelsTable({
+  search,
+  status,
+  userId,
+  isAdminPage = false,
+}: ParcelsTableProps) {
   const [page, dispatchPage] = useReducer(
     (page: number, action: 'next' | 'prev' | 'reset') => {
       switch (action) {
@@ -39,13 +46,14 @@ export function ParcelsTable({ search, status }: ParcelsTableProps) {
 
   useEffect(() => {
     dispatchPage('reset')
-  }, [search, status])
+  }, [search, status, userId])
 
   const params: GetParcelsParams = {
     limit: PARCELS_PAGE_SIZE,
     offset: page * PARCELS_PAGE_SIZE,
     search: debouncedSearch.length === 0 ? undefined : debouncedSearch,
     status,
+    userId,
   }
 
   const { data: parcels = [], isPending: isPageLoading } = useQuery(
@@ -91,7 +99,11 @@ export function ParcelsTable({ search, status }: ParcelsTableProps) {
                 <Table.Cell align="right">
                   <Button asChild variant="ghost">
                     <Link
-                      to="/parcels/$parcelId"
+                      to={
+                        isAdminPage
+                          ? '/admin/parcels/$parcelId'
+                          : '/parcels/$parcelId'
+                      }
                       params={{ parcelId: parcel.id }}
                     >
                       {i18n.t('parcels:details')} <ArrowRightIcon />

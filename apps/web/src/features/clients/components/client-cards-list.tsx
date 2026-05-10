@@ -1,5 +1,6 @@
 import { Box, Card, Flex, Skeleton, Text } from '@radix-ui/themes'
 import { useInfiniteQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 
 import { useDebounce } from '../../../hooks/use-debounce'
 import { useIntersectionObserver } from '../../../hooks/use-intersection-observer'
@@ -47,18 +48,23 @@ export function ClientCardsList({ search }: ClientCardsListProps) {
     <Flex direction="column" gap="3">
       {clients.length > 0 &&
         clients.map((client) => (
-          <Card key={client.id}>
-            <Flex p="3" justify="between" align="center" gap="3">
-              <Box minWidth="0">
-                <Text as="p" weight="bold">
-                  {client.name}
-                </Text>
+          <Card key={client.id} asChild>
+            <Link
+              to="/admin/clients/$clientId"
+              params={{ clientId: client.id }}
+            >
+              <Flex p="3" justify="between" align="center" gap="3">
+                <Box minWidth="0">
+                  <Text as="p" weight="bold">
+                    {client.name}
+                  </Text>
 
-                <Text as="p" color="gray" size="2" truncate>
-                  {formatPhoneNumber(client.phoneNumber ?? '')}
-                </Text>
-              </Box>
-            </Flex>
+                  <Text as="p" color="gray" size="2" truncate>
+                    {formatPhoneNumber(client.phoneNumber ?? '')}
+                  </Text>
+                </Box>
+              </Flex>
+            </Link>
           </Card>
         ))}
 

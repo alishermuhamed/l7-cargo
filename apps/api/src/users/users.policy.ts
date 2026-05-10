@@ -6,11 +6,15 @@ import { EntityPolicyProvider } from '../authorization/decorators/entity-policy-
 import { EntityPolicy } from '../authorization/entity.policy'
 import { ContextService } from '../context/context.service'
 import { User } from './entities/user.entity'
+import { UsersService } from './users.service'
 
 @EntityPolicyProvider()
 @Injectable()
 export class UsersPolicy extends EntityPolicy<User> {
-  constructor(protected readonly contextService: ContextService) {
+  constructor(
+    protected readonly contextService: ContextService,
+    private readonly usersService: UsersService
+  ) {
     super(contextService, User)
   }
 
@@ -27,6 +31,16 @@ export class UsersPolicy extends EntityPolicy<User> {
     const user = this.contextService.getUserOrThrow()
 
     if (user.role !== 'admin') {
+      throw new ForbiddenException()
+    }
+  }
+
+  async checkCanRead(userId: string): Promise<void> {
+    const user = await this.usersService.findOneOrThrow({
+      where: { id: userId },
+    })
+
+    if (!this.ability.can('read', user)) {
       throw new ForbiddenException()
     }
   }

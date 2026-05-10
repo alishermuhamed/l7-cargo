@@ -1,8 +1,10 @@
 import { ArrowLeftIcon, ArrowRightIcon } from '@radix-ui/react-icons'
 import { Flex, Skeleton, Table, Text } from '@radix-ui/themes'
 import { useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import { useEffect, useReducer } from 'react'
 
+import { Button } from '../../../components/button'
 import { IconButton } from '../../../components/icon-button'
 import { useDebounce } from '../../../hooks/use-debounce'
 import { UserRole } from '../../../lib/api/api.gen'
@@ -62,6 +64,7 @@ export function ClientsTable({ search }: ClientsTableProps) {
             <Table.ColumnHeaderCell>
               {i18n.t('auth:phoneNumber')}
             </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell />
           </Table.Row>
         </Table.Header>
 
@@ -72,7 +75,18 @@ export function ClientsTable({ search }: ClientsTableProps) {
                 <Table.RowHeaderCell>{client.name}</Table.RowHeaderCell>
 
                 <Table.Cell>
-                  {formatPhoneNumber(client.phoneNumber ?? '')}
+                  {formatPhoneNumber(client.phoneNumber ?? '') ?? '-'}
+                </Table.Cell>
+
+                <Table.Cell align="right">
+                  <Button asChild variant="ghost">
+                    <Link
+                      to="/admin/clients/$clientId"
+                      params={{ clientId: client.id }}
+                    >
+                      {i18n.t('clients:details')} <ArrowRightIcon />
+                    </Link>
+                  </Button>
                 </Table.Cell>
               </Table.Row>
             ))}
@@ -91,7 +105,7 @@ export function ClientsTable({ search }: ClientsTableProps) {
 
           {!isPageLoading && clients.length === 0 && (
             <Table.Row>
-              <Table.Cell align="center" colSpan={2}>
+              <Table.Cell align="center" colSpan={3}>
                 {i18n.t('clients:noClientsFound')}
               </Table.Cell>
             </Table.Row>

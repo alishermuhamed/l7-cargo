@@ -1,5 +1,3 @@
-import './index.css'
-
 import { PlusIcon } from '@radix-ui/react-icons'
 import { Box, Container, Flex } from '@radix-ui/themes'
 import { createFileRoute, Link } from '@tanstack/react-router'
@@ -7,7 +5,7 @@ import { useState } from 'react'
 
 import { Button } from '../../../../components/button'
 import { SearchField } from '../../../../components/search-field/search-field'
-import { Select } from '../../../../components/select'
+import { Select } from '../../../../components/select/select'
 import { ParcelCardsList } from '../../../../features/parcels/components/parcel-cards-list'
 import { ParcelsTable } from '../../../../features/parcels/components/parcels-table'
 import { ReadyForPickupBalance } from '../../../../features/parcels/components/ready-for-pickup-balance'
@@ -25,8 +23,6 @@ export const Route = createFileRoute('/_authenticated/_client/parcels/')({
 function ParcelsPage() {
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<ParcelStatus | 'all'>('all')
-  const parcelStatuses = Object.values(ParcelStatus)
-  const normalizedStatus = status === 'all' ? undefined : status
 
   return (
     <Container p="4">
@@ -49,22 +45,17 @@ function ParcelsPage() {
               flexGrow={{ initial: '1', xs: '0' }}
               flexShrink="0"
             >
-              <Select.Root
+              <Select
                 value={status}
-                onValueChange={(s) => setStatus(s as ParcelStatus | 'all')}
-              >
-                <Select.Trigger className="status-filter" />
-
-                <Select.Content>
-                  <Select.Item value="all">{i18n.t('parcels:all')}</Select.Item>
-
-                  {parcelStatuses.map((s) => (
-                    <Select.Item key={s} value={s}>
-                      {PARCEL_STATUS_LABELS[s]}
-                    </Select.Item>
-                  ))}
-                </Select.Content>
-              </Select.Root>
+                onValueChange={setStatus}
+                items={[
+                  { label: i18n.t('parcels:all'), value: 'all' },
+                  ...Object.values(ParcelStatus).map((parcelStatus) => ({
+                    label: PARCEL_STATUS_LABELS[parcelStatus],
+                    value: parcelStatus,
+                  })),
+                ]}
+              />
             </Box>
           </Flex>
 
@@ -78,11 +69,17 @@ function ParcelsPage() {
         </Flex>
 
         <Box display={{ initial: 'block', xs: 'none' }}>
-          <ParcelCardsList search={search} status={normalizedStatus} />
+          <ParcelCardsList
+            search={search}
+            status={status === 'all' ? undefined : status}
+          />
         </Box>
 
         <Box display={{ initial: 'none', xs: 'block' }}>
-          <ParcelsTable search={search} status={normalizedStatus} />
+          <ParcelsTable
+            search={search}
+            status={status === 'all' ? undefined : status}
+          />
         </Box>
       </Flex>
     </Container>

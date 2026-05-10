@@ -24,6 +24,8 @@ import { Route as AuthenticatedClientParcelsIndexRouteImport } from './routes/_a
 import { Route as AuthenticatedClientAddressIndexRouteImport } from './routes/_authenticated/_client/address/index'
 import { Route as AuthenticatedClientProfileEditRouteImport } from './routes/_authenticated/_client/profile/edit'
 import { Route as AuthenticatedClientParcelsAddRouteImport } from './routes/_authenticated/_client/parcels/add'
+import { Route as AuthenticatedAdminParcelsParcelIdIndexRouteImport } from './routes/_authenticated/admin/parcels/$parcelId/index'
+import { Route as AuthenticatedAdminClientsClientIdIndexRouteImport } from './routes/_authenticated/admin/clients/$clientId/index'
 import { Route as AuthenticatedClientParcelsParcelIdIndexRouteImport } from './routes/_authenticated/_client/parcels/$parcelId/index'
 import { Route as AuthenticatedClientParcelsParcelIdEditRouteImport } from './routes/_authenticated/_client/parcels/$parcelId/edit'
 
@@ -108,6 +110,18 @@ const AuthenticatedClientParcelsAddRoute =
     path: '/parcels/add',
     getParentRoute: () => AuthenticatedClientRouteRoute,
   } as any)
+const AuthenticatedAdminParcelsParcelIdIndexRoute =
+  AuthenticatedAdminParcelsParcelIdIndexRouteImport.update({
+    id: '/parcels/$parcelId/',
+    path: '/parcels/$parcelId/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminClientsClientIdIndexRoute =
+  AuthenticatedAdminClientsClientIdIndexRouteImport.update({
+    id: '/clients/$clientId/',
+    path: '/clients/$clientId/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedClientParcelsParcelIdIndexRoute =
   AuthenticatedClientParcelsParcelIdIndexRouteImport.update({
     id: '/parcels/$parcelId/',
@@ -137,6 +151,8 @@ export interface FileRoutesByFullPath {
   '/admin/parcels/': typeof AuthenticatedAdminParcelsIndexRoute
   '/parcels/$parcelId/edit': typeof AuthenticatedClientParcelsParcelIdEditRoute
   '/parcels/$parcelId/': typeof AuthenticatedClientParcelsParcelIdIndexRoute
+  '/admin/clients/$clientId/': typeof AuthenticatedAdminClientsClientIdIndexRoute
+  '/admin/parcels/$parcelId/': typeof AuthenticatedAdminParcelsParcelIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -154,6 +170,8 @@ export interface FileRoutesByTo {
   '/admin/parcels': typeof AuthenticatedAdminParcelsIndexRoute
   '/parcels/$parcelId/edit': typeof AuthenticatedClientParcelsParcelIdEditRoute
   '/parcels/$parcelId': typeof AuthenticatedClientParcelsParcelIdIndexRoute
+  '/admin/clients/$clientId': typeof AuthenticatedAdminClientsClientIdIndexRoute
+  '/admin/parcels/$parcelId': typeof AuthenticatedAdminParcelsParcelIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -174,6 +192,8 @@ export interface FileRoutesById {
   '/_authenticated/admin/parcels/': typeof AuthenticatedAdminParcelsIndexRoute
   '/_authenticated/_client/parcels/$parcelId/edit': typeof AuthenticatedClientParcelsParcelIdEditRoute
   '/_authenticated/_client/parcels/$parcelId/': typeof AuthenticatedClientParcelsParcelIdIndexRoute
+  '/_authenticated/admin/clients/$clientId/': typeof AuthenticatedAdminClientsClientIdIndexRoute
+  '/_authenticated/admin/parcels/$parcelId/': typeof AuthenticatedAdminParcelsParcelIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -193,6 +213,8 @@ export interface FileRouteTypes {
     | '/admin/parcels/'
     | '/parcels/$parcelId/edit'
     | '/parcels/$parcelId/'
+    | '/admin/clients/$clientId/'
+    | '/admin/parcels/$parcelId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -210,6 +232,8 @@ export interface FileRouteTypes {
     | '/admin/parcels'
     | '/parcels/$parcelId/edit'
     | '/parcels/$parcelId'
+    | '/admin/clients/$clientId'
+    | '/admin/parcels/$parcelId'
   id:
     | '__root__'
     | '/'
@@ -229,6 +253,8 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/parcels/'
     | '/_authenticated/_client/parcels/$parcelId/edit'
     | '/_authenticated/_client/parcels/$parcelId/'
+    | '/_authenticated/admin/clients/$clientId/'
+    | '/_authenticated/admin/parcels/$parcelId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -344,6 +370,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientParcelsAddRouteImport
       parentRoute: typeof AuthenticatedClientRouteRoute
     }
+    '/_authenticated/admin/parcels/$parcelId/': {
+      id: '/_authenticated/admin/parcels/$parcelId/'
+      path: '/parcels/$parcelId'
+      fullPath: '/admin/parcels/$parcelId/'
+      preLoaderRoute: typeof AuthenticatedAdminParcelsParcelIdIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/clients/$clientId/': {
+      id: '/_authenticated/admin/clients/$clientId/'
+      path: '/clients/$clientId'
+      fullPath: '/admin/clients/$clientId/'
+      preLoaderRoute: typeof AuthenticatedAdminClientsClientIdIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/_client/parcels/$parcelId/': {
       id: '/_authenticated/_client/parcels/$parcelId/'
       path: '/parcels/$parcelId'
@@ -392,12 +432,18 @@ const AuthenticatedClientRouteRouteWithChildren =
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminClientsIndexRoute: typeof AuthenticatedAdminClientsIndexRoute
   AuthenticatedAdminParcelsIndexRoute: typeof AuthenticatedAdminParcelsIndexRoute
+  AuthenticatedAdminClientsClientIdIndexRoute: typeof AuthenticatedAdminClientsClientIdIndexRoute
+  AuthenticatedAdminParcelsParcelIdIndexRoute: typeof AuthenticatedAdminParcelsParcelIdIndexRoute
 }
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
     AuthenticatedAdminClientsIndexRoute: AuthenticatedAdminClientsIndexRoute,
     AuthenticatedAdminParcelsIndexRoute: AuthenticatedAdminParcelsIndexRoute,
+    AuthenticatedAdminClientsClientIdIndexRoute:
+      AuthenticatedAdminClientsClientIdIndexRoute,
+    AuthenticatedAdminParcelsParcelIdIndexRoute:
+      AuthenticatedAdminParcelsParcelIdIndexRoute,
   }
 
 const AuthenticatedAdminRouteRouteWithChildren =

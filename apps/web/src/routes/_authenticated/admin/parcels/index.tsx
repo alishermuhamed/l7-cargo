@@ -1,11 +1,9 @@
-import './index.css'
-
 import { Box, Container, Flex } from '@radix-ui/themes'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { SearchField } from '../../../../components/search-field/search-field'
-import { Select } from '../../../../components/select'
+import { Select } from '../../../../components/select/select'
 import { ParcelCardsList } from '../../../../features/parcels/components/parcel-cards-list'
 import { ParcelsTable } from '../../../../features/parcels/components/parcels-table'
 import { PARCEL_STATUS_LABELS } from '../../../../features/parcels/lib/parcel-status-labels'
@@ -36,22 +34,17 @@ function AdminParcelsPage() {
             flexGrow={{ initial: '1', xs: '0' }}
             flexShrink="0"
           >
-            <Select.Root
+            <Select
               value={status}
-              onValueChange={(s) => setStatus(s as ParcelStatus | 'all')}
-            >
-              <Select.Trigger className="status-filter" />
-
-              <Select.Content>
-                <Select.Item value="all">{i18n.t('parcels:all')}</Select.Item>
-
-                {Object.values(ParcelStatus).map((s) => (
-                  <Select.Item key={s} value={s}>
-                    {PARCEL_STATUS_LABELS[s]}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Root>
+              onValueChange={setStatus}
+              items={[
+                { label: i18n.t('parcels:all'), value: 'all' },
+                ...Object.values(ParcelStatus).map((parcelStatus) => ({
+                  label: PARCEL_STATUS_LABELS[parcelStatus],
+                  value: parcelStatus,
+                })),
+              ]}
+            />
           </Box>
         </Flex>
 
@@ -59,6 +52,7 @@ function AdminParcelsPage() {
           <ParcelCardsList
             search={search}
             status={status === 'all' ? undefined : status}
+            isAdminPage
           />
         </Box>
 
@@ -66,6 +60,7 @@ function AdminParcelsPage() {
           <ParcelsTable
             search={search}
             status={status === 'all' ? undefined : status}
+            isAdminPage
           />
         </Box>
       </Flex>
