@@ -5,7 +5,7 @@ import { PARCEL_STATUSES, type ParcelStatus } from '../parcel-status'
 export class GetParcelStatusHistoryResponseDto {
   id!: string
   parcelId!: string
-  createdAt!: Date
+  createdAt!: string
 
   @ApiProperty({
     enum: PARCEL_STATUSES,

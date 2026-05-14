@@ -125,6 +125,13 @@ function AdminParcelPage() {
                 : '-'}
             </DataList.Value>
           </DataList.Item>
+
+          {parcel.notes && (
+            <DataList.Item>
+              <DataList.Label>Notes</DataList.Label>
+              <DataList.Value>{parcel.notes}</DataList.Value>
+            </DataList.Item>
+          )}
         </DataList.Root>
 
         <ParcelStatusHistory history={statusHistory} />

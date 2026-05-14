@@ -4,8 +4,8 @@ import { PARCEL_STATUSES, type ParcelStatus } from '../parcel-status'
 
 export class GetParcelResponseDto {
   id!: string
-  createdAt!: Date
-  updatedAt!: Date
+  createdAt!: string
+  updatedAt!: string
   trackingNumber!: string
   userId!: string | null
 

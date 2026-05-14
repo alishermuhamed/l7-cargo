@@ -8,7 +8,7 @@ export class ParcelStatusHistoryMapper {
     return {
       id: history.id,
       parcelId: history.parcelId,
-      createdAt: history.createdAt,
+      createdAt: history.createdAt.toISOString(),
       status: history.status,
     }
   }

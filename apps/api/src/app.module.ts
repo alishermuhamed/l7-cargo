@@ -10,6 +10,7 @@ import { ConfigModule } from './config/config.module'
 import { ContextModule } from './context/context.module'
 import { DbModule } from './db/db.module'
 import { ParcelsModule } from './parcels/parcels.module'
+import { ParcelsImportsModule } from './parcels-imports/parcels-imports.module'
 import { UsersModule } from './users/users.module'
 
 @Module({
@@ -24,9 +25,10 @@ import { UsersModule } from './users/users.module'
     DbModule,
     ContextModule,
     AuthenticationModule,
+    AuthorizationModule,
     UsersModule,
     ParcelsModule,
-    AuthorizationModule,
+    ParcelsImportsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -16,6 +16,6 @@ import { ParcelsService } from './parcels.service'
     ParcelStatusHistoryService,
     ParcelsPolicy,
   ],
-  exports: [ParcelsService],
+  exports: [ParcelsService, ParcelStatusHistoryService],
 })
 export class ParcelsModule {}

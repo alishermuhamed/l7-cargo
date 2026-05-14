@@ -8,6 +8,7 @@ import { Session } from '../authentication/entities/session.entity'
 import { Verification } from '../authentication/entities/verification.entity'
 import { Parcel } from '../parcels/entities/parcel.entity'
 import { ParcelStatusHistory } from '../parcels/entities/parcel-status-history.entity'
+import { ParcelsImport } from '../parcels-imports/entities/parcels-import.entity'
 
 // Migrations
 import { AddBetterAuthEntities1777914172901 } from './migrations/1777914172901-add-better-auth-entities'
@@ -15,6 +16,7 @@ import { AddParcels1777992156801 } from './migrations/1777992156801-add-parcels'
 import { AddParcelStatusHistory1778165216012 } from './migrations/1778165216012-add-parcel-status-history'
 import { AddUserRole1778267733853 } from './migrations/1778267733853-add-user-role'
 import { AddClientId1778411635666 } from './migrations/1778411635666-add-client-id'
+import { AddParcelsImportEntity1778745509438 } from './migrations/1778745509438-add-parcels-import-entity'
 
 export function buildDataSourceOptions(
   db: EnvConfig['database']
@@ -39,6 +41,7 @@ export function buildDataSourceOptions(
       Verification,
       Parcel,
       ParcelStatusHistory,
+      ParcelsImport,
     ],
     migrations: [
       AddBetterAuthEntities1777914172901,
@@ -46,6 +49,7 @@ export function buildDataSourceOptions(
       AddParcelStatusHistory1778165216012,
       AddUserRole1778267733853,
       AddClientId1778411635666,
+      AddParcelsImportEntity1778745509438,
     ],
   }
 }

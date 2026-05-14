@@ -3,6 +3,7 @@ import { FindManyOptions, FindOneOptions, FindOptionsRelations } from 'typeorm'
 
 import { WithRelations } from '../db/db.types'
 import { Parcel } from './entities/parcel.entity'
+import type { ParcelStatus } from './parcel-status'
 import { ParcelsRepository } from './parcels.repository'
 
 @Injectable()
@@ -12,19 +13,31 @@ export class ParcelsService {
   async create({
     userId,
     trackingNumber,
+    status,
     source,
     description,
+    weightKg,
+    deliveryFee,
+    notes,
   }: {
-    userId: string
+    userId: string | null
     trackingNumber: string
+    status?: ParcelStatus | null
     source?: string
     description?: string
+    weightKg?: string | null
+    deliveryFee?: string | null
+    notes?: string | null
   }): Promise<Parcel['id']> {
     const parcel = this.parcelsRepository.create({
       trackingNumber,
       userId,
+      status,
       source,
       description,
+      weightKg,
+      deliveryFee,
+      notes,
     })
 
     await this.parcelsRepository.insert(parcel)
@@ -40,6 +53,14 @@ export class ParcelsService {
     return this.parcelsRepository.find(options)
   }
 
+  async findOne<R extends FindOptionsRelations<Parcel>>(
+    options: Omit<FindOneOptions<Parcel>, 'relations'> & {
+      relations?: R
+    }
+  ): Promise<WithRelations<Parcel, R> | null> {
+    return this.parcelsRepository.findOne(options)
+  }
+
   async findOneOrThrow<R extends FindOptionsRelations<Parcel>>(
     options: Omit<FindOneOptions<Parcel>, 'relations'> & {
       relations?: R
@@ -51,20 +72,26 @@ export class ParcelsService {
   async update(
     parcelId: string,
     {
+      userId,
+      status,
       source,
       description,
       weightKg,
       deliveryFee,
+      notes,
     }: {
+      userId?: string | null
+      status?: ParcelStatus | null
       source?: string | null
       description?: string | null
       weightKg?: string | null
       deliveryFee?: string | null
+      notes?: string | null
     }
   ): Promise<void> {
     await this.parcelsRepository.update(
       { id: parcelId },
-      { source, description, weightKg, deliveryFee }
+      { userId, status, source, description, weightKg, deliveryFee, notes }
     )
   }
 

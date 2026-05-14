@@ -51,7 +51,7 @@ export class ParcelsController {
       description,
     })
 
-    return { id }
+    return ParcelsMapper.toCreateParcelResponseDto(id)
   }
 
   @Get()
