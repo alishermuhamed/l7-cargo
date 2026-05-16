@@ -23,7 +23,7 @@ export function ParcelStatusHistory({ history }: ParcelStatusHistoryProps) {
       <ol className="parcel-status-history__timeline">
         {Object.values(ParcelStatus).map((status, index) => {
           const entry = history.find((e) => e.status === status)
-          const isKnown = entry !== undefined
+          const isDone = entry !== undefined
 
           return (
             <Flex asChild key={status} gap="3">
@@ -34,7 +34,7 @@ export function ParcelStatusHistory({ history }: ParcelStatusHistoryProps) {
                     height="20px"
                     className={classNames(
                       'parcel-status-history__marker',
-                      isKnown && 'parcel-status-history__marker--done'
+                      isDone && 'parcel-status-history__marker--done'
                     )}
                   />
 
@@ -44,7 +44,7 @@ export function ParcelStatusHistory({ history }: ParcelStatusHistoryProps) {
                       height="40px"
                       className={classNames(
                         'parcel-status-history__line',
-                        isKnown && 'parcel-status-history__line--done'
+                        isDone && 'parcel-status-history__line--done'
                       )}
                     />
                   )}
@@ -53,14 +53,14 @@ export function ParcelStatusHistory({ history }: ParcelStatusHistoryProps) {
                 <Flex mt="-1" direction="column">
                   <Text
                     as="p"
-                    weight={isKnown ? 'medium' : 'regular'}
-                    color={isKnown ? undefined : 'gray'}
+                    weight={isDone ? 'medium' : 'regular'}
+                    color={isDone ? undefined : 'gray'}
                   >
                     {PARCEL_STATUS_LABELS[status]}
                   </Text>
 
                   <Text as="p" color="gray" size="2">
-                    {isKnown
+                    {isDone
                       ? formatDateTime(entry.createdAt)
                       : i18n.t('parcels:pendingStatus')}
                   </Text>

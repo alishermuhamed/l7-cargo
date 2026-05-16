@@ -15,6 +15,10 @@ export class CreateParcelsImportRequestDto {
   @IsBooleanString()
   withHeader: string = 'true'
 
+  @ApiProperty({
+    enum: PARCEL_STATUSES,
+    enumName: 'ParcelStatus',
+  })
   @IsIn(PARCEL_STATUSES)
   parcelStatus!: ParcelStatus
 }

@@ -1,5 +1,6 @@
 {
   "parcels": "Parcels",
+  "parcelsImports": "Parcel imports",
   "address": "Address",
   "profile": "Profile",
   "clients": "Clients",

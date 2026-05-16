@@ -3,6 +3,9 @@ import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
 import {
   getParcel,
   getParcels,
+  getParcelsImport,
+  getParcelsImports,
+  type GetParcelsImportsParams,
   type GetParcelsParams,
   getParcelStatusHistory,
   getUser,
@@ -102,4 +105,52 @@ export const getParcelStatusHistoryQueryOptions = (parcelId: string) =>
   queryOptions({
     queryKey: parcelsKeys.statusHistory(parcelId),
     queryFn: () => getParcelStatusHistory(parcelId),
+  })
+
+// Parcels imports
+
+export const parcelsImportsKeys = {
+  all: ['parcelsImports'] as const,
+  lists: () => [...parcelsImportsKeys.all, 'list'] as const,
+  list: (params?: GetParcelsImportsParams) =>
+    [...parcelsImportsKeys.lists(), params ?? {}] as const,
+  details: () => [...parcelsImportsKeys.all, 'detail'] as const,
+  detail: (parcelsImportId: string) =>
+    [...parcelsImportsKeys.details(), parcelsImportId] as const,
+}
+
+export const getParcelsImportsQueryOptions = (
+  params?: GetParcelsImportsParams
+) =>
+  queryOptions({
+    queryKey: parcelsImportsKeys.list(params),
+    queryFn: () => getParcelsImports(params),
+  })
+
+export const getParcelsImportsInfiniteQueryOptions = (
+  params?: GetParcelsImportsParams
+) =>
+  infiniteQueryOptions({
+    queryKey: parcelsImportsKeys.list(params),
+    initialPageParam: 0,
+    queryFn: ({ pageParam = 0 }) =>
+      getParcelsImports({
+        ...params,
+        offset: pageParam,
+      }),
+    getNextPageParam: (lastPage, allPages) => {
+      const pageSize = params?.limit ?? 10
+
+      if (lastPage.length < pageSize) {
+        return undefined
+      }
+
+      return allPages.reduce((total, page) => total + page.length, 0)
+    },
+  })
+
+export const getParcelsImportQueryOptions = (parcelsImportId: string) =>
+  queryOptions({
+    queryKey: parcelsImportsKeys.detail(parcelsImportId),
+    queryFn: () => getParcelsImport(parcelsImportId),
   })

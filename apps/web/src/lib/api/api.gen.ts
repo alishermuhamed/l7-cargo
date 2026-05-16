@@ -48,9 +48,9 @@ export const UserRole = {
 } as const
 
 export interface GetUserResponseDto {
-  clientId: number
   role: UserRole
   id: string
+  clientId: number
   name: string
   /** @nullable */
   phoneNumber: string | null
@@ -124,6 +124,78 @@ export interface SuccessResponseDto {
   success: boolean
 }
 
+export interface CreateParcelsImportRequestDto {
+  file: Blob
+  parcelStatus: ParcelStatus
+  withHeader: string
+}
+
+export interface CreateParcelsImportResponseDto {
+  id: string
+}
+
+export interface GetParcelsImportSummaryResponseDto {
+  parcelStatus: ParcelStatus
+  id: string
+  createdAt: string
+  isCommitted: boolean
+  /** @nullable */
+  committedAt: string | null
+}
+
+export interface ParsedParcelsImportRowDto {
+  rowNumber: number
+  clientId: number
+  trackingNumber: string
+  weightKg?: number
+  deliveryFee?: number
+  notes?: string
+}
+
+export type ParcelsImportWarningCode =
+  (typeof ParcelsImportWarningCode)[keyof typeof ParcelsImportWarningCode]
+
+export const ParcelsImportWarningCode = {
+  PARCEL_OWNER_MISMATCH: 'PARCEL_OWNER_MISMATCH',
+} as const
+
+export interface ParsedParcelsImportWarningDto {
+  code: ParcelsImportWarningCode
+  rowNumber: number
+}
+
+export type ParcelsImportErrorCode =
+  (typeof ParcelsImportErrorCode)[keyof typeof ParcelsImportErrorCode]
+
+export const ParcelsImportErrorCode = {
+  INVALID_CLIENT_ID: 'INVALID_CLIENT_ID',
+  INVALID_TRACKING_CODE: 'INVALID_TRACKING_CODE',
+  INVALID_WEIGHT_KG: 'INVALID_WEIGHT_KG',
+  INVALID_DELIVERY_FEE: 'INVALID_DELIVERY_FEE',
+  INVALID_NOTES: 'INVALID_NOTES',
+  UNKNOWN: 'UNKNOWN',
+} as const
+
+export interface ParsedParcelsImportErrorDto {
+  code: ParcelsImportErrorCode
+  rowNumber: number
+}
+
+export interface ParsedParcelsImportDataDto {
+  rows: ParsedParcelsImportRowDto[]
+  warnings: ParsedParcelsImportWarningDto[]
+  errors: ParsedParcelsImportErrorDto[]
+}
+
+export interface GetParcelsImportResponseDto {
+  parcelStatus: ParcelStatus
+  id: string
+  isCommitted: boolean
+  /** @nullable */
+  committedAt: string | null
+  parsedData: ParsedParcelsImportDataDto
+}
+
 export type GetUsersParams = {
   /**
    * @minimum 0
@@ -149,6 +221,17 @@ export type GetParcelsParams = {
   status?: ParcelStatus
   search?: string
   userId?: string
+}
+
+export type GetParcelsImportsParams = {
+  /**
+   * @minimum 0
+   */
+  limit?: number
+  /**
+   * @minimum 0
+   */
+  offset?: number
 }
 
 export const getGetHealthUrl = () => {
@@ -415,6 +498,92 @@ export const getParcelStatusHistory = async (
 ): Promise<GetParcelStatusHistoryResponseDto[]> => {
   return customFetch<GetParcelStatusHistoryResponseDto[]>(
     getGetParcelStatusHistoryUrl(parcelId),
+    {
+      ...options,
+      method: 'GET',
+    }
+  )
+}
+
+export const getCreateParcelsImportUrl = () => {
+  return `/parcels-imports`
+}
+
+export const createParcelsImport = async (
+  createParcelsImportRequestDto: CreateParcelsImportRequestDto,
+  options?: RequestInit
+): Promise<CreateParcelsImportResponseDto> => {
+  const formData = new FormData()
+  formData.append(`file`, createParcelsImportRequestDto.file)
+  formData.append(`parcelStatus`, createParcelsImportRequestDto.parcelStatus)
+  formData.append(`withHeader`, createParcelsImportRequestDto.withHeader)
+
+  return customFetch<CreateParcelsImportResponseDto>(
+    getCreateParcelsImportUrl(),
+    {
+      ...options,
+      method: 'POST',
+      body: formData,
+    }
+  )
+}
+
+export const getGetParcelsImportsUrl = (params?: GetParcelsImportsParams) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0
+    ? `/parcels-imports?${stringifiedParams}`
+    : `/parcels-imports`
+}
+
+export const getParcelsImports = async (
+  params?: GetParcelsImportsParams,
+  options?: RequestInit
+): Promise<GetParcelsImportSummaryResponseDto[]> => {
+  return customFetch<GetParcelsImportSummaryResponseDto[]>(
+    getGetParcelsImportsUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    }
+  )
+}
+
+export const getCommitParcelsImportUrl = (parcelsImportId: string) => {
+  return `/parcels-imports/${parcelsImportId}`
+}
+
+export const commitParcelsImport = async (
+  parcelsImportId: string,
+  options?: RequestInit
+): Promise<SuccessResponseDto> => {
+  return customFetch<SuccessResponseDto>(
+    getCommitParcelsImportUrl(parcelsImportId),
+    {
+      ...options,
+      method: 'POST',
+    }
+  )
+}
+
+export const getGetParcelsImportUrl = (parcelsImportId: string) => {
+  return `/parcels-imports/${parcelsImportId}`
+}
+
+export const getParcelsImport = async (
+  parcelsImportId: string,
+  options?: RequestInit
+): Promise<GetParcelsImportResponseDto> => {
+  return customFetch<GetParcelsImportResponseDto>(
+    getGetParcelsImportUrl(parcelsImportId),
     {
       ...options,
       method: 'GET',

@@ -34,6 +34,14 @@ export class ParcelsImportsPolicy extends EntityPolicy<ParcelsImport> {
     }
   }
 
+  checkCanList(): void {
+    const user = this.contextService.getUserOrThrow()
+
+    if (user.role !== 'admin') {
+      throw new ForbiddenException()
+    }
+  }
+
   async checkCanRead(parcelsImportId: string): Promise<void> {
     const parcelsImport = await this.parcelsImportsService.findOneOrThrow({
       where: { id: parcelsImportId },

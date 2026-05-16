@@ -9,6 +9,7 @@ import {
   ParseFilePipe,
   ParseUUIDPipe,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common'
@@ -19,6 +20,8 @@ import { SuccessResponseDto } from '../common/dtos/success-response.dto'
 import { CreateParcelsImportRequestDto } from './dtos/create-parcels-import-request.dto'
 import { CreateParcelsImportResponseDto } from './dtos/create-parcels-import-response.dto'
 import { GetParcelsImportResponseDto } from './dtos/get-parcels-import-response.dto'
+import { GetParcelsImportSummaryResponseDto } from './dtos/get-parcels-import-summary-response.dto'
+import { GetParcelsImportsQueryDto } from './dtos/get-parcels-imports-query.dto'
 import { ParcelsImportsMapper } from './parcels-imports.mapper'
 import { ParcelsImportsPolicy } from './parcels-imports.policy'
 import { ParcelsImportsService } from './parcels-imports.service'
@@ -66,6 +69,23 @@ export class ParcelsImportsController {
     })
 
     return ParcelsImportsMapper.toCreateParcelsImportResponseDto(id)
+  }
+
+  @Get()
+  async getParcelsImports(
+    @Query() { limit, offset }: GetParcelsImportsQueryDto
+  ): Promise<GetParcelsImportSummaryResponseDto[]> {
+    this.parcelsImportsPolicy.checkCanList()
+
+    const parcelsImports = await this.parcelsImportsService.find({
+      order: { createdAt: 'DESC' },
+      take: limit,
+      skip: offset,
+    })
+
+    return parcelsImports.map((parcelsImport) =>
+      ParcelsImportsMapper.toGetParcelsImportSummaryResponseDto(parcelsImport)
+    )
   }
 
   @Post(`:${PARCELS_IMPORT_ID_PARAM}`)

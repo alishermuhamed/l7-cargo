@@ -5,7 +5,12 @@ import {
   Logger,
 } from '@nestjs/common'
 import { Transactional } from '@nestjs-cls/transactional'
-import { FindOneOptions, FindOptionsRelations, In } from 'typeorm'
+import {
+  FindManyOptions,
+  FindOneOptions,
+  FindOptionsRelations,
+  In,
+} from 'typeorm'
 import * as XLSX from 'xlsx'
 
 import { WithRelations } from '../db/db.types'
@@ -80,6 +85,14 @@ export class ParcelsImportsService {
         committedAt: new Date(),
       }
     )
+  }
+
+  async find<R extends FindOptionsRelations<ParcelsImport>>(
+    options?: Omit<FindManyOptions<ParcelsImport>, 'relations'> & {
+      relations?: R
+    }
+  ): Promise<WithRelations<ParcelsImport, R>[]> {
+    return this.parcelsImportsRepository.find(options)
   }
 
   async findOneOrThrow<R extends FindOptionsRelations<ParcelsImport>>(

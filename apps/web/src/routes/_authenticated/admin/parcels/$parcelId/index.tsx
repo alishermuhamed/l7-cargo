@@ -6,13 +6,13 @@ import {
   Link as RouterLink,
   useNavigate,
 } from '@tanstack/react-router'
-import BigNumber from 'bignumber.js'
 import { useState } from 'react'
 
 import { AlertDialog } from '../../../../../components/alert-dialog'
 import { Button } from '../../../../../components/button'
 import { CopyButton } from '../../../../../components/copy-button'
 import { ParcelStatusHistory } from '../../../../../features/parcels/components/parcel-status-history/parcel-status-history'
+import { formatWeightKg } from '../../../../../features/parcels/lib/format-weight'
 import { deleteParcel } from '../../../../../lib/api/api.gen'
 import {
   getParcelQueryOptions,
@@ -109,11 +109,7 @@ function AdminParcelPage() {
           <DataList.Item>
             <DataList.Label>{i18n.t('parcels:weight')}</DataList.Label>
             <DataList.Value>
-              {parcel.weightKg !== null
-                ? i18n.t('parcels:weightValue', {
-                    weight: new BigNumber(parcel.weightKg).toFixed(),
-                  })
-                : '-'}
+              {parcel.weightKg !== null ? formatWeightKg(parcel.weightKg) : '-'}
             </DataList.Value>
           </DataList.Item>
 
