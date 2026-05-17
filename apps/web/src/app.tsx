@@ -6,7 +6,7 @@ import {
 import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { Toaster } from 'react-hot-toast'
 
-import { DRAWER_PORTAL_ROOT_ID } from './lib/constants'
+import { DRAWER_PORTAL_ROOT_ID, SCROLL_CONTAINER_CLASS } from './lib/constants'
 import { LocaleContextProvider } from './providers/locale-context-provider'
 import { ThemeContextProvider } from './providers/theme-context-provider'
 import { routeTree } from './routeTree.gen'
@@ -29,6 +29,8 @@ const queryClient = new QueryClient({
 const router = createRouter({
   routeTree,
   context: { queryClient },
+  scrollRestoration: true,
+  scrollToTopSelectors: [`.${SCROLL_CONTAINER_CLASS}`],
 })
 
 declare module '@tanstack/react-router' {

@@ -8,6 +8,7 @@ import { AdminNavBar } from '../../../components/admin-nav-bar/admin-nav-bar'
 import { Drawer } from '../../../components/drawer/drawer'
 import { Header } from '../../../components/header/header'
 import { UserRole } from '../../../lib/api/api.gen'
+import { SCROLL_CONTAINER_CLASS } from '../../../lib/constants'
 import i18n from '../../../lib/i18n'
 
 export const Route = createFileRoute('/_authenticated/admin')({
@@ -37,7 +38,13 @@ function AdminLayout() {
           <AdminNavBar />
         </Box>
 
-        <Box flexGrow="1" minWidth="0" minHeight="0" overflowY="auto">
+        <Box
+          className={SCROLL_CONTAINER_CLASS}
+          flexGrow="1"
+          minWidth="0"
+          minHeight="0"
+          overflowY="auto"
+        >
           <Header onMenuClick={() => setIsNavBarOpen(true)} />
           <Outlet />
         </Box>
