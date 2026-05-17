@@ -8,6 +8,9 @@
   "trackingNumber": {
     "required": "Tracking number is required"
   },
+  "file": {
+    "required": "File is required"
+  },
   "name": {
     "required": "Name is required",
     "tooLong": "Name must be 100 characters or fewer"

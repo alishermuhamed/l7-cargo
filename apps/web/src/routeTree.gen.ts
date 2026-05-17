@@ -23,6 +23,7 @@ import { Route as AuthenticatedAdminClientsIndexRouteImport } from './routes/_au
 import { Route as AuthenticatedClientProfileIndexRouteImport } from './routes/_authenticated/_client/profile/index'
 import { Route as AuthenticatedClientParcelsIndexRouteImport } from './routes/_authenticated/_client/parcels/index'
 import { Route as AuthenticatedClientAddressIndexRouteImport } from './routes/_authenticated/_client/address/index'
+import { Route as AuthenticatedAdminParcelsImportsAddRouteImport } from './routes/_authenticated/admin/parcels-imports/add'
 import { Route as AuthenticatedClientProfileEditRouteImport } from './routes/_authenticated/_client/profile/edit'
 import { Route as AuthenticatedClientParcelsAddRouteImport } from './routes/_authenticated/_client/parcels/add'
 import { Route as AuthenticatedAdminParcelsParcelIdIndexRouteImport } from './routes/_authenticated/admin/parcels/$parcelId/index'
@@ -107,6 +108,12 @@ const AuthenticatedClientAddressIndexRoute =
     path: '/address/',
     getParentRoute: () => AuthenticatedClientRouteRoute,
   } as any)
+const AuthenticatedAdminParcelsImportsAddRoute =
+  AuthenticatedAdminParcelsImportsAddRouteImport.update({
+    id: '/parcels-imports/add',
+    path: '/parcels-imports/add',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedClientProfileEditRoute =
   AuthenticatedClientProfileEditRouteImport.update({
     id: '/profile/edit',
@@ -165,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/auth/verify': typeof AuthVerifyRoute
   '/parcels/add': typeof AuthenticatedClientParcelsAddRoute
   '/profile/edit': typeof AuthenticatedClientProfileEditRoute
+  '/admin/parcels-imports/add': typeof AuthenticatedAdminParcelsImportsAddRoute
   '/address/': typeof AuthenticatedClientAddressIndexRoute
   '/parcels/': typeof AuthenticatedClientParcelsIndexRoute
   '/profile/': typeof AuthenticatedClientProfileIndexRoute
@@ -187,6 +195,7 @@ export interface FileRoutesByTo {
   '/auth/verify': typeof AuthVerifyRoute
   '/parcels/add': typeof AuthenticatedClientParcelsAddRoute
   '/profile/edit': typeof AuthenticatedClientProfileEditRoute
+  '/admin/parcels-imports/add': typeof AuthenticatedAdminParcelsImportsAddRoute
   '/address': typeof AuthenticatedClientAddressIndexRoute
   '/parcels': typeof AuthenticatedClientParcelsIndexRoute
   '/profile': typeof AuthenticatedClientProfileIndexRoute
@@ -212,6 +221,7 @@ export interface FileRoutesById {
   '/auth/verify': typeof AuthVerifyRoute
   '/_authenticated/_client/parcels/add': typeof AuthenticatedClientParcelsAddRoute
   '/_authenticated/_client/profile/edit': typeof AuthenticatedClientProfileEditRoute
+  '/_authenticated/admin/parcels-imports/add': typeof AuthenticatedAdminParcelsImportsAddRoute
   '/_authenticated/_client/address/': typeof AuthenticatedClientAddressIndexRoute
   '/_authenticated/_client/parcels/': typeof AuthenticatedClientParcelsIndexRoute
   '/_authenticated/_client/profile/': typeof AuthenticatedClientProfileIndexRoute
@@ -236,6 +246,7 @@ export interface FileRouteTypes {
     | '/auth/verify'
     | '/parcels/add'
     | '/profile/edit'
+    | '/admin/parcels-imports/add'
     | '/address/'
     | '/parcels/'
     | '/profile/'
@@ -258,6 +269,7 @@ export interface FileRouteTypes {
     | '/auth/verify'
     | '/parcels/add'
     | '/profile/edit'
+    | '/admin/parcels-imports/add'
     | '/address'
     | '/parcels'
     | '/profile'
@@ -282,6 +294,7 @@ export interface FileRouteTypes {
     | '/auth/verify'
     | '/_authenticated/_client/parcels/add'
     | '/_authenticated/_client/profile/edit'
+    | '/_authenticated/admin/parcels-imports/add'
     | '/_authenticated/_client/address/'
     | '/_authenticated/_client/parcels/'
     | '/_authenticated/_client/profile/'
@@ -402,6 +415,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientAddressIndexRouteImport
       parentRoute: typeof AuthenticatedClientRouteRoute
     }
+    '/_authenticated/admin/parcels-imports/add': {
+      id: '/_authenticated/admin/parcels-imports/add'
+      path: '/parcels-imports/add'
+      fullPath: '/admin/parcels-imports/add'
+      preLoaderRoute: typeof AuthenticatedAdminParcelsImportsAddRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/_client/profile/edit': {
       id: '/_authenticated/_client/profile/edit'
       path: '/profile/edit'
@@ -490,6 +510,7 @@ const AuthenticatedClientRouteRouteWithChildren =
   )
 
 interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminParcelsImportsAddRoute: typeof AuthenticatedAdminParcelsImportsAddRoute
   AuthenticatedAdminClientsIndexRoute: typeof AuthenticatedAdminClientsIndexRoute
   AuthenticatedAdminParcelsImportsIndexRoute: typeof AuthenticatedAdminParcelsImportsIndexRoute
   AuthenticatedAdminParcelsIndexRoute: typeof AuthenticatedAdminParcelsIndexRoute
@@ -501,6 +522,8 @@ interface AuthenticatedAdminRouteRouteChildren {
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
+    AuthenticatedAdminParcelsImportsAddRoute:
+      AuthenticatedAdminParcelsImportsAddRoute,
     AuthenticatedAdminClientsIndexRoute: AuthenticatedAdminClientsIndexRoute,
     AuthenticatedAdminParcelsImportsIndexRoute:
       AuthenticatedAdminParcelsImportsIndexRoute,

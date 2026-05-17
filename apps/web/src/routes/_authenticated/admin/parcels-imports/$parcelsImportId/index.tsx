@@ -1,3 +1,4 @@
+import { MagicWandIcon, TrashIcon } from '@radix-ui/react-icons'
 import {
   Box,
   Card,
@@ -7,15 +8,23 @@ import {
   Heading,
   Table,
 } from '@radix-ui/themes'
-import { useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
 
+import { AlertDialog } from '../../../../../components/alert-dialog'
+import { Button } from '../../../../../components/button'
 import { ParcelStatusBadge } from '../../../../../features/parcels/components/parcel-status-badge'
 import { formatWeightKg } from '../../../../../features/parcels/lib/format-weight'
 import {
   PARSE_ERROR_LABELS,
   PARSE_WARNING_LABELS,
 } from '../../../../../features/parcels-imports/lib/parcels-import-labels'
+import {
+  commitParcelsImport as commitParcelsImportRequest,
+  deleteParcelsImport as deleteParcelsImportRequest,
+} from '../../../../../lib/api/api.gen'
 import { getParcelsImportQueryOptions } from '../../../../../lib/api/queries'
 import { formatDateTime } from '../../../../../lib/date-time'
 import i18n from '../../../../../lib/i18n'
@@ -39,12 +48,45 @@ export const Route = createFileRoute(
 })
 
 function AdminParcelsImportDetailsPage() {
+  const navigate = useNavigate()
   const { initialParcelsImport } = Route.useLoaderData()
+
+  const [isCommitDialogOpen, setIsCommitDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   const { data: parcelsImport } = useQuery({
     ...getParcelsImportQueryOptions(initialParcelsImport.id),
     initialData: initialParcelsImport,
   })
+
+  const commitParcelsImportMutation = useMutation({
+    mutationFn: () => commitParcelsImportRequest(initialParcelsImport.id),
+  })
+
+  const deleteParcelsImportMutation = useMutation({
+    mutationFn: () => deleteParcelsImportRequest(initialParcelsImport.id),
+  })
+
+  const commitParcelsImport = async () => {
+    try {
+      await commitParcelsImportMutation.mutateAsync()
+    } catch {
+      toast.error(i18n.t('parcels:unableToCommitParcelsImport'))
+    }
+  }
+
+  const deleteParcelsImport = async () => {
+    try {
+      await deleteParcelsImportMutation.mutateAsync()
+
+      await navigate({
+        to: '/admin/parcels-imports',
+        replace: true,
+      })
+    } catch {
+      toast.error(i18n.t('parcels:unableToDeleteParcelsImport'))
+    }
+  }
 
   const parsedData = parcelsImport.parsedData
 
@@ -63,35 +105,18 @@ function AdminParcelsImportDetailsPage() {
             <DataList.Item>
               <DataList.Label>{i18n.t('parcels:committed')}</DataList.Label>
               <DataList.Value>
-                {parcelsImport.isCommitted
-                  ? i18n.t('parcels:committed')
-                  : i18n.t('parcels:notCommitted')}
+                {parcelsImport.isCommitted ? 'Yes' : 'No'}
               </DataList.Value>
             </DataList.Item>
 
-            <DataList.Item>
-              <DataList.Label>{i18n.t('parcels:committedAt')}</DataList.Label>
-              <DataList.Value>
-                {parcelsImport.committedAt
-                  ? formatDateTime(parcelsImport.committedAt)
-                  : '-'}
-              </DataList.Value>
-            </DataList.Item>
-
-            <DataList.Item>
-              <DataList.Label>{i18n.t('parcels:rowsCount')}</DataList.Label>
-              <DataList.Value>{parsedData.rows.length}</DataList.Value>
-            </DataList.Item>
-
-            <DataList.Item>
-              <DataList.Label>{i18n.t('parcels:errorsCount')}</DataList.Label>
-              <DataList.Value>{parsedData.errors.length}</DataList.Value>
-            </DataList.Item>
-
-            <DataList.Item>
-              <DataList.Label>{i18n.t('parcels:warningsCount')}</DataList.Label>
-              <DataList.Value>{parsedData.warnings.length}</DataList.Value>
-            </DataList.Item>
+            {parcelsImport.committedAt && (
+              <DataList.Item>
+                <DataList.Label>{i18n.t('parcels:committedAt')}</DataList.Label>
+                <DataList.Value>
+                  {formatDateTime(parcelsImport.committedAt)}
+                </DataList.Value>
+              </DataList.Item>
+            )}
           </DataList.Root>
         </Card>
 
@@ -216,6 +241,58 @@ function AdminParcelsImportDetailsPage() {
           </Box>
         </Flex>
       </Flex>
+
+      {!parcelsImport.isCommitted && (
+        <Flex
+          direction={{ initial: 'column-reverse', xs: 'row' }}
+          align={{ initial: 'stretch', xs: 'center' }}
+          justify="end"
+          gap="3"
+        >
+          <Button
+            type="button"
+            variant="soft"
+            color="red"
+            onClick={() => setIsDeleteDialogOpen(true)}
+          >
+            <TrashIcon />
+            {i18n.t('parcels:deleteParcelsImportAction')}
+          </Button>
+
+          <Button
+            type="button"
+            loading={commitParcelsImportMutation.isPending}
+            onClick={() => setIsCommitDialogOpen(true)}
+          >
+            <MagicWandIcon />
+            {i18n.t('parcels:commitParcelsImportAction')}
+          </Button>
+        </Flex>
+      )}
+
+      {!parcelsImport.isCommitted && (
+        <>
+          <AlertDialog
+            open={isCommitDialogOpen}
+            onOpenChange={setIsCommitDialogOpen}
+            title={i18n.t('parcels:commitParcelsImportTitle')}
+            description={i18n.t('parcels:commitParcelsImportDescription')}
+            actionLabel={i18n.t('parcels:commitParcelsImportAction')}
+            actionColor="green"
+            onAction={() => commitParcelsImport()}
+          />
+
+          <AlertDialog
+            open={isDeleteDialogOpen}
+            onOpenChange={setIsDeleteDialogOpen}
+            title={i18n.t('parcels:deleteParcelsImportTitle')}
+            description={i18n.t('parcels:deleteParcelsImportDescription')}
+            actionLabel={i18n.t('parcels:deleteParcelsImportAction')}
+            actionColor="red"
+            onAction={() => deleteParcelsImport()}
+          />
+        </>
+      )}
     </Container>
   )
 }

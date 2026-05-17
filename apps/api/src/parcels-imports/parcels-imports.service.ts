@@ -103,6 +103,18 @@ export class ParcelsImportsService {
     return this.parcelsImportsRepository.findOneOrThrow(options)
   }
 
+  async delete(parcelsImportId: string): Promise<void> {
+    const parcelsImport = await this.findOneOrThrow({
+      where: { id: parcelsImportId },
+    })
+
+    if (parcelsImport.isCommitted) {
+      throw new BadRequestException()
+    }
+
+    await this.parcelsImportsRepository.delete({ id: parcelsImport.id })
+  }
+
   private async buildParsedData(
     file: Express.Multer.File,
     withHeader: boolean

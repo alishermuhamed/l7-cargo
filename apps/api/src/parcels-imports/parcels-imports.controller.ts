@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   FileTypeValidator,
   Get,
   MaxFileSizeValidator,
@@ -110,5 +111,16 @@ export class ParcelsImportsController {
     })
 
     return ParcelsImportsMapper.toGetParcelsImportResponseDto(parcelsImport)
+  }
+
+  @Delete(`:${PARCELS_IMPORT_ID_PARAM}`)
+  async deleteParcelsImport(
+    @Param(PARCELS_IMPORT_ID_PARAM, ParseUUIDPipe) parcelsImportId: string
+  ): Promise<SuccessResponseDto> {
+    await this.parcelsImportsPolicy.checkCanDelete(parcelsImportId)
+
+    await this.parcelsImportsService.delete(parcelsImportId)
+
+    return new SuccessResponseDto()
   }
 }

@@ -574,6 +574,23 @@ export const commitParcelsImport = async (
   )
 }
 
+export const getDeleteParcelsImportUrl = (parcelsImportId: string) => {
+  return `/parcels-imports/${parcelsImportId}`
+}
+
+export const deleteParcelsImport = async (
+  parcelsImportId: string,
+  options?: RequestInit
+): Promise<SuccessResponseDto> => {
+  return customFetch<SuccessResponseDto>(
+    getDeleteParcelsImportUrl(parcelsImportId),
+    {
+      ...options,
+      method: 'DELETE',
+    }
+  )
+}
+
 export const getGetParcelsImportUrl = (parcelsImportId: string) => {
   return `/parcels-imports/${parcelsImportId}`
 }

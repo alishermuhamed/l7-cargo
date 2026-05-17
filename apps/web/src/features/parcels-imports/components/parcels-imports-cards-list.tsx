@@ -56,9 +56,7 @@ export function ParcelsImportsCardsList() {
                 </Box>
 
                 <Text as="p">
-                  {parcelsImport.isCommitted
-                    ? i18n.t('parcels:committed')
-                    : i18n.t('parcels:notCommitted')}
+                  Committed: {parcelsImport.isCommitted ? 'Yes' : 'No'}
                 </Text>
               </Flex>
             </Link>

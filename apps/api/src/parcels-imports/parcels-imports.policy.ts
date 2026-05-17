@@ -1,5 +1,9 @@
 import { AbilityBuilder } from '@casl/ability'
-import { ForbiddenException, Injectable } from '@nestjs/common'
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common'
 
 import { Ability } from '../authorization/authorization.types'
 import { EntityPolicyProvider } from '../authorization/decorators/entity-policy-provider.decorator'
@@ -58,6 +62,20 @@ export class ParcelsImportsPolicy extends EntityPolicy<ParcelsImport> {
     })
 
     if (!this.ability.can('update', parcelsImport)) {
+      throw new ForbiddenException()
+    }
+  }
+
+  async checkCanDelete(parcelsImportId: string): Promise<void> {
+    const parcelsImport = await this.parcelsImportsService.findOneOrThrow({
+      where: { id: parcelsImportId },
+    })
+
+    if (parcelsImport.isCommitted) {
+      throw new ConflictException()
+    }
+
+    if (!this.ability.can('delete', parcelsImport)) {
       throw new ForbiddenException()
     }
   }

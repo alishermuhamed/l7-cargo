@@ -1,5 +1,5 @@
 import { Pencil1Icon, TrashIcon } from '@radix-ui/react-icons'
-import { Container, DataList, Flex, Text } from '@radix-ui/themes'
+import { Card, Container, DataList, Flex, Text } from '@radix-ui/themes'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import {
   createFileRoute,
@@ -72,63 +72,69 @@ function AdminParcelPage() {
   return (
     <Container p="4">
       <Flex direction="column" gap="4">
-        <DataList.Root>
-          <DataList.Item>
-            <DataList.Label>{i18n.t('parcels:trackingNumber')}</DataList.Label>
-            <DataList.Value>
-              <Flex align="center" gap="2">
-                <Text>{parcel.trackingNumber}</Text>
-                <CopyButton data={parcel.trackingNumber} />
-              </Flex>
-            </DataList.Value>
-          </DataList.Item>
-
-          <DataList.Item>
-            <DataList.Label>{i18n.t('parcels:description')}</DataList.Label>
-            <DataList.Value>{parcel.description ?? '-'}</DataList.Value>
-          </DataList.Item>
-
-          <DataList.Item>
-            <DataList.Label>{i18n.t('parcels:owner')}</DataList.Label>
-            <DataList.Value>
-              {owner ? (
-                <Text asChild weight="medium">
-                  <RouterLink
-                    to="/admin/clients/$clientId"
-                    params={{ clientId: owner.id }}
-                  >
-                    {owner.name} (ID: {owner.clientId})
-                  </RouterLink>
-                </Text>
-              ) : (
-                '-'
-              )}
-            </DataList.Value>
-          </DataList.Item>
-
-          <DataList.Item>
-            <DataList.Label>{i18n.t('parcels:weight')}</DataList.Label>
-            <DataList.Value>
-              {parcel.weightKg !== null ? formatWeightKg(parcel.weightKg) : '-'}
-            </DataList.Value>
-          </DataList.Item>
-
-          <DataList.Item>
-            <DataList.Label>{i18n.t('parcels:deliveryFee')}</DataList.Label>
-            <DataList.Value>
-              {parcel.deliveryFee !== null
-                ? formatMoneyAmount(parcel.deliveryFee, 'KZT')
-                : '-'}
-            </DataList.Value>
-          </DataList.Item>
-
-          {parcel.notes && (
+        <Card size="3">
+          <DataList.Root>
             <DataList.Item>
-              <DataList.Label>Notes</DataList.Label>
-              <DataList.Value>{parcel.notes}</DataList.Value>
+              <DataList.Label>
+                {i18n.t('parcels:trackingNumber')}
+              </DataList.Label>
+              <DataList.Value>
+                <Flex align="center" gap="2">
+                  <Text>{parcel.trackingNumber}</Text>
+                  <CopyButton data={parcel.trackingNumber} />
+                </Flex>
+              </DataList.Value>
             </DataList.Item>
-          )}
-        </DataList.Root>
+
+            <DataList.Item>
+              <DataList.Label>{i18n.t('parcels:description')}</DataList.Label>
+              <DataList.Value>{parcel.description ?? '-'}</DataList.Value>
+            </DataList.Item>
+
+            <DataList.Item>
+              <DataList.Label>{i18n.t('parcels:owner')}</DataList.Label>
+              <DataList.Value>
+                {owner ? (
+                  <Text asChild weight="medium">
+                    <RouterLink
+                      to="/admin/clients/$clientId"
+                      params={{ clientId: owner.id }}
+                    >
+                      {owner.name} (ID: {owner.clientId})
+                    </RouterLink>
+                  </Text>
+                ) : (
+                  '-'
+                )}
+              </DataList.Value>
+            </DataList.Item>
+
+            <DataList.Item>
+              <DataList.Label>{i18n.t('parcels:weight')}</DataList.Label>
+              <DataList.Value>
+                {parcel.weightKg !== null
+                  ? formatWeightKg(parcel.weightKg)
+                  : '-'}
+              </DataList.Value>
+            </DataList.Item>
+
+            <DataList.Item>
+              <DataList.Label>{i18n.t('parcels:deliveryFee')}</DataList.Label>
+              <DataList.Value>
+                {parcel.deliveryFee !== null
+                  ? formatMoneyAmount(parcel.deliveryFee, 'KZT')
+                  : '-'}
+              </DataList.Value>
+            </DataList.Item>
+
+            {parcel.notes && (
+              <DataList.Item>
+                <DataList.Label>Notes</DataList.Label>
+                <DataList.Value>{parcel.notes}</DataList.Value>
+              </DataList.Item>
+            )}
+          </DataList.Root>
+        </Card>
 
         <ParcelStatusHistory history={statusHistory} />
 

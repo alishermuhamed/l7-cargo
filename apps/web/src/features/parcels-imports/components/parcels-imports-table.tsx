@@ -59,10 +59,6 @@ export function ParcelsImportsTable() {
               {i18n.t('parcels:committed')}
             </Table.ColumnHeaderCell>
 
-            <Table.ColumnHeaderCell>
-              {i18n.t('parcels:committedAt')}
-            </Table.ColumnHeaderCell>
-
             <Table.ColumnHeaderCell />
           </Table.Row>
         </Table.Header>
@@ -80,15 +76,7 @@ export function ParcelsImportsTable() {
                 </Table.Cell>
 
                 <Table.Cell>
-                  {parcelsImport.isCommitted
-                    ? i18n.t('parcels:committed')
-                    : i18n.t('parcels:notCommitted')}
-                </Table.Cell>
-
-                <Table.Cell>
-                  {parcelsImport.committedAt
-                    ? formatDateTime(parcelsImport.committedAt)
-                    : '-'}
+                  {parcelsImport.isCommitted ? 'Yes' : 'No'}
                 </Table.Cell>
 
                 <Table.Cell align="right">
@@ -116,10 +104,6 @@ export function ParcelsImportsTable() {
 
               <Table.Cell>
                 <Skeleton width="90px" />
-              </Table.Cell>
-
-              <Table.Cell>
-                <Skeleton width="120px" />
               </Table.Cell>
 
               <Table.Cell>
