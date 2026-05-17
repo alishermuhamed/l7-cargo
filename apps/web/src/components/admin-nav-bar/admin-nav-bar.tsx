@@ -22,6 +22,12 @@ export function AdminNavBar({ onNavigate }: AdminNavBarProps) {
           gap="2"
         >
           <RouterLinkWrapper>
+            <RouterLink onClick={onNavigate} to="/admin/clients">
+              <Text size="3">{i18n.t('nav:clients')}</Text>
+            </RouterLink>
+          </RouterLinkWrapper>
+
+          <RouterLinkWrapper>
             <RouterLink onClick={onNavigate} to="/admin/parcels">
               <Text size="3">{i18n.t('nav:parcels')}</Text>
             </RouterLink>
@@ -30,12 +36,6 @@ export function AdminNavBar({ onNavigate }: AdminNavBarProps) {
           <RouterLinkWrapper>
             <RouterLink onClick={onNavigate} to="/admin/parcels-imports">
               <Text size="3">{i18n.t('nav:parcelsImports')}</Text>
-            </RouterLink>
-          </RouterLinkWrapper>
-
-          <RouterLinkWrapper>
-            <RouterLink onClick={onNavigate} to="/admin/clients">
-              <Text size="3">{i18n.t('nav:clients')}</Text>
             </RouterLink>
           </RouterLinkWrapper>
         </Flex>
