@@ -59,6 +59,11 @@ function createBetterAuth({
           required: false,
           input: false,
         },
+        clientId: {
+          type: 'number',
+          required: false,
+          input: false,
+        },
       },
     },
     database: (options: BetterAuthOptions) => typeOrmAdapter.build(options),

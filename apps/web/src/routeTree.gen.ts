@@ -26,6 +26,7 @@ import { Route as AuthenticatedClientAddressIndexRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminParcelsImportsAddRouteImport } from './routes/_authenticated/admin/parcels-imports/add'
 import { Route as AuthenticatedClientProfileEditRouteImport } from './routes/_authenticated/_client/profile/edit'
 import { Route as AuthenticatedClientParcelsAddRouteImport } from './routes/_authenticated/_client/parcels/add'
+import { Route as AuthenticatedClientAddressMarketplaceRouteImport } from './routes/_authenticated/_client/address/$marketplace'
 import { Route as AuthenticatedAdminParcelsParcelIdIndexRouteImport } from './routes/_authenticated/admin/parcels/$parcelId/index'
 import { Route as AuthenticatedAdminParcelsImportsParcelsImportIdIndexRouteImport } from './routes/_authenticated/admin/parcels-imports/$parcelsImportId/index'
 import { Route as AuthenticatedAdminClientsClientIdIndexRouteImport } from './routes/_authenticated/admin/clients/$clientId/index'
@@ -126,6 +127,12 @@ const AuthenticatedClientParcelsAddRoute =
     path: '/parcels/add',
     getParentRoute: () => AuthenticatedClientRouteRoute,
   } as any)
+const AuthenticatedClientAddressMarketplaceRoute =
+  AuthenticatedClientAddressMarketplaceRouteImport.update({
+    id: '/address/$marketplace',
+    path: '/address/$marketplace',
+    getParentRoute: () => AuthenticatedClientRouteRoute,
+  } as any)
 const AuthenticatedAdminParcelsParcelIdIndexRoute =
   AuthenticatedAdminParcelsParcelIdIndexRouteImport.update({
     id: '/parcels/$parcelId/',
@@ -170,6 +177,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/verify': typeof AuthVerifyRoute
+  '/address/$marketplace': typeof AuthenticatedClientAddressMarketplaceRoute
   '/parcels/add': typeof AuthenticatedClientParcelsAddRoute
   '/profile/edit': typeof AuthenticatedClientProfileEditRoute
   '/admin/parcels-imports/add': typeof AuthenticatedAdminParcelsImportsAddRoute
@@ -193,6 +201,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/verify': typeof AuthVerifyRoute
+  '/address/$marketplace': typeof AuthenticatedClientAddressMarketplaceRoute
   '/parcels/add': typeof AuthenticatedClientParcelsAddRoute
   '/profile/edit': typeof AuthenticatedClientProfileEditRoute
   '/admin/parcels-imports/add': typeof AuthenticatedAdminParcelsImportsAddRoute
@@ -219,6 +228,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/verify': typeof AuthVerifyRoute
+  '/_authenticated/_client/address/$marketplace': typeof AuthenticatedClientAddressMarketplaceRoute
   '/_authenticated/_client/parcels/add': typeof AuthenticatedClientParcelsAddRoute
   '/_authenticated/_client/profile/edit': typeof AuthenticatedClientProfileEditRoute
   '/_authenticated/admin/parcels-imports/add': typeof AuthenticatedAdminParcelsImportsAddRoute
@@ -244,6 +254,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/auth/sign-in'
     | '/auth/verify'
+    | '/address/$marketplace'
     | '/parcels/add'
     | '/profile/edit'
     | '/admin/parcels-imports/add'
@@ -267,6 +278,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/auth/sign-in'
     | '/auth/verify'
+    | '/address/$marketplace'
     | '/parcels/add'
     | '/profile/edit'
     | '/admin/parcels-imports/add'
@@ -292,6 +304,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/auth/sign-in'
     | '/auth/verify'
+    | '/_authenticated/_client/address/$marketplace'
     | '/_authenticated/_client/parcels/add'
     | '/_authenticated/_client/profile/edit'
     | '/_authenticated/admin/parcels-imports/add'
@@ -436,6 +449,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientParcelsAddRouteImport
       parentRoute: typeof AuthenticatedClientRouteRoute
     }
+    '/_authenticated/_client/address/$marketplace': {
+      id: '/_authenticated/_client/address/$marketplace'
+      path: '/address/$marketplace'
+      fullPath: '/address/$marketplace'
+      preLoaderRoute: typeof AuthenticatedClientAddressMarketplaceRouteImport
+      parentRoute: typeof AuthenticatedClientRouteRoute
+    }
     '/_authenticated/admin/parcels/$parcelId/': {
       id: '/_authenticated/admin/parcels/$parcelId/'
       path: '/parcels/$parcelId'
@@ -482,6 +502,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedClientRouteRouteChildren {
+  AuthenticatedClientAddressMarketplaceRoute: typeof AuthenticatedClientAddressMarketplaceRoute
   AuthenticatedClientParcelsAddRoute: typeof AuthenticatedClientParcelsAddRoute
   AuthenticatedClientProfileEditRoute: typeof AuthenticatedClientProfileEditRoute
   AuthenticatedClientAddressIndexRoute: typeof AuthenticatedClientAddressIndexRoute
@@ -493,6 +514,8 @@ interface AuthenticatedClientRouteRouteChildren {
 
 const AuthenticatedClientRouteRouteChildren: AuthenticatedClientRouteRouteChildren =
   {
+    AuthenticatedClientAddressMarketplaceRoute:
+      AuthenticatedClientAddressMarketplaceRoute,
     AuthenticatedClientParcelsAddRoute: AuthenticatedClientParcelsAddRoute,
     AuthenticatedClientProfileEditRoute: AuthenticatedClientProfileEditRoute,
     AuthenticatedClientAddressIndexRoute: AuthenticatedClientAddressIndexRoute,

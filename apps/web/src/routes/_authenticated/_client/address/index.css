@@ -1,0 +1,4 @@
+.marketplace-logo {
+  border-radius: var(--radius-6);
+  object-fit: contain;
+}
