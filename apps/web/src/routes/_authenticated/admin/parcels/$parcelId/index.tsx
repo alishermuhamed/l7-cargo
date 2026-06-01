@@ -100,7 +100,7 @@ function AdminParcelPage() {
                       to="/admin/clients/$clientId"
                       params={{ clientId: owner.id }}
                     >
-                      {owner.name} (ID: {owner.clientId})
+                      {owner.name} ({i18n.t('clients:id')}: {owner.clientId})
                     </RouterLink>
                   </Text>
                 ) : (
@@ -129,7 +129,7 @@ function AdminParcelPage() {
 
             {parcel.notes && (
               <DataList.Item>
-                <DataList.Label>Notes</DataList.Label>
+                <DataList.Label>{i18n.t('parcels:notes')}</DataList.Label>
                 <DataList.Value>{parcel.notes}</DataList.Value>
               </DataList.Item>
             )}

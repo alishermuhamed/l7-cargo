@@ -32,7 +32,9 @@ function AddressPage() {
                   overflow="hidden"
                 >
                   <img
-                    alt={`${marketplace.name} logo`}
+                    alt={i18n.t('address:logoAlt', {
+                      marketplace: marketplace.name,
+                    })}
                     src={marketplace.logoUrl}
                     loading="lazy"
                     className="marketplace-logo"

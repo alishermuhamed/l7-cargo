@@ -47,6 +47,10 @@ function MarketplaceAddressPage() {
 
   const marketplaceConfig = MARKETPLACES_BY_SLUGS[marketplace]
   const screenshotUrls = marketplaceConfig.screenshotUrls ?? []
+  const marketplaceNote =
+    marketplaceConfig.noteKey === 'wechatInvoiceNote'
+      ? i18n.t('address:wechatInvoiceNote')
+      : null
 
   const addressLines = marketplaceConfig.formatAddress({
     clientId: user.clientId,
@@ -69,7 +73,9 @@ function MarketplaceAddressPage() {
         <Flex align="center" gap="2">
           <Box asChild flexShrink="0" width="36px" height="36px">
             <img
-              alt={`${marketplaceConfig.name} logo`}
+              alt={i18n.t('address:logoAlt', {
+                marketplace: marketplaceConfig.name,
+              })}
               loading="lazy"
               src={marketplaceConfig.logoUrl}
             />
@@ -78,13 +84,13 @@ function MarketplaceAddressPage() {
           <Heading size="6">{marketplaceConfig.name}</Heading>
         </Flex>
 
-        {marketplaceConfig.note && (
+        {marketplaceNote && (
           <Callout.Root color="blue">
             <Callout.Icon>
               <InfoCircledIcon />
             </Callout.Icon>
 
-            <Callout.Text>{marketplaceConfig.note}</Callout.Text>
+            <Callout.Text>{marketplaceNote}</Callout.Text>
           </Callout.Root>
         )}
 
@@ -106,15 +112,16 @@ function MarketplaceAddressPage() {
 
         <Flex direction={{ initial: 'column', xs: 'row' }}>
           <Button onClick={handleCopyAddress}>
-            <CopyIcon /> Copy full address
+            <CopyIcon /> {i18n.t('address:copyFullAddress')}
           </Button>
         </Flex>
 
         {screenshotUrls.length > 0 && (
           <>
             <Heading size="4" mt="4">
-              Example of a correctly entered address on {marketplaceConfig.name}
-              :
+              {i18n.t('address:exampleScreenshotsTitle', {
+                marketplace: marketplaceConfig.name,
+              })}
             </Heading>
 
             <Grid columns={{ initial: '1', xs: '2' }} gap="2" align="start">
@@ -123,7 +130,10 @@ function MarketplaceAddressPage() {
                   <a href={screenshotUrl} target="_blank" rel="noreferrer">
                     <Box asChild width="100%" height="auto">
                       <img
-                        alt={`${marketplaceConfig.name} example screenshot ${index + 1}`}
+                        alt={i18n.t('address:exampleScreenshotAlt', {
+                          index: index + 1,
+                          marketplace: marketplaceConfig.name,
+                        })}
                         loading="lazy"
                         src={screenshotUrl}
                       />

@@ -9,7 +9,14 @@
     "required": "Tracking number is required"
   },
   "file": {
-    "required": "File is required"
+    "required": "File is required",
+    "onlyXlsx": "Only XLSX files are supported"
+  },
+  "weight": {
+    "invalid": "Enter a valid weight"
+  },
+  "deliveryFee": {
+    "invalid": "Enter a valid delivery fee"
   },
   "name": {
     "required": "Name is required",

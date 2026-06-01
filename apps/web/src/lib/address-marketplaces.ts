@@ -20,11 +20,7 @@ export interface MarketplaceConfig {
   slug: MarketplaceSlug
   name: string
   screenshotUrls?: string[]
-  note?: string
-  callout?: {
-    title: string
-    content: string
-  }
+  noteKey?: 'wechatInvoiceNote'
   formatAddress: (input: MarketplaceAddressInput) => string[]
   logoUrl: string
 }
@@ -208,7 +204,7 @@ const _1688_CONFIG: MarketplaceConfig = {
 const WECHAT_CONFIG: MarketplaceConfig = {
   slug: 'wechat',
   name: 'WeChat',
-  note: 'If you are buying from a seller on WeChat, ask them to print these details on the invoice',
+  noteKey: 'wechatInvoiceNote',
   formatAddress: formatWeChatAddress,
   logoUrl: '/marketplace-logos/wechat.png',
 }

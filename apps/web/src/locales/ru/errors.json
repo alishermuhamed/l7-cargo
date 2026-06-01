@@ -1,0 +1,5 @@
+{
+  "unableToSendVerificationCode": "Не удалось отправить код подтверждения",
+  "invalidOrExpiredCode": "Код неверный или срок его действия истек",
+  "unableToSaveYourName": "Не удалось сохранить ваше имя"
+}

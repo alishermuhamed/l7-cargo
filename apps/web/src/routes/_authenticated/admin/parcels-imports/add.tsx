@@ -40,7 +40,7 @@ const addParcelsImportSchema = z.object({
     .file(i18n.t('validation:file.required'))
     .mime(
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'Only XLSX files are supported'
+      i18n.t('validation:file.onlyXlsx')
     ),
   parcelStatus: z.enum(Object.values(ParcelStatus)),
   withHeader: z.boolean(),

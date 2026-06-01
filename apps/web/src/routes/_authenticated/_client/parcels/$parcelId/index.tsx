@@ -95,7 +95,7 @@ function ParcelPage() {
 
             {parcel.notes && (
               <DataList.Item>
-                <DataList.Label>Notes</DataList.Label>
+                <DataList.Label>{i18n.t('parcels:notes')}</DataList.Label>
                 <DataList.Value>{parcel.notes}</DataList.Value>
               </DataList.Item>
             )}

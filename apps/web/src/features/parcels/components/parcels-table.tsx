@@ -146,7 +146,7 @@ export function ParcelsTable({
       <Flex align="center" gap="3">
         <IconButton
           type="button"
-          tooltip="Previous"
+          tooltip={i18n.t('common:previous')}
           variant="soft"
           onClick={() => dispatchPage('prev')}
           disabled={page === 0 || isPageLoading}
@@ -156,7 +156,7 @@ export function ParcelsTable({
 
         <IconButton
           type="button"
-          tooltip="Next"
+          tooltip={i18n.t('common:next')}
           variant="soft"
           onClick={() => dispatchPage('next')}
           disabled={!hasNextPage || isPageLoading}
@@ -165,7 +165,7 @@ export function ParcelsTable({
         </IconButton>
 
         <Text size="2" color="gray">
-          Page {page + 1}
+          {i18n.t('common:page', { page: page + 1 })}
         </Text>
       </Flex>
     </Flex>

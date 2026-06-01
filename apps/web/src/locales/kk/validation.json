@@ -1,0 +1,25 @@
+{
+  "phoneNumber": {
+    "required": "Телефон нөмірі міндетті"
+  },
+  "otpCode": {
+    "required": "Растау коды міндетті"
+  },
+  "trackingNumber": {
+    "required": "Трек-нөмір міндетті"
+  },
+  "file": {
+    "required": "Файл міндетті",
+    "onlyXlsx": "Тек XLSX файлдары қолданылады"
+  },
+  "weight": {
+    "invalid": "Дұрыс салмақ енгізіңіз"
+  },
+  "deliveryFee": {
+    "invalid": "Дұрыс жеткізу құнын енгізіңіз"
+  },
+  "name": {
+    "required": "Аты міндетті",
+    "tooLong": "Аты 100 таңбадан аспауы керек"
+  }
+}

@@ -1,11 +1,8 @@
 {
   "title": "Address",
-  "hubTitle": "Choose a marketplace",
-  "hubDescription": "Open a marketplace card to view the formatted address and example screenshots.",
-  "viewAddress": "View address",
-  "detailDescription": "Use the formatted block below when adding the warehouse address.",
-  "formattedAddress": "Formatted address",
-  "exampleScreenshots": "Example screenshots",
-  "copyAddress": "Copy address",
-  "templatePending": "Template coming soon"
+  "copyFullAddress": "Copy full address",
+  "exampleScreenshotsTitle": "Example of a correctly entered address on {{marketplace}}:",
+  "exampleScreenshotAlt": "{{marketplace}} example screenshot {{index}}",
+  "logoAlt": "{{marketplace}} logo",
+  "wechatInvoiceNote": "If you are buying from a seller on WeChat, ask them to print these details on the invoice"
 }

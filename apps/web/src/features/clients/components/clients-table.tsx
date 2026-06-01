@@ -129,7 +129,7 @@ export function ClientsTable({ search }: ClientsTableProps) {
       <Flex align="center" gap="3">
         <IconButton
           type="button"
-          tooltip="Previous"
+          tooltip={i18n.t('common:previous')}
           variant="soft"
           color="gray"
           onClick={() => dispatchPage('prev')}
@@ -140,7 +140,7 @@ export function ClientsTable({ search }: ClientsTableProps) {
 
         <IconButton
           type="button"
-          tooltip="Next"
+          tooltip={i18n.t('common:next')}
           variant="soft"
           color="gray"
           onClick={() => dispatchPage('next')}
@@ -150,7 +150,7 @@ export function ClientsTable({ search }: ClientsTableProps) {
         </IconButton>
 
         <Text size="2" color="gray">
-          Page {page + 1}
+          {i18n.t('common:page', { page: page + 1 })}
         </Text>
       </Flex>
     </Flex>

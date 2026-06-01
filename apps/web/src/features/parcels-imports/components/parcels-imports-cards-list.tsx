@@ -51,12 +51,15 @@ export function ParcelsImportsCardsList() {
                 </Text>
 
                 <Box>
-                  Parcel status:{' '}
+                  {i18n.t('parcels:parcelStatus')}:{' '}
                   <ParcelStatusBadge status={parcelsImport.parcelStatus} />
                 </Box>
 
                 <Text as="p">
-                  Committed: {parcelsImport.isCommitted ? 'Yes' : 'No'}
+                  {i18n.t('parcels:committed')}:{' '}
+                  {parcelsImport.isCommitted
+                    ? i18n.t('common:yes')
+                    : i18n.t('common:no')}
                 </Text>
               </Flex>
             </Link>

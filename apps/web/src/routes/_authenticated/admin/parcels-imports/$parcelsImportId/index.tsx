@@ -105,7 +105,9 @@ function AdminParcelsImportDetailsPage() {
             <DataList.Item>
               <DataList.Label>{i18n.t('parcels:committed')}</DataList.Label>
               <DataList.Value>
-                {parcelsImport.isCommitted ? 'Yes' : 'No'}
+                {parcelsImport.isCommitted
+                  ? i18n.t('common:yes')
+                  : i18n.t('common:no')}
               </DataList.Value>
             </DataList.Item>
 

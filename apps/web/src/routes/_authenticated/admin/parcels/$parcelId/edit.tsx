@@ -59,14 +59,14 @@ const editAdminParcelSchema = z.object({
     .trim()
     .refine(
       (value) => value === '' || WEIGHT_KG_PATTERN.test(value),
-      'Enter a valid weight'
+      i18n.t('validation:weight.invalid')
     ),
   deliveryFee: z
     .string()
     .trim()
     .refine(
       (value) => value === '' || isValidMoneyAmount(value),
-      'Enter a valid delivery fee'
+      i18n.t('validation:deliveryFee.invalid')
     ),
 })
 
@@ -126,7 +126,7 @@ function EditAdminParcelPage() {
 
                   <FormFieldControl>
                     <TextField.Root
-                      placeholder="Enter weight"
+                      placeholder={i18n.t('parcels:weightPlaceholder')}
                       autoComplete="off"
                       inputMode="decimal"
                       {...field}
@@ -150,7 +150,7 @@ function EditAdminParcelPage() {
                   <FormFieldControl>
                     <MoneyTextField
                       currency="KZT"
-                      placeholder="Enter delivery fee"
+                      placeholder={i18n.t('parcels:deliveryFeePlaceholder')}
                       autoComplete="off"
                       {...field}
                     />

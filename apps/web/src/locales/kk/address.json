@@ -1,11 +1,8 @@
 {
-  "title": "Address",
-  "hubTitle": "Choose a marketplace",
-  "hubDescription": "Open a marketplace card to view the formatted address and example screenshots.",
-  "viewAddress": "View address",
-  "detailDescription": "Use the formatted block below when adding the warehouse address.",
-  "formattedAddress": "Formatted address",
-  "exampleScreenshots": "Example screenshots",
-  "copyAddress": "Copy address",
-  "templatePending": "Template coming soon"
+  "title": "Мекенжай",
+  "copyFullAddress": "Мекенжайды толық көшіру",
+  "exampleScreenshotsTitle": "{{marketplace}} сервисінде мекенжайды дұрыс толтыру мысалы:",
+  "exampleScreenshotAlt": "{{marketplace}} скриншот мысалы {{index}}",
+  "logoAlt": "{{marketplace}} логотипі",
+  "wechatInvoiceNote": "WeChat-та сатушыдан сатып алсаңыз, осы деректерді жүкқұжатқа басып шығаруды сұраңыз"
 }
