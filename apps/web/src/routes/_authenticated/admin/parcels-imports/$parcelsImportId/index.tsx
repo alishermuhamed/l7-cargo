@@ -242,35 +242,35 @@ function AdminParcelsImportDetailsPage() {
             </Table.Root>
           </Box>
         </Flex>
+
+        {!parcelsImport.isCommitted && (
+          <Flex
+            direction={{ initial: 'column-reverse', xs: 'row' }}
+            align={{ initial: 'stretch', xs: 'center' }}
+            justify="end"
+            gap="3"
+          >
+            <Button
+              type="button"
+              variant="soft"
+              color="red"
+              onClick={() => setIsDeleteDialogOpen(true)}
+            >
+              <TrashIcon />
+              {i18n.t('parcels:deleteParcelsImportAction')}
+            </Button>
+
+            <Button
+              type="button"
+              loading={commitParcelsImportMutation.isPending}
+              onClick={() => setIsCommitDialogOpen(true)}
+            >
+              <MagicWandIcon />
+              {i18n.t('parcels:commitParcelsImportAction')}
+            </Button>
+          </Flex>
+        )}
       </Flex>
-
-      {!parcelsImport.isCommitted && (
-        <Flex
-          direction={{ initial: 'column-reverse', xs: 'row' }}
-          align={{ initial: 'stretch', xs: 'center' }}
-          justify="end"
-          gap="3"
-        >
-          <Button
-            type="button"
-            variant="soft"
-            color="red"
-            onClick={() => setIsDeleteDialogOpen(true)}
-          >
-            <TrashIcon />
-            {i18n.t('parcels:deleteParcelsImportAction')}
-          </Button>
-
-          <Button
-            type="button"
-            loading={commitParcelsImportMutation.isPending}
-            onClick={() => setIsCommitDialogOpen(true)}
-          >
-            <MagicWandIcon />
-            {i18n.t('parcels:commitParcelsImportAction')}
-          </Button>
-        </Flex>
-      )}
 
       {!parcelsImport.isCommitted && (
         <>
