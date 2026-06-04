@@ -74,49 +74,67 @@ export class OtpDeliveryService {
     code: string
   }): Promise<boolean> {
     const botToken = this.configService.get('otp.telegramFallback.botToken')
-    const chatId = this.configService.get('otp.telegramFallback.chatId')
+    const rawChatIds = this.configService.get('otp.telegramFallback.chatIds')
     const envName = this.configService.get('env.name')
 
-    if (typeof botToken !== 'string' || typeof chatId !== 'string') {
+    if (typeof botToken !== 'string' || typeof rawChatIds !== 'string') {
       this.logger.warn('Telegram OTP fallback is not configured')
       return false
     }
 
-    try {
-      const response = await fetch(
-        `https://api.telegram.org/bot${botToken}/sendMessage`,
-        {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: `L7 Cargo OTP fallback\nEnv: ${envName ?? 'unknown'}\nPhone: ${phoneNumber}\nCode: ${code}`,
-          }),
-        }
-      )
+    const chatIds = rawChatIds
+      .split(',')
+      .map((chatId) => chatId.trim())
+      .filter((chatId) => chatId.length > 0)
 
-      const responseJson = (await response.json()) as {
-        description?: string
-        ok?: boolean
-      }
-
-      if (!response.ok || responseJson.ok !== true) {
-        this.logger.error(
-          `Telegram OTP fallback failed for ${phoneNumber}: ${JSON.stringify(responseJson)}`
-        )
-        return false
-      }
-
-      return true
-    } catch (error: unknown) {
-      this.logger.error(
-        `Telegram OTP fallback request failed for ${phoneNumber}`,
-        error instanceof Error ? (error.stack ?? error.message) : String(error)
-      )
+    if (chatIds.length === 0) {
+      this.logger.warn('Telegram OTP fallback is not configured')
       return false
     }
+
+    const deliveryResults = await Promise.all(
+      chatIds.map(async (chatId) => {
+        try {
+          const response = await fetch(
+            `https://api.telegram.org/bot${botToken}/sendMessage`,
+            {
+              method: 'POST',
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                chat_id: chatId,
+                text: `L7 Cargo OTP fallback\nEnv: ${envName ?? 'unknown'}\nPhone: ${phoneNumber}\nCode: ${code}`,
+              }),
+            }
+          )
+
+          const responseJson = (await response.json()) as {
+            description?: string
+            ok?: boolean
+          }
+
+          if (!response.ok || responseJson.ok !== true) {
+            this.logger.error(
+              `Telegram OTP fallback failed for ${phoneNumber} in chat ${chatId}: ${JSON.stringify(responseJson)}`
+            )
+            return false
+          }
+
+          return true
+        } catch (error: unknown) {
+          this.logger.error(
+            `Telegram OTP fallback request failed for ${phoneNumber} in chat ${chatId}`,
+            error instanceof Error
+              ? (error.stack ?? error.message)
+              : String(error)
+          )
+          return false
+        }
+      })
+    )
+
+    return deliveryResults.some((sent) => sent)
   }
 }

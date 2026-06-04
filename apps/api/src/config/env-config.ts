@@ -36,7 +36,7 @@ export function envConfig() {
       },
       telegramFallback: {
         botToken: process.env.TELEGRAM_FALLBACK_BOT_TOKEN,
-        chatId: process.env.TELEGRAM_FALLBACK_CHAT_ID,
+        chatIds: process.env.TELEGRAM_FALLBACK_CHAT_IDS,
       },
     },
     defaultAdmin: {
