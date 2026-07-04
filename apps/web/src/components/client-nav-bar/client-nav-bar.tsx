@@ -4,6 +4,7 @@ import { Box, Flex, Heading, Link, Text } from '@radix-ui/themes'
 import { Link as RouterLink } from '@tanstack/react-router'
 import type { PropsWithChildren } from 'react'
 
+import { useSessionContext } from '../../hooks/use-session-context'
 import i18n from '../../lib/i18n'
 
 interface ClientNavBarProps {
@@ -11,10 +12,20 @@ interface ClientNavBarProps {
 }
 
 export function ClientNavBar({ onNavigate }: ClientNavBarProps) {
+  const {
+    session: { user },
+  } = useSessionContext()
+
   return (
     <Flex direction="column" justify="between" p="3" height="100%">
       <Flex direction="column" gap="5">
-        <Heading>L7 Cargo</Heading>
+        <Flex direction="column" gap="1">
+          <Heading>L7 Cargo</Heading>
+
+          <Text size="2" color="gray">
+            {i18n.t('clients:id')}: {user.clientId}
+          </Text>
+        </Flex>
 
         <Flex
           aria-label={i18n.t('common:navigation')}

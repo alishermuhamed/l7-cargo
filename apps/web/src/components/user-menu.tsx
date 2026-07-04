@@ -13,6 +13,7 @@ import type { ThemePreference } from '../contexts/theme'
 import { useLocaleContext } from '../hooks/use-locale-context'
 import { useSessionContext } from '../hooks/use-session-context'
 import { useThemeContext } from '../hooks/use-theme-context'
+import { UserRole } from '../lib/api/api.gen'
 import { authClient } from '../lib/auth-client'
 import i18n, {
   type Language,
@@ -60,6 +61,12 @@ export function UserMenu() {
             <Text size="1" color="gray">
               {phoneNumber}
             </Text>
+
+            {session.user.role === UserRole.client && (
+              <Text size="1" color="gray">
+                {i18n.t('clients:id')}: {session.user.clientId}
+              </Text>
+            )}
           </Flex>
         </Box>
 
