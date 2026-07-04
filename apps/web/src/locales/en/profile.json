@@ -2,5 +2,6 @@
   "profile": "Profile",
   "editProfile": "Edit profile",
   "name": "Name",
+  "clientId": "Client ID",
   "unableToUpdateProfile": "Unable to update profile"
 }

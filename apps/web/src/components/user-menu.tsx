@@ -64,7 +64,7 @@ export function UserMenu() {
 
             {session.user.role === UserRole.client && (
               <Text size="1" color="gray">
-                {i18n.t('clients:id')}: {session.user.clientId}
+                {i18n.t('profile:clientId')}: {session.user.clientId}
               </Text>
             )}
           </Flex>

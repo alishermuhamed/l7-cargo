@@ -23,7 +23,7 @@ export function ClientNavBar({ onNavigate }: ClientNavBarProps) {
           <Heading>L7 Cargo</Heading>
 
           <Text size="2" color="gray">
-            {i18n.t('clients:id')}: {user.clientId}
+            {i18n.t('profile:clientId')}: {user.clientId}
           </Text>
         </Flex>
 

@@ -24,7 +24,7 @@ function ProfilePage() {
         <Flex direction="column" gap="4">
           <DataList.Root>
             <DataList.Item>
-              <DataList.Label>{i18n.t('clients:id')}</DataList.Label>
+              <DataList.Label>{i18n.t('profile:clientId')}</DataList.Label>
               <DataList.Value>{session.user.clientId}</DataList.Value>
             </DataList.Item>
 
