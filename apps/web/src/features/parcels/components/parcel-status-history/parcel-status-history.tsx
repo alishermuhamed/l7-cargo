@@ -61,7 +61,7 @@ export function ParcelStatusHistory({ history }: ParcelStatusHistoryProps) {
 
                   <Text as="p" color="gray" size="2">
                     {isDone
-                      ? formatDateTime(entry.createdAt)
+                      ? formatDateTime(entry.achievedAt)
                       : i18n.t('parcels:pendingStatus')}
                   </Text>
                 </Flex>

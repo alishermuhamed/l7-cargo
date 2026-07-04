@@ -15,13 +15,16 @@ export class ParcelStatusHistoryService {
   async create({
     parcelId,
     status,
+    achievedAt,
   }: {
     parcelId: string
     status: ParcelStatus
+    achievedAt: Date
   }): Promise<ParcelStatusHistory['id']> {
     const history = this.parcelStatusHistoryRepository.create({
       parcelId,
       status,
+      achievedAt,
     })
 
     await this.parcelStatusHistoryRepository.insert(history)

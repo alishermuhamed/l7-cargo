@@ -17,6 +17,7 @@ import { AddParcelStatusHistory1778165216012 } from './migrations/1778165216012-
 import { AddUserRole1778267733853 } from './migrations/1778267733853-add-user-role'
 import { AddClientId1778411635666 } from './migrations/1778411635666-add-client-id'
 import { AddParcelsImportEntity1778745509438 } from './migrations/1778745509438-add-parcels-import-entity'
+import { AddAchievedAtToParcelStatusHistory1783196326251 } from './migrations/1783196326251-add-achieved-at-to-parcel-status-history'
 
 export function buildDataSourceOptions(
   db: EnvConfig['database']
@@ -50,6 +51,7 @@ export function buildDataSourceOptions(
       AddUserRole1778267733853,
       AddClientId1778411635666,
       AddParcelsImportEntity1778745509438,
+      AddAchievedAtToParcelStatusHistory1783196326251,
     ],
   }
 }

@@ -284,6 +284,8 @@ export class ParcelsImportsService {
     const { existingUsersByClientIds, existingParcelsByTrackingNumbers } =
       await this.loadExistingData(rows)
 
+    const achievedAt = new Date()
+
     for (const row of rows) {
       const existingParcel = existingParcelsByTrackingNumbers.get(
         row.trackingNumber
@@ -305,6 +307,7 @@ export class ParcelsImportsService {
         await this.parcelStatusHistoryService.create({
           parcelId: existingParcel.id,
           status: parcelStatus,
+          achievedAt,
         })
       } else {
         const createdParcelId = await this.parcelsService.create({
@@ -319,6 +322,7 @@ export class ParcelsImportsService {
         await this.parcelStatusHistoryService.create({
           parcelId: createdParcelId,
           status: parcelStatus,
+          achievedAt,
         })
       }
     }
