@@ -16,6 +16,7 @@ import {
   FormFieldLabel,
 } from '../../../../components/form'
 import { Select } from '../../../../components/select/select'
+import { TextField } from '../../../../components/text-field'
 import { UnsavedChangesBlocker } from '../../../../components/unsaved-changes-blocker'
 import { PARCEL_STATUS_LABELS } from '../../../../features/parcels/lib/parcel-status-labels'
 import {
@@ -23,6 +24,7 @@ import {
   type CreateParcelsImportRequestDto,
   ParcelStatus,
 } from '../../../../lib/api/api.gen'
+import { formatIsoDate } from '../../../../lib/date-time'
 import i18n from '../../../../lib/i18n'
 
 export const Route = createFileRoute(
@@ -43,6 +45,7 @@ const addParcelsImportSchema = z.object({
       i18n.t('validation:file.onlyXlsx')
     ),
   parcelStatus: z.enum(Object.values(ParcelStatus)),
+  achievedAt: z.iso.date(),
   withHeader: z.boolean(),
 })
 
@@ -56,6 +59,7 @@ function AdminAddParcelsImportPage() {
     defaultValues: {
       file: undefined,
       parcelStatus: ParcelStatus.left_china,
+      achievedAt: formatIsoDate(new Date()),
       withHeader: true,
     },
   })
@@ -68,12 +72,14 @@ function AdminAddParcelsImportPage() {
   const onSubmit = async ({
     file,
     parcelStatus,
+    achievedAt,
     withHeader,
   }: AddParcelsImportFormValues) => {
     try {
       const { id } = await createParcelsImportMutation.mutateAsync({
         file,
         parcelStatus,
+        achievedAt,
         withHeader: withHeader ? 'true' : 'false',
       })
 
@@ -140,6 +146,24 @@ function AdminAddParcelsImportPage() {
                             value: ps,
                           }))}
                         />
+                      </FormFieldControl>
+
+                      <FormFieldError />
+                    </FormFieldItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="achievedAt"
+                  render={({ field }) => (
+                    <FormFieldItem>
+                      <FormFieldLabel>
+                        {i18n.t('parcels:achievedAt')}
+                      </FormFieldLabel>
+
+                      <FormFieldControl>
+                        <TextField.Root type="date" {...field} />
                       </FormFieldControl>
 
                       <FormFieldError />

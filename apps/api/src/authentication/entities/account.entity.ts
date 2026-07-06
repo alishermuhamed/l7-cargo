@@ -1,7 +1,7 @@
 import { Entity, ManyToOne } from 'typeorm'
 
 import { BaseEntity } from '../../db/base.entity'
-import { DateColumn } from '../../db/columns/date-column'
+import { DateTimeColumn } from '../../db/columns/date-time-column'
 import { TextColumn } from '../../db/columns/text-column'
 import { UUIDColumn } from '../../db/columns/uuid-column'
 import { User } from '../../users/entities/user.entity'
@@ -20,10 +20,10 @@ export class Account extends BaseEntity {
   @TextColumn({ nullable: true })
   refreshToken!: string | null
 
-  @DateColumn({ nullable: true })
+  @DateTimeColumn({ nullable: true })
   accessTokenExpiresAt!: Date | null
 
-  @DateColumn({ nullable: true })
+  @DateTimeColumn({ nullable: true })
   refreshTokenExpiresAt!: Date | null
 
   @TextColumn({ nullable: true })

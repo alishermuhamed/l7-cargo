@@ -22,6 +22,7 @@
   "trackingNumberPlaceholder": "Введите трек-номер",
   "importFile": "XLSX-файл",
   "withHeader": "В файле есть строка заголовков",
+  "achievedAt": "Дата достижения статуса",
   "description": "Описание",
   "descriptionPlaceholder": "Введите описание",
   "noDescription": "Нет описания",

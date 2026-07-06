@@ -18,6 +18,8 @@ import { AddUserRole1778267733853 } from './migrations/1778267733853-add-user-ro
 import { AddClientId1778411635666 } from './migrations/1778411635666-add-client-id'
 import { AddParcelsImportEntity1778745509438 } from './migrations/1778745509438-add-parcels-import-entity'
 import { AddAchievedAtToParcelStatusHistory1783196326251 } from './migrations/1783196326251-add-achieved-at-to-parcel-status-history'
+import { AddAchievedAtToParcelsImport1783197115439 } from './migrations/1783197115439-add-achieved-at-to-parcels-import'
+import { ConvertAchievedAtToDateOnly1783368829744 } from './migrations/1783368829744-convert-achieved-at-to-date-only'
 
 export function buildDataSourceOptions(
   db: EnvConfig['database']
@@ -52,6 +54,8 @@ export function buildDataSourceOptions(
       AddClientId1778411635666,
       AddParcelsImportEntity1778745509438,
       AddAchievedAtToParcelStatusHistory1783196326251,
+      AddAchievedAtToParcelsImport1783197115439,
+      ConvertAchievedAtToDateOnly1783368829744,
     ],
   }
 }

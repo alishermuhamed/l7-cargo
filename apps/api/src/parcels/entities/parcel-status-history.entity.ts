@@ -20,5 +20,5 @@ export class ParcelStatusHistory extends BaseEntity {
   status!: ParcelStatus
 
   @DateColumn()
-  achievedAt!: Date
+  achievedAt!: string
 }

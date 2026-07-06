@@ -50,6 +50,7 @@ export class GetParcelsImportResponseDto {
     enumName: 'ParcelStatus',
   })
   parcelStatus!: ParcelStatus
+  achievedAt!: string
   committedAt!: string | null
   parsedData!: ParsedParcelsImportDataDto
 }

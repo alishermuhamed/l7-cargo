@@ -128,6 +128,7 @@ export interface SuccessResponseDto {
 export interface CreateParcelsImportRequestDto {
   file: Blob
   parcelStatus: ParcelStatus
+  achievedAt: string
   withHeader: string
 }
 
@@ -139,6 +140,7 @@ export interface GetParcelsImportSummaryResponseDto {
   parcelStatus: ParcelStatus
   id: string
   createdAt: string
+  achievedAt: string
   isCommitted: boolean
   /** @nullable */
   committedAt: string | null
@@ -192,6 +194,7 @@ export interface GetParcelsImportResponseDto {
   parcelStatus: ParcelStatus
   id: string
   isCommitted: boolean
+  achievedAt: string
   /** @nullable */
   committedAt: string | null
   parsedData: ParsedParcelsImportDataDto
@@ -517,6 +520,7 @@ export const createParcelsImport = async (
   const formData = new FormData()
   formData.append(`file`, createParcelsImportRequestDto.file)
   formData.append(`parcelStatus`, createParcelsImportRequestDto.parcelStatus)
+  formData.append(`achievedAt`, createParcelsImportRequestDto.achievedAt)
   formData.append(`withHeader`, createParcelsImportRequestDto.withHeader)
 
   return customFetch<CreateParcelsImportResponseDto>(

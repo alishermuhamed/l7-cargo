@@ -1,10 +1,10 @@
 import { Column, ColumnOptions } from 'typeorm'
 
 /**
- * `@Column({ type: 'timestamp with time zone', ...options })`
+ * `@Column({ type: 'date', ...options })`
  */
 export function DateColumn(
   options: Omit<ColumnOptions, 'type'> = {}
 ): PropertyDecorator {
-  return Column({ type: 'timestamp with time zone', ...options })
+  return Column({ type: 'date', ...options })
 }

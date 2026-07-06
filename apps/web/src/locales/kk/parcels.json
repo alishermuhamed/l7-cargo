@@ -22,6 +22,7 @@
   "trackingNumberPlaceholder": "Трек-нөмірді енгізіңіз",
   "importFile": "XLSX файлы",
   "withHeader": "Файлда тақырып жолы бар",
+  "achievedAt": "Қол жеткізілген күні",
   "description": "Сипаттама",
   "descriptionPlaceholder": "Сипаттаманы енгізіңіз",
   "noDescription": "Сипаттама жоқ",

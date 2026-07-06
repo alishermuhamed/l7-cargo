@@ -3,6 +3,7 @@ import { Entity } from 'typeorm'
 import { BaseEntity } from '../../db/base.entity'
 import { BooleanColumn } from '../../db/columns/boolean-column'
 import { DateColumn } from '../../db/columns/date-column'
+import { DateTimeColumn } from '../../db/columns/date-time-column'
 import { JsonbColumn } from '../../db/columns/jsonb-column'
 import { TextColumn } from '../../db/columns/text-column'
 import type { ParcelStatus } from '../../parcels/parcel-status'
@@ -55,7 +56,10 @@ export class ParcelsImport extends BaseEntity {
   @TextColumn()
   parcelStatus!: ParcelStatus
 
-  @DateColumn({ nullable: true })
+  @DateColumn()
+  achievedAt!: string
+
+  @DateTimeColumn({ nullable: true })
   committedAt!: Date | null
 
   @JsonbColumn()

@@ -19,7 +19,7 @@ export class ParcelStatusHistoryService {
   }: {
     parcelId: string
     status: ParcelStatus
-    achievedAt: Date
+    achievedAt: string
   }): Promise<ParcelStatusHistory['id']> {
     const history = this.parcelStatusHistoryRepository.create({
       parcelId,

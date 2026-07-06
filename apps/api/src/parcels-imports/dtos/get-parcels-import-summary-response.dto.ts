@@ -12,6 +12,7 @@ export class GetParcelsImportSummaryResponseDto {
   })
   parcelStatus!: ParcelStatus
 
+  achievedAt!: string
   isCommitted!: boolean
   committedAt!: string | null
 }

@@ -45,16 +45,19 @@ export class ParcelsImportsService {
     file,
     withHeader,
     parcelStatus,
+    achievedAt,
   }: {
     file: Express.Multer.File
     withHeader: boolean
     parcelStatus: ParcelStatus
+    achievedAt: string
   }): Promise<ParcelsImport['id']> {
     const parsedData = await this.buildParsedData(file, withHeader)
 
     const parcelsImport = this.parcelsImportsRepository.create({
       isCommitted: false,
       parcelStatus,
+      achievedAt,
       parsedData,
     })
 
@@ -75,7 +78,8 @@ export class ParcelsImportsService {
 
     await this.commitParsedRows(
       parcelsImport.parsedData.rows,
-      parcelsImport.parcelStatus
+      parcelsImport.parcelStatus,
+      parcelsImport.achievedAt
     )
 
     await this.parcelsImportsRepository.update(
@@ -279,12 +283,11 @@ export class ParcelsImportsService {
 
   private async commitParsedRows(
     rows: ParsedParcelsImportRow[],
-    parcelStatus: ParcelStatus
+    parcelStatus: ParcelStatus,
+    achievedAt: string
   ): Promise<void> {
     const { existingUsersByClientIds, existingParcelsByTrackingNumbers } =
       await this.loadExistingData(rows)
-
-    const achievedAt = new Date()
 
     for (const row of rows) {
       const existingParcel = existingParcelsByTrackingNumbers.get(
