@@ -161,11 +161,11 @@ export class ParcelsImportsService {
         }
 
         try {
-          const clientId = this.parseClientId(row[1])
-          const trackingNumber = this.parseTrackingNumber(row[2])
-          const weightKg = this.parseWeightKg(row[3])
-          const deliveryFee = this.parseDeliveryFee(row[4])
-          const notes = this.parseNotes(row[5])
+          const clientId = this.parseClientId(row[0])
+          const trackingNumber = this.parseTrackingNumber(row[1])
+          const weightKg = this.parseWeightKg(row[2])
+          const deliveryFee = this.parseDeliveryFee(row[3])
+          const notes = this.parseNotes(row[4])
 
           rows.push({
             rowNumber,
