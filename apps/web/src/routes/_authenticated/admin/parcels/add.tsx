@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Container, Flex } from '@radix-ui/themes'
+import { Cross1Icon } from '@radix-ui/react-icons'
+import { Box, Container, Flex, Heading } from '@radix-ui/themes'
 import { useMutation } from '@tanstack/react-query'
 import {
   createFileRoute,
@@ -7,7 +8,7 @@ import {
   useNavigate,
 } from '@tanstack/react-router'
 import BigNumber from 'bignumber.js'
-import { useForm } from 'react-hook-form'
+import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import z from 'zod'
 
@@ -20,12 +21,21 @@ import {
   FormFieldItem,
   FormFieldLabel,
 } from '../../../../components/form'
+import { IconButton } from '../../../../components/icon-button'
 import { MoneyTextField } from '../../../../components/money-text-field'
 import { TextField } from '../../../../components/text-field'
 import { UnsavedChangesBlocker } from '../../../../components/unsaved-changes-blocker'
 import {
+  ParcelStatusHistory,
+  ParcelStatusHistoryItem,
+} from '../../../../features/parcels/components/parcel-status-history/parcel-status-history'
+import { PARCEL_STATUS_LABELS } from '../../../../features/parcels/lib/parcel-status-labels'
+import {
   createParcel,
   type CreateParcelRequestDto,
+  ParcelStatus,
+  putParcelStatusHistory,
+  type PutParcelStatusHistoryRequestDto,
 } from '../../../../lib/api/api.gen'
 import { ApiError } from '../../../../lib/api/custom-fetch'
 import i18n from '../../../../lib/i18n'
@@ -60,6 +70,12 @@ const addAdminParcelSchema = z.object({
       (value) => value === '' || isValidMoneyAmount(value),
       i18n.t('validation:deliveryFee.invalid')
     ),
+  statusHistory: z
+    .object({
+      status: z.enum(ParcelStatus),
+      achievedAt: z.union([z.iso.date(), z.literal('')]),
+    })
+    .array(),
 })
 
 type AddAdminParcelFormValues = z.infer<typeof addAdminParcelSchema>
@@ -73,33 +89,59 @@ function AddAdminParcelPage() {
       trackingNumber: '',
       weightKg: '',
       deliveryFee: '',
+      statusHistory: Object.values(ParcelStatus).map((status) => ({
+        status,
+        achievedAt: '',
+      })),
     },
   })
 
-  const addParcelMutation = useMutation({
+  const statusHistory = useFieldArray({
+    control: form.control,
+    name: 'statusHistory',
+  })
+
+  const watchedStatusHistory = useWatch({
+    control: form.control,
+    name: 'statusHistory',
+  })
+
+  const controlledStatusHistory = statusHistory.fields.map((field, index) => ({
+    ...field,
+    ...watchedStatusHistory[index],
+  }))
+
+  const createParcelMutation = useMutation({
     mutationFn: (dto: CreateParcelRequestDto) => createParcel(dto),
+  })
+
+  const putParcelStatusHistoryMutation = useMutation({
+    mutationFn: ({
+      parcelId,
+      dto,
+    }: {
+      parcelId: string
+      dto: PutParcelStatusHistoryRequestDto
+    }) => putParcelStatusHistory(parcelId, dto),
   })
 
   const onSubmit = async ({
     trackingNumber,
     weightKg,
     deliveryFee,
+    statusHistory,
   }: AddAdminParcelFormValues) => {
+    let parcelId: string
+
     try {
-      const { id } = await addParcelMutation.mutateAsync({
+      const parcel = await createParcelMutation.mutateAsync({
         trackingNumber,
         weightKg:
           weightKg === '' ? undefined : new BigNumber(weightKg).toFixed(),
         deliveryFee:
           deliveryFee === '' ? undefined : normalizeMoneyAmount(deliveryFee),
       })
-
-      await navigate({
-        to: '/admin/parcels/$parcelId',
-        params: { parcelId: id },
-        ignoreBlocker: true,
-        replace: true,
-      })
+      parcelId = parcel.id
     } catch (error) {
       if (error instanceof ApiError && error.status === 409) {
         form.setError(
@@ -111,7 +153,30 @@ function AddAdminParcelPage() {
       }
 
       toast.error(i18n.t('parcels:unableToAddParcel'))
+      return
     }
+
+    const entries = statusHistory.flatMap(({ status, achievedAt }) =>
+      achievedAt === '' ? [] : [{ status, achievedAt }]
+    )
+
+    if (entries.length > 0) {
+      try {
+        await putParcelStatusHistoryMutation.mutateAsync({
+          parcelId,
+          dto: { entries },
+        })
+      } catch {
+        toast.error(i18n.t('parcels:unableToUpdateStatusHistory'))
+      }
+    }
+
+    await navigate({
+      to: '/admin/parcels/$parcelId',
+      params: { parcelId },
+      ignoreBlocker: true,
+      replace: true,
+    })
   }
 
   return (
@@ -184,6 +249,50 @@ function AddAdminParcelPage() {
                 </FormFieldItem>
               )}
             />
+
+            <Heading size="4">{i18n.t('parcels:statusHistory')}</Heading>
+
+            <ParcelStatusHistory>
+              {controlledStatusHistory.map((item, index) => (
+                <ParcelStatusHistoryItem
+                  key={item.id}
+                  isAchieved={!!item.achievedAt}
+                >
+                  <FormField
+                    control={form.control}
+                    name={`statusHistory.${index}.achievedAt`}
+                    render={({ field }) => (
+                      <FormFieldItem mb="3">
+                        <FormFieldLabel>
+                          {PARCEL_STATUS_LABELS[item.status]}
+                        </FormFieldLabel>
+
+                        <Flex align="center" gap="3">
+                          <Box asChild width="200px">
+                            <FormFieldControl>
+                              <TextField.Root type="date" {...field} />
+                            </FormFieldControl>
+                          </Box>
+
+                          {field.value && (
+                            <IconButton
+                              type="button"
+                              size="1"
+                              variant="ghost"
+                              onClick={() => field.onChange('')}
+                            >
+                              <Cross1Icon />
+                            </IconButton>
+                          )}
+                        </Flex>
+
+                        <FormFieldError />
+                      </FormFieldItem>
+                    )}
+                  />
+                </ParcelStatusHistoryItem>
+              ))}
+            </ParcelStatusHistory>
 
             <Flex
               direction={{ initial: 'column-reverse', xs: 'row' }}

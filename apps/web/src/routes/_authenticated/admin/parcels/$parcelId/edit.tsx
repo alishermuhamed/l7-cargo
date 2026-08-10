@@ -33,7 +33,9 @@ import { PARCEL_STATUS_LABELS } from '../../../../../features/parcels/lib/parcel
 import {
   ParcelStatus,
   putParcelStatusHistory,
+  type PutParcelStatusHistoryRequestDto,
   updateParcel,
+  type UpdateParcelRequestDto,
 } from '../../../../../lib/api/api.gen'
 import {
   getParcelQueryOptions,
@@ -125,40 +127,48 @@ function EditAdminParcelPage() {
     ...watchedStatusHistory[index],
   }))
 
-  const editParcelMutation = useMutation({
-    mutationFn: async ({
-      weightKg,
-      deliveryFee,
-      statusHistory,
-    }: EditAdminParcelFormValues) => {
-      await Promise.all([
-        updateParcel(initialParcel.id, {
-          weightKg: weightKg === '' ? null : new BigNumber(weightKg).toFixed(),
-          deliveryFee:
-            deliveryFee === '' ? null : normalizeMoneyAmount(deliveryFee),
-        }),
-        putParcelStatusHistory(initialParcel.id, {
-          entries: statusHistory.flatMap(({ status, achievedAt }) =>
-            achievedAt === '' ? [] : [{ status, achievedAt }]
-          ),
-        }),
-      ])
-    },
+  const updateParcelMutation = useMutation({
+    mutationFn: (dto: UpdateParcelRequestDto) =>
+      updateParcel(initialParcel.id, dto),
   })
 
-  const onSubmit = async (values: EditAdminParcelFormValues) => {
-    try {
-      await editParcelMutation.mutateAsync(values)
+  const putParcelStatusHistoryMutation = useMutation({
+    mutationFn: (dto: PutParcelStatusHistoryRequestDto) =>
+      putParcelStatusHistory(initialParcel.id, dto),
+  })
 
-      await navigate({
-        to: '/admin/parcels/$parcelId',
-        params: { parcelId: initialParcel.id },
-        ignoreBlocker: true,
-        replace: true,
+  const onSubmit = async ({
+    weightKg,
+    deliveryFee,
+    statusHistory,
+  }: EditAdminParcelFormValues) => {
+    try {
+      await updateParcelMutation.mutateAsync({
+        weightKg: weightKg === '' ? null : new BigNumber(weightKg).toFixed(),
+        deliveryFee:
+          deliveryFee === '' ? null : normalizeMoneyAmount(deliveryFee),
       })
     } catch {
       toast.error(i18n.t('parcels:unableToEditParcel'))
+      return
     }
+
+    try {
+      await putParcelStatusHistoryMutation.mutateAsync({
+        entries: statusHistory.flatMap(({ status, achievedAt }) =>
+          achievedAt === '' ? [] : [{ status, achievedAt }]
+        ),
+      })
+    } catch {
+      toast.error(i18n.t('parcels:unableToUpdateStatusHistory'))
+    }
+
+    await navigate({
+      to: '/admin/parcels/$parcelId',
+      params: { parcelId: initialParcel.id },
+      ignoreBlocker: true,
+      replace: true,
+    })
   }
 
   return (
