@@ -46,7 +46,6 @@ const addAdminParcelSchema = z.object({
     .string()
     .trim()
     .min(1, i18n.t('validation:trackingNumber.required')),
-  description: z.string().trim(),
   weightKg: z
     .string()
     .trim()
@@ -72,7 +71,6 @@ function AddAdminParcelPage() {
     resolver: zodResolver(addAdminParcelSchema),
     defaultValues: {
       trackingNumber: '',
-      description: '',
       weightKg: '',
       deliveryFee: '',
     },
@@ -84,14 +82,12 @@ function AddAdminParcelPage() {
 
   const onSubmit = async ({
     trackingNumber,
-    description,
     weightKg,
     deliveryFee,
   }: AddAdminParcelFormValues) => {
     try {
       const { id } = await addParcelMutation.mutateAsync({
         trackingNumber,
-        description: description || undefined,
         weightKg:
           weightKg === '' ? undefined : new BigNumber(weightKg).toFixed(),
         deliveryFee:
@@ -135,28 +131,6 @@ function AddAdminParcelPage() {
                   <FormFieldControl>
                     <TextField.Root
                       placeholder={i18n.t('parcels:trackingNumberPlaceholder')}
-                      autoComplete="off"
-                      {...field}
-                    />
-                  </FormFieldControl>
-
-                  <FormFieldError />
-                </FormFieldItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormFieldItem>
-                  <FormFieldLabel>
-                    {i18n.t('parcels:description')}
-                  </FormFieldLabel>
-
-                  <FormFieldControl>
-                    <TextField.Root
-                      placeholder={i18n.t('parcels:descriptionPlaceholder')}
                       autoComplete="off"
                       {...field}
                     />
