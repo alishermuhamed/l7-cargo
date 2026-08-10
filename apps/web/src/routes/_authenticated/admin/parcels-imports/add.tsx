@@ -24,7 +24,6 @@ import {
   type CreateParcelsImportRequestDto,
   ParcelStatus,
 } from '../../../../lib/api/api.gen'
-import { formatIsoDate } from '../../../../lib/date-time'
 import i18n from '../../../../lib/i18n'
 
 export const Route = createFileRoute(
@@ -59,7 +58,7 @@ function AdminAddParcelsImportPage() {
     defaultValues: {
       file: undefined,
       parcelStatus: ParcelStatus.left_china,
-      achievedAt: formatIsoDate(new Date()),
+      achievedAt: '',
       withHeader: true,
     },
   })

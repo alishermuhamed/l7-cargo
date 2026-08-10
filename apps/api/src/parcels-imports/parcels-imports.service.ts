@@ -296,38 +296,33 @@ export class ParcelsImportsService {
 
       const matchingUser = existingUsersByClientIds.get(row.clientId) ?? null
 
+      let parcelId: string
+
       if (existingParcel) {
+        parcelId = existingParcel.id
         const userId = existingParcel.userId ?? matchingUser?.id ?? null
 
-        await this.parcelsService.update(existingParcel.id, {
+        await this.parcelsService.update(parcelId, {
           userId,
-          status: parcelStatus,
           weightKg: row.weightKg?.toFixed(3),
           deliveryFee: row.deliveryFee?.toFixed(),
           notes: row.notes,
-        })
-
-        await this.parcelStatusHistoryService.create({
-          parcelId: existingParcel.id,
-          status: parcelStatus,
-          achievedAt,
         })
       } else {
-        const createdParcelId = await this.parcelsService.create({
+        parcelId = await this.parcelsService.create({
           trackingNumber: row.trackingNumber,
           userId: matchingUser?.id ?? null,
-          status: parcelStatus,
           weightKg: row.weightKg?.toFixed(3),
           deliveryFee: row.deliveryFee?.toFixed(),
           notes: row.notes,
         })
-
-        await this.parcelStatusHistoryService.create({
-          parcelId: createdParcelId,
-          status: parcelStatus,
-          achievedAt,
-        })
       }
+
+      await this.parcelStatusHistoryService.upsert({
+        parcelId,
+        status: parcelStatus,
+        achievedAt,
+      })
     }
   }
 

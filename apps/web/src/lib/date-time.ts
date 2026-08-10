@@ -9,6 +9,14 @@ export function formatDateTime(value: string) {
   }).format(new Date(value))
 }
 
+export function formatDate(value: string) {
+  const locale = i18n.resolvedLanguage ?? i18n.language ?? 'en'
+
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: 'medium',
+  }).format(new Date(`${value}T00:00:00`))
+}
+
 export function formatIsoDate(value: Date) {
   const parts = new Intl.DateTimeFormat('en', {
     year: 'numeric',

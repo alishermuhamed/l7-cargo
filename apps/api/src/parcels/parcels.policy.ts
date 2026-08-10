@@ -7,6 +7,7 @@ import { EntityPolicyProvider } from '../authorization/decorators/entity-policy-
 import { EntityPolicy } from '../authorization/entity.policy'
 import { ContextService } from '../context/context.service'
 import { User } from '../users/entities/user.entity'
+import { CreateParcelRequestDto } from './dtos/create-parcel-request.dto'
 import { UpdateParcelRequestDto } from './dtos/update-parcel-request.dto'
 import { Parcel } from './entities/parcel.entity'
 import { ParcelsService } from './parcels.service'
@@ -29,15 +30,22 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
       return
     }
 
-    can('create', Parcel)
+    can('create', Parcel, ['trackingNumber', 'source', 'description'])
     can('read', Parcel, { userId: user.id })
     can('update', Parcel, ['source', 'description'], { userId: user.id })
     can('delete', Parcel, { userId: user.id })
   }
 
-  checkCanCreate(): void {
-    if (!this.ability.can('create', Parcel)) {
-      throw new ForbiddenException()
+  checkCanCreate(createParcelRequestDto: CreateParcelRequestDto): void {
+    for (const field of Object.keys(createParcelRequestDto) as Array<
+      keyof CreateParcelRequestDto
+    >) {
+      if (
+        createParcelRequestDto[field] !== undefined &&
+        !this.ability.can('create', Parcel, field)
+      ) {
+        throw new ForbiddenException()
+      }
     }
   }
 
@@ -59,14 +67,9 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
       where: { id: parcelId },
     })
 
-    const updateFields: Array<keyof UpdateParcelRequestDto> = [
-      'source',
-      'description',
-      'weightKg',
-      'deliveryFee',
-    ]
-
-    for (const field of updateFields) {
+    for (const field of Object.keys(updateParcelRequestDto) as Array<
+      keyof UpdateParcelRequestDto
+    >) {
       if (
         updateParcelRequestDto[field] !== undefined &&
         !this.ability.can('update', parcel, field)
@@ -82,6 +85,14 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
     })
 
     if (!this.ability.can('delete', parcel)) {
+      throw new ForbiddenException()
+    }
+  }
+
+  checkCanManageStatusHistory(): void {
+    const user = this.contextService.getUserOrThrow()
+
+    if (user.role !== 'admin') {
       throw new ForbiddenException()
     }
   }

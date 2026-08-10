@@ -20,6 +20,7 @@ import { AddParcelsImportEntity1778745509438 } from './migrations/1778745509438-
 import { AddAchievedAtToParcelStatusHistory1783196326251 } from './migrations/1783196326251-add-achieved-at-to-parcel-status-history'
 import { AddAchievedAtToParcelsImport1783197115439 } from './migrations/1783197115439-add-achieved-at-to-parcels-import'
 import { ConvertAchievedAtToDateOnly1783368829744 } from './migrations/1783368829744-convert-achieved-at-to-date-only'
+import { MakeParcelStatusHistoryUnique1786125107169 } from './migrations/1786125107169-make-parcel-status-history-unique'
 
 export function buildDataSourceOptions(
   db: EnvConfig['database']
@@ -56,6 +57,7 @@ export function buildDataSourceOptions(
       AddAchievedAtToParcelStatusHistory1783196326251,
       AddAchievedAtToParcelsImport1783197115439,
       ConvertAchievedAtToDateOnly1783368829744,
+      MakeParcelStatusHistoryUnique1786125107169,
     ],
   }
 }

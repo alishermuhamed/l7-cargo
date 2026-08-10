@@ -57,10 +57,15 @@ export interface GetUserResponseDto {
 }
 
 export interface CreateParcelRequestDto {
-  /** @minLength 1 */
+  /**
+   * @minLength 1
+   * @pattern \S
+   */
   trackingNumber: string
   source?: string
   description?: string
+  weightKg?: string
+  deliveryFee?: string
 }
 
 export interface CreateParcelResponseDto {
@@ -110,6 +115,19 @@ export interface GetParcelStatusHistoryResponseDto {
   achievedAt: string
 }
 
+export interface PutParcelStatusHistoryEntryRequestDto {
+  status: ParcelStatus
+  achievedAt: string
+}
+
+export interface PutParcelStatusHistoryRequestDto {
+  entries: PutParcelStatusHistoryEntryRequestDto[]
+}
+
+export interface SuccessResponseDto {
+  success: boolean
+}
+
 export interface UpdateParcelRequestDto {
   /** @nullable */
   source?: string | null
@@ -119,10 +137,6 @@ export interface UpdateParcelRequestDto {
   weightKg?: string | null
   /** @nullable */
   deliveryFee?: string | null
-}
-
-export interface SuccessResponseDto {
-  success: boolean
 }
 
 export interface CreateParcelsImportRequestDto {
@@ -505,6 +519,26 @@ export const getParcelStatusHistory = async (
     {
       ...options,
       method: 'GET',
+    }
+  )
+}
+
+export const getPutParcelStatusHistoryUrl = (parcelId: string) => {
+  return `/parcels/${parcelId}/status-history`
+}
+
+export const putParcelStatusHistory = async (
+  parcelId: string,
+  putParcelStatusHistoryRequestDto: PutParcelStatusHistoryRequestDto,
+  options?: RequestInit
+): Promise<SuccessResponseDto> => {
+  return customFetch<SuccessResponseDto>(
+    getPutParcelStatusHistoryUrl(parcelId),
+    {
+      ...options,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(putParcelStatusHistoryRequestDto),
     }
   )
 }

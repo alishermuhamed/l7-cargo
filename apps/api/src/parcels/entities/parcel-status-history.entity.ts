@@ -8,6 +8,7 @@ import type { ParcelStatus } from '../parcel-status'
 import { Parcel } from './parcel.entity'
 
 @Index(['parcelId', 'createdAt'])
+@Index(['parcelId', 'status'], { unique: true })
 @Entity()
 export class ParcelStatusHistory extends BaseEntity {
   @UUIDColumn()

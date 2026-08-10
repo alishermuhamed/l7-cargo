@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { ConflictException, Injectable } from '@nestjs/common'
 import { FindManyOptions, FindOneOptions, FindOptionsRelations } from 'typeorm'
 
 import { WithRelations } from '../db/db.types'
@@ -29,8 +29,17 @@ export class ParcelsService {
     deliveryFee?: string | null
     notes?: string | null
   }): Promise<Parcel['id']> {
+    const normalizedTrackingNumber = trackingNumber.trim()
+    const existingParcel = await this.parcelsRepository.findOne({
+      where: { trackingNumber: normalizedTrackingNumber },
+    })
+
+    if (existingParcel) {
+      throw new ConflictException('PARCEL_TRACKING_NUMBER_EXISTS')
+    }
+
     const parcel = this.parcelsRepository.create({
-      trackingNumber,
+      trackingNumber: normalizedTrackingNumber,
       userId,
       status,
       source,

@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Container, Flex } from '@radix-ui/themes'
+import { Cross1Icon } from '@radix-ui/react-icons'
+import { Box, Container, Flex, Heading } from '@radix-ui/themes'
 import { useMutation } from '@tanstack/react-query'
 import {
   createFileRoute,
@@ -7,7 +8,7 @@ import {
   useNavigate,
 } from '@tanstack/react-router'
 import BigNumber from 'bignumber.js'
-import { useForm } from 'react-hook-form'
+import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import z from 'zod'
 
@@ -20,14 +21,24 @@ import {
   FormFieldItem,
   FormFieldLabel,
 } from '../../../../../components/form'
+import { IconButton } from '../../../../../components/icon-button'
 import { MoneyTextField } from '../../../../../components/money-text-field'
 import { TextField } from '../../../../../components/text-field'
 import { UnsavedChangesBlocker } from '../../../../../components/unsaved-changes-blocker'
 import {
+  ParcelStatusHistory,
+  ParcelStatusHistoryItem,
+} from '../../../../../features/parcels/components/parcel-status-history/parcel-status-history'
+import { PARCEL_STATUS_LABELS } from '../../../../../features/parcels/lib/parcel-status-labels'
+import {
+  ParcelStatus,
+  putParcelStatusHistory,
   updateParcel,
-  type UpdateParcelRequestDto,
 } from '../../../../../lib/api/api.gen'
-import { getParcelQueryOptions } from '../../../../../lib/api/queries'
+import {
+  getParcelQueryOptions,
+  getParcelStatusHistoryQueryOptions,
+} from '../../../../../lib/api/queries'
 import i18n from '../../../../../lib/i18n'
 import {
   isValidMoneyAmount,
@@ -44,11 +55,12 @@ export const Route = createFileRoute(
     fallbackTo: '/admin/parcels',
   },
   loader: async ({ context: { queryClient }, params: { parcelId } }) => {
-    const initialParcel = await queryClient.ensureQueryData(
-      getParcelQueryOptions(parcelId)
-    )
+    const [initialParcel, initialStatusHistory] = await Promise.all([
+      queryClient.ensureQueryData(getParcelQueryOptions(parcelId)),
+      queryClient.ensureQueryData(getParcelStatusHistoryQueryOptions(parcelId)),
+    ])
 
-    return { initialParcel }
+    return { initialParcel, initialStatusHistory }
   },
   component: EditAdminParcelPage,
 })
@@ -68,6 +80,12 @@ const editAdminParcelSchema = z.object({
       (value) => value === '' || isValidMoneyAmount(value),
       i18n.t('validation:deliveryFee.invalid')
     ),
+  statusHistory: z
+    .object({
+      status: z.enum(ParcelStatus),
+      achievedAt: z.union([z.iso.date(), z.literal('')]),
+    })
+    .array(),
 })
 
 type EditAdminParcelFormValues = z.infer<typeof editAdminParcelSchema>
@@ -75,31 +93,62 @@ type EditAdminParcelFormValues = z.infer<typeof editAdminParcelSchema>
 function EditAdminParcelPage() {
   const navigate = useNavigate()
 
-  const { initialParcel } = Route.useLoaderData()
+  const { initialParcel, initialStatusHistory } = Route.useLoaderData()
 
   const form = useForm<EditAdminParcelFormValues>({
     resolver: zodResolver(editAdminParcelSchema),
     defaultValues: {
       weightKg: initialParcel.weightKg ?? '',
       deliveryFee: initialParcel.deliveryFee ?? '',
+      statusHistory: Object.values(ParcelStatus).map((status) => {
+        const existingEntry = initialStatusHistory.find(
+          (item) => item.status === status
+        )
+
+        return { status, achievedAt: existingEntry?.achievedAt ?? '' }
+      }),
     },
   })
 
-  const editParcelMutation = useMutation({
-    mutationFn: (dto: UpdateParcelRequestDto) =>
-      updateParcel(initialParcel.id, dto),
+  const statusHistory = useFieldArray({
+    control: form.control,
+    name: 'statusHistory',
   })
 
-  const onSubmit = async ({
-    weightKg,
-    deliveryFee,
-  }: EditAdminParcelFormValues) => {
+  const watchedStatusHistory = useWatch({
+    control: form.control,
+    name: 'statusHistory',
+  })
+
+  const controlledStatusHistory = statusHistory.fields.map((field, index) => ({
+    ...field,
+    ...watchedStatusHistory[index],
+  }))
+
+  const editParcelMutation = useMutation({
+    mutationFn: async ({
+      weightKg,
+      deliveryFee,
+      statusHistory,
+    }: EditAdminParcelFormValues) => {
+      await Promise.all([
+        updateParcel(initialParcel.id, {
+          weightKg: weightKg === '' ? null : new BigNumber(weightKg).toFixed(),
+          deliveryFee:
+            deliveryFee === '' ? null : normalizeMoneyAmount(deliveryFee),
+        }),
+        putParcelStatusHistory(initialParcel.id, {
+          entries: statusHistory.flatMap(({ status, achievedAt }) =>
+            achievedAt === '' ? [] : [{ status, achievedAt }]
+          ),
+        }),
+      ])
+    },
+  })
+
+  const onSubmit = async (values: EditAdminParcelFormValues) => {
     try {
-      await editParcelMutation.mutateAsync({
-        weightKg: weightKg === '' ? null : new BigNumber(weightKg).toFixed(),
-        deliveryFee:
-          deliveryFee === '' ? null : normalizeMoneyAmount(deliveryFee),
-      })
+      await editParcelMutation.mutateAsync(values)
 
       await navigate({
         to: '/admin/parcels/$parcelId',
@@ -160,6 +209,50 @@ function EditAdminParcelPage() {
                 </FormFieldItem>
               )}
             />
+
+            <Heading size="4">{i18n.t('parcels:statusHistory')}</Heading>
+
+            <ParcelStatusHistory>
+              {controlledStatusHistory.map((item, index) => (
+                <ParcelStatusHistoryItem
+                  key={item.id}
+                  isAchieved={!!item.achievedAt}
+                >
+                  <FormField
+                    control={form.control}
+                    name={`statusHistory.${index}.achievedAt`}
+                    render={({ field }) => (
+                      <FormFieldItem mb="3">
+                        <FormFieldLabel>
+                          {PARCEL_STATUS_LABELS[item.status]}
+                        </FormFieldLabel>
+
+                        <Flex align="center" gap="3">
+                          <Box asChild width="200px">
+                            <FormFieldControl>
+                              <TextField.Root type="date" {...field} />
+                            </FormFieldControl>
+                          </Box>
+
+                          {field.value && (
+                            <IconButton
+                              type="button"
+                              size="1"
+                              variant="ghost"
+                              onClick={() => field.onChange('')}
+                            >
+                              <Cross1Icon />
+                            </IconButton>
+                          )}
+                        </Flex>
+
+                        <FormFieldError />
+                      </FormFieldItem>
+                    )}
+                  />
+                </ParcelStatusHistoryItem>
+              ))}
+            </ParcelStatusHistory>
 
             <Flex
               direction={{ initial: 'column-reverse', xs: 'row' }}

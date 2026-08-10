@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Put,
   Query,
 } from '@nestjs/common'
 import { ILike } from 'typeorm'
@@ -18,6 +19,7 @@ import { CreateParcelResponseDto } from './dtos/create-parcel-response.dto'
 import { GetParcelResponseDto } from './dtos/get-parcel-response.dto'
 import { GetParcelStatusHistoryResponseDto } from './dtos/get-parcel-status-history-response.dto'
 import { GetParcelsQueryDto } from './dtos/get-parcels-query.dto'
+import { PutParcelStatusHistoryRequestDto } from './dtos/put-parcel-status-history-request.dto'
 import { UpdateParcelRequestDto } from './dtos/update-parcel-request.dto'
 import { ParcelStatusHistoryMapper } from './parcel-status-history.mapper'
 import { ParcelStatusHistoryService } from './parcel-status-history.service'
@@ -30,25 +32,30 @@ const PARCEL_ID_PARAM = 'parcelId'
 @Controller('parcels')
 export class ParcelsController {
   constructor(
-    private readonly parcelsPolicy: ParcelsPolicy,
     private readonly contextService: ContextService,
+    private readonly parcelsPolicy: ParcelsPolicy,
     private readonly parcelsService: ParcelsService,
     private readonly parcelStatusHistoryService: ParcelStatusHistoryService
   ) {}
 
   @Post()
   async createParcel(
-    @Body() { trackingNumber, source, description }: CreateParcelRequestDto
+    @Body() createParcelRequestDto: CreateParcelRequestDto
   ): Promise<CreateParcelResponseDto> {
-    this.parcelsPolicy.checkCanCreate()
+    this.parcelsPolicy.checkCanCreate(createParcelRequestDto)
 
-    const userId = this.contextService.getUserIdOrThrow()
+    const user = this.contextService.getUserOrThrow()
+
+    const { trackingNumber, source, description, weightKg, deliveryFee } =
+      createParcelRequestDto
 
     const id = await this.parcelsService.create({
-      userId,
+      userId: user.role === 'admin' ? null : user.id,
       trackingNumber,
       source,
       description,
+      weightKg,
+      deliveryFee,
     })
 
     return ParcelsMapper.toCreateParcelResponseDto(id)
@@ -112,6 +119,18 @@ export class ParcelsController {
     return statusHistory.map((history) =>
       ParcelStatusHistoryMapper.toGetParcelStatusHistoryResponseDto(history)
     )
+  }
+
+  @Put(`:${PARCEL_ID_PARAM}/status-history`)
+  async putParcelStatusHistory(
+    @Param(PARCEL_ID_PARAM, ParseUUIDPipe) parcelId: string,
+    @Body() { entries }: PutParcelStatusHistoryRequestDto
+  ): Promise<SuccessResponseDto> {
+    this.parcelsPolicy.checkCanManageStatusHistory()
+
+    await this.parcelStatusHistoryService.replace(parcelId, entries)
+
+    return new SuccessResponseDto()
   }
 
   @Patch(`:${PARCEL_ID_PARAM}`)

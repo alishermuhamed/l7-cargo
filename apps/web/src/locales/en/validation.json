@@ -6,7 +6,8 @@
     "required": "Verification code is required"
   },
   "trackingNumber": {
-    "required": "Tracking number is required"
+    "required": "Tracking number is required",
+    "duplicate": "A parcel with this tracking number already exists"
   },
   "file": {
     "required": "File is required",
@@ -17,6 +18,13 @@
   },
   "deliveryFee": {
     "invalid": "Enter a valid delivery fee"
+  },
+  "status": {
+    "required": "Select a status"
+  },
+  "statusDate": {
+    "future": "Status date cannot be in the future",
+    "order": "Date must follow the parcel status order"
   },
   "name": {
     "required": "Name is required",
