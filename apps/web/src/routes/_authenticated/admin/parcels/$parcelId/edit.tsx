@@ -41,13 +41,14 @@ import {
   getParcelQueryOptions,
   getParcelStatusHistoryQueryOptions,
 } from '../../../../../lib/api/queries'
+import { normalizeDecimalSeparator } from '../../../../../lib/decimal'
 import i18n from '../../../../../lib/i18n'
 import {
   isValidMoneyAmount,
   normalizeMoneyAmount,
 } from '../../../../../lib/money'
 
-const WEIGHT_KG_PATTERN = /^(?:0|[1-9]\d{0,3})(?:\.\d{1,3})?$/
+const WEIGHT_KG_PATTERN = /^(?:0|[1-9]\d{0,3})(?:[.,]\d{1,3})?$/
 
 export const Route = createFileRoute(
   '/_authenticated/admin/parcels/$parcelId/edit'
@@ -144,7 +145,10 @@ function EditAdminParcelPage() {
   }: EditAdminParcelFormValues) => {
     try {
       await updateParcelMutation.mutateAsync({
-        weightKg: weightKg === '' ? null : new BigNumber(weightKg).toFixed(),
+        weightKg:
+          weightKg === ''
+            ? null
+            : new BigNumber(normalizeDecimalSeparator(weightKg)).toFixed(),
         deliveryFee:
           deliveryFee === '' ? null : normalizeMoneyAmount(deliveryFee),
       })

@@ -38,10 +38,11 @@ import {
   type PutParcelStatusHistoryRequestDto,
 } from '../../../../lib/api/api.gen'
 import { ApiError } from '../../../../lib/api/custom-fetch'
+import { normalizeDecimalSeparator } from '../../../../lib/decimal'
 import i18n from '../../../../lib/i18n'
 import { isValidMoneyAmount, normalizeMoneyAmount } from '../../../../lib/money'
 
-const WEIGHT_KG_PATTERN = /^(?:0|[1-9]\d{0,3})(?:\.\d{1,3})?$/
+const WEIGHT_KG_PATTERN = /^(?:0|[1-9]\d{0,3})(?:[.,]\d{1,3})?$/
 
 export const Route = createFileRoute('/_authenticated/admin/parcels/add')({
   staticData: {
@@ -144,7 +145,9 @@ function AddAdminParcelPage() {
         clientCode: Number(clientCode),
         trackingNumber,
         weightKg:
-          weightKg === '' ? undefined : new BigNumber(weightKg).toFixed(),
+          weightKg === ''
+            ? undefined
+            : new BigNumber(normalizeDecimalSeparator(weightKg)).toFixed(),
         deliveryFee:
           deliveryFee === '' ? undefined : normalizeMoneyAmount(deliveryFee),
       })
