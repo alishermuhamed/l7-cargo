@@ -1,5 +1,5 @@
 import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common'
-import { ILike, Raw } from 'typeorm'
+import { ILike } from 'typeorm'
 
 import { GetUserResponseDto } from './dtos/get-user-response.dto'
 import { GetUsersQueryDto } from './dtos/get-users-query.dto'
@@ -39,12 +39,6 @@ export class UsersController {
       ? [
           { ...baseWhere, name: ILike(`%${search}%`) },
           { ...baseWhere, phoneNumber: ILike(`%${search}%`) },
-          {
-            ...baseWhere,
-            clientId: Raw((alias) => `CAST(${alias} AS text) ILIKE :search`, {
-              search: `%${search}%`,
-            }),
-          },
         ]
       : baseWhere
 

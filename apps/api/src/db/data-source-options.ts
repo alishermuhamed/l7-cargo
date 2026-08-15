@@ -6,6 +6,7 @@ import { User } from '../users/entities/user.entity'
 import { Account } from '../authentication/entities/account.entity'
 import { Session } from '../authentication/entities/session.entity'
 import { Verification } from '../authentication/entities/verification.entity'
+import { Client } from '../clients/entities/client.entity'
 import { Parcel } from '../parcels/entities/parcel.entity'
 import { ParcelStatusHistory } from '../parcels/entities/parcel-status-history.entity'
 import { ParcelsImport } from '../parcels-imports/entities/parcels-import.entity'
@@ -21,6 +22,7 @@ import { AddAchievedAtToParcelStatusHistory1783196326251 } from './migrations/17
 import { AddAchievedAtToParcelsImport1783197115439 } from './migrations/1783197115439-add-achieved-at-to-parcels-import'
 import { ConvertAchievedAtToDateOnly1783368829744 } from './migrations/1783368829744-convert-achieved-at-to-date-only'
 import { MakeParcelStatusHistoryUnique1786125107169 } from './migrations/1786125107169-make-parcel-status-history-unique'
+import { AddClientEntity1786808443379 } from './migrations/1786808443379-add-client-entity'
 
 export function buildDataSourceOptions(
   db: EnvConfig['database']
@@ -43,6 +45,7 @@ export function buildDataSourceOptions(
       Account,
       Session,
       Verification,
+      Client,
       Parcel,
       ParcelStatusHistory,
       ParcelsImport,
@@ -58,6 +61,7 @@ export function buildDataSourceOptions(
       AddAchievedAtToParcelsImport1783197115439,
       ConvertAchievedAtToDateOnly1783368829744,
       MakeParcelStatusHistoryUnique1786125107169,
+      AddClientEntity1786808443379,
     ],
   }
 }

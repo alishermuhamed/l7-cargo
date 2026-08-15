@@ -8,6 +8,7 @@ import { phoneNumber } from 'better-auth/plugins'
 import type { IncomingHttpHeaders } from 'http'
 import parsePhoneNumberFromString from 'libphonenumber-js'
 
+import { ClientsService } from '../clients/clients.service'
 import { ConfigService } from '../config/config.service'
 import { BetterAuthTypeOrmAdapter } from '../db/adapters/better-auth-typeorm.adapter'
 import { DEFAULT_USER_ROLE } from '../users/user-role'
@@ -22,6 +23,7 @@ function createBetterAuth({
   validatePhoneNumber,
   sendOTP,
   sendPasswordResetOTP,
+  resolveClientIdForNewUser,
 }: {
   typeOrmAdapter: BetterAuthTypeOrmAdapter
   secret: string
@@ -34,6 +36,7 @@ function createBetterAuth({
     phoneNumber: string
     code: string
   }) => Promise<void>
+  resolveClientIdForNewUser: (phoneNumber: unknown) => Promise<string>
 }) {
   return betterAuthFactory({
     basePath: '/auth',
@@ -60,9 +63,21 @@ function createBetterAuth({
           input: false,
         },
         clientId: {
-          type: 'number',
+          type: 'string',
           required: false,
           input: false,
+        },
+      },
+    },
+    databaseHooks: {
+      user: {
+        create: {
+          before: async (user) => ({
+            data: {
+              ...user,
+              clientId: await resolveClientIdForNewUser(user.phoneNumber),
+            },
+          }),
         },
       },
     },
@@ -90,7 +105,8 @@ export class AuthenticationService {
   constructor(
     private readonly configService: ConfigService,
     private readonly betterAuthTypeOrmAdapter: BetterAuthTypeOrmAdapter,
-    private readonly otpDeliveryService: OtpDeliveryService
+    private readonly otpDeliveryService: OtpDeliveryService,
+    private readonly clientsService: ClientsService
   ) {
     this.betterAuth = createBetterAuth({
       typeOrmAdapter: this.betterAuthTypeOrmAdapter,
@@ -101,6 +117,8 @@ export class AuthenticationService {
       validatePhoneNumber: (input) => this.validatePhoneNumber(input),
       sendOTP: (data) => this.sendOTP(data),
       sendPasswordResetOTP: (data) => this.sendPasswordResetOTP(data),
+      resolveClientIdForNewUser: async (phoneNumber) =>
+        (await this.clientsService.resolveForNewUser(phoneNumber)).id,
     })
   }
 

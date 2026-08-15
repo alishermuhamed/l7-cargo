@@ -65,13 +65,15 @@
   "rows": "Строки",
   "issue": "Проблема",
   "rowNumber": "Строка",
-  "clientId": "Код клиента",
+  "clientCode": "Код клиента",
+  "clientCodePlaceholder": "Введите код клиента",
   "notes": "Заметки",
-  "invalidClientId": "Неверный код клиента",
+  "invalidClientCode": "Неверный код клиента",
   "invalidTrackingCode": "Неверный трек-номер",
   "invalidWeightKg": "Неверный вес",
   "invalidDeliveryFee": "Неверная стоимость доставки",
   "invalidNotes": "Неверные заметки",
   "unknownError": "Неизвестная ошибка",
-  "parcelOwnerMismatch": "Владелец посылки не совпадает"
+  "parcelOwnerMismatch": "Владелец посылки не совпадает",
+  "unknownClient": "Клиент будет создан при применении импорта"
 }

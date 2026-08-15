@@ -5,7 +5,7 @@ import { USER_ROLES } from '../user-role'
 
 export class GetUserResponseDto {
   id!: string
-  clientId!: number
+  clientId!: string
   name!: string
   phoneNumber!: string | null
 

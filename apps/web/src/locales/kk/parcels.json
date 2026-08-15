@@ -65,13 +65,15 @@
   "rows": "Жолдар",
   "issue": "Мәселе",
   "rowNumber": "Жол",
-  "clientId": "Клиент коды",
+  "clientCode": "Клиент коды",
+  "clientCodePlaceholder": "Клиент кодын енгізіңіз",
   "notes": "Ескертпелер",
-  "invalidClientId": "Клиент коды қате",
+  "invalidClientCode": "Клиент коды қате",
   "invalidTrackingCode": "Трек-нөмір қате",
   "invalidWeightKg": "Салмақ қате",
   "invalidDeliveryFee": "Жеткізу құны қате",
   "invalidNotes": "Ескертпелер қате",
   "unknownError": "Белгісіз қате",
-  "parcelOwnerMismatch": "Сәлемдеме иесі сәйкес келмейді"
+  "parcelOwnerMismatch": "Сәлемдеме иесі сәйкес келмейді",
+  "unknownClient": "Импорт қолданылған кезде клиент жасалады"
 }

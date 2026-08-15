@@ -1,6 +1,9 @@
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
 
 import {
+  getClient,
+  getClients,
+  type GetClientsParams,
   getParcel,
   getParcels,
   getParcelsImport,
@@ -12,6 +15,49 @@ import {
   getUsers,
   type GetUsersParams,
 } from './api.gen'
+
+// Clients
+
+export const clientsKeys = {
+  all: ['clients'] as const,
+  lists: () => [...clientsKeys.all, 'list'] as const,
+  list: (params?: GetClientsParams) =>
+    [...clientsKeys.lists(), params ?? {}] as const,
+  details: () => [...clientsKeys.all, 'detail'] as const,
+  detail: (clientId: string) => [...clientsKeys.details(), clientId] as const,
+}
+
+export const getClientsQueryOptions = (params?: GetClientsParams) =>
+  queryOptions({
+    queryKey: clientsKeys.list(params),
+    queryFn: () => getClients(params),
+  })
+
+export const getClientQueryOptions = (clientId: string) =>
+  queryOptions({
+    queryKey: clientsKeys.detail(clientId),
+    queryFn: () => getClient(clientId),
+  })
+
+export const getClientsInfiniteQueryOptions = (params?: GetClientsParams) =>
+  infiniteQueryOptions({
+    queryKey: clientsKeys.list(params),
+    initialPageParam: 0,
+    queryFn: ({ pageParam = 0 }) =>
+      getClients({
+        ...params,
+        offset: pageParam,
+      }),
+    getNextPageParam: (lastPage, allPages) => {
+      const pageSize = params?.limit ?? 10
+
+      if (lastPage.length < pageSize) {
+        return undefined
+      }
+
+      return allPages.reduce((total, page) => total + page.length, 0)
+    },
+  })
 
 // Users
 

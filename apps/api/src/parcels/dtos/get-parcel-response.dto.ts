@@ -7,7 +7,7 @@ export class GetParcelResponseDto {
   createdAt!: string
   updatedAt!: string
   trackingNumber!: string
-  userId!: string | null
+  clientId!: string
 
   @ApiProperty({
     enum: PARCEL_STATUSES,

@@ -17,14 +17,14 @@ const PARCELS_PAGE_SIZE = 20
 interface ParcelsTableProps {
   search: string
   status?: ParcelStatus
-  userId?: string
+  clientId?: string
   isAdminPage?: boolean
 }
 
 export function ParcelsTable({
   search,
   status,
-  userId,
+  clientId,
   isAdminPage = false,
 }: ParcelsTableProps) {
   const [page, dispatchPage] = useReducer(
@@ -46,14 +46,14 @@ export function ParcelsTable({
 
   useEffect(() => {
     dispatchPage('reset')
-  }, [search, status, userId])
+  }, [clientId, search, status])
 
   const params: GetParcelsParams = {
     limit: PARCELS_PAGE_SIZE,
     offset: page * PARCELS_PAGE_SIZE,
     search: debouncedSearch.length === 0 ? undefined : debouncedSearch,
     status,
-    userId,
+    clientId,
   }
 
   const { data: parcels = [], isPending: isPageLoading } = useQuery(

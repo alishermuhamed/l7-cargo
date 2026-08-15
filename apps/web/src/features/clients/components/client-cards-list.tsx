@@ -4,8 +4,7 @@ import { Link } from '@tanstack/react-router'
 
 import { useDebounce } from '../../../hooks/use-debounce'
 import { useIntersectionObserver } from '../../../hooks/use-intersection-observer'
-import { UserRole } from '../../../lib/api/api.gen'
-import { getUsersInfiniteQueryOptions } from '../../../lib/api/queries'
+import { getClientsInfiniteQueryOptions } from '../../../lib/api/queries'
 import i18n from '../../../lib/i18n'
 import { formatPhoneNumber } from '../../../lib/phone-number'
 
@@ -20,7 +19,6 @@ export function ClientCardsList({ search }: ClientCardsListProps) {
 
   const params = {
     limit: CLIENTS_PAGE_SIZE,
-    role: UserRole.client,
     search: debouncedSearch.length === 0 ? undefined : debouncedSearch,
   }
 
@@ -30,7 +28,7 @@ export function ClientCardsList({ search }: ClientCardsListProps) {
     hasNextPage,
     isFetchingNextPage,
     isPending: isInitialLoading,
-  } = useInfiniteQuery(getUsersInfiniteQueryOptions(params))
+  } = useInfiniteQuery(getClientsInfiniteQueryOptions(params))
 
   const clients = data?.pages.flatMap((page) => page) ?? []
 
@@ -56,15 +54,17 @@ export function ClientCardsList({ search }: ClientCardsListProps) {
               <Flex p="3" justify="between" align="center" gap="3">
                 <Box minWidth="0">
                   <Text as="p" weight="bold">
-                    {client.name}
+                    {client.user?.name ?? '-'}
                   </Text>
 
                   <Text as="p" color="gray" size="2" truncate>
-                    {i18n.t('clients:id')}: {client.clientId}
+                    {i18n.t('clients:code')}: {client.code}
                   </Text>
 
                   <Text as="p" color="gray" size="2" truncate>
-                    {formatPhoneNumber(client.phoneNumber ?? '')}
+                    {formatPhoneNumber(
+                      client.user?.phoneNumber ?? client.legacyPhoneRaw ?? ''
+                    ) ?? '-'}
                   </Text>
                 </Box>
               </Flex>

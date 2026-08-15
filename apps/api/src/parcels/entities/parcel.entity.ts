@@ -1,10 +1,10 @@
 import { Entity, Index, ManyToOne } from 'typeorm'
 
+import { Client } from '../../clients/entities/client.entity'
 import { BaseEntity } from '../../db/base.entity'
 import { DecimalColumn, MoneyColumn } from '../../db/columns/decimal-column'
 import { TextColumn } from '../../db/columns/text-column'
 import { UUIDColumn } from '../../db/columns/uuid-column'
-import { User } from '../../users/entities/user.entity'
 import type { ParcelStatus } from '../parcel-status'
 
 @Entity()
@@ -14,11 +14,11 @@ export class Parcel extends BaseEntity {
   trackingNumber!: string
 
   @Index()
-  @UUIDColumn({ nullable: true })
-  userId!: string | null
+  @UUIDColumn()
+  clientId!: string
 
-  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
-  user?: User | null
+  @ManyToOne(() => Client, { nullable: false, onDelete: 'RESTRICT' })
+  client?: Client
 
   @TextColumn({ nullable: true })
   status!: ParcelStatus | null

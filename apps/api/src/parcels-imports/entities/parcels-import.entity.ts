@@ -10,14 +10,17 @@ import type { ParcelStatus } from '../../parcels/parcel-status'
 
 export interface ParsedParcelsImportRow {
   rowNumber: number
-  clientId: number
+  clientCode: number
   trackingNumber: string
   weightKg?: number
   deliveryFee?: number
   notes?: string
 }
 
-export const PARSE_WARNING_CODES = ['PARCEL_OWNER_MISMATCH'] as const
+export const PARSE_WARNING_CODES = [
+  'PARCEL_OWNER_MISMATCH',
+  'UNKNOWN_CLIENT',
+] as const
 
 export type ParseWarningCode = (typeof PARSE_WARNING_CODES)[number]
 

@@ -14,6 +14,7 @@ import toast from 'react-hot-toast'
 
 import { Button } from '../../../../components/button'
 import { CopyButton } from '../../../../components/copy-button'
+import { useClientContext } from '../../../../hooks/use-client-context'
 import { useSessionContext } from '../../../../hooks/use-session-context'
 import {
   isMarketplaceSlug,
@@ -40,6 +41,7 @@ export const Route = createFileRoute(
 
 function MarketplaceAddressPage() {
   const { marketplace } = Route.useRouteContext()
+  const client = useClientContext()
 
   const {
     session: { user },
@@ -53,8 +55,8 @@ function MarketplaceAddressPage() {
       : null
 
   const addressLines = marketplaceConfig.formatAddress({
-    clientId: user.clientId,
-    clientName: user.name,
+    clientCode: client.code,
+    userName: user.name,
     phoneNumber: user.phoneNumber,
   })
 

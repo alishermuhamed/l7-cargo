@@ -1,5 +1,6 @@
 import type { ExtractSubjectType, MongoAbility } from '@casl/ability'
 
+import { Client } from '../clients/entities/client.entity'
 import { Parcel } from '../parcels/entities/parcel.entity'
 import { ParcelsImport } from '../parcels-imports/entities/parcels-import.entity'
 import { User } from '../users/entities/user.entity'
@@ -7,6 +8,8 @@ import { User } from '../users/entities/user.entity'
 export type Action = 'create' | 'read' | 'update' | 'delete'
 
 export type Subject =
+  | Client
+  | typeof Client
   | Parcel
   | typeof Parcel
   | User

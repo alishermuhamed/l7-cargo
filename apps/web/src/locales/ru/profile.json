@@ -2,6 +2,6 @@
   "profile": "Профиль",
   "editProfile": "Изменить профиль",
   "name": "Имя",
-  "clientId": "Код клиента",
+  "clientCode": "Код клиента",
   "unableToUpdateProfile": "Не удалось обновить профиль"
 }

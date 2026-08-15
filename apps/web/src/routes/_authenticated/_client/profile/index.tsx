@@ -3,6 +3,7 @@ import { Card, Container, DataList, Flex } from '@radix-ui/themes'
 import { createFileRoute, Link as RouterLink } from '@tanstack/react-router'
 
 import { Button } from '../../../../components/button'
+import { useClientContext } from '../../../../hooks/use-client-context'
 import i18n from '../../../../lib/i18n'
 import { formatPhoneNumber } from '../../../../lib/phone-number'
 
@@ -15,6 +16,7 @@ export const Route = createFileRoute('/_authenticated/_client/profile/')({
 
 function ProfilePage() {
   const { session } = Route.useRouteContext()
+  const client = useClientContext()
 
   const phoneNumber = formatPhoneNumber(session.user.phoneNumber ?? '')
 
@@ -24,8 +26,8 @@ function ProfilePage() {
         <Flex direction="column" gap="4">
           <DataList.Root>
             <DataList.Item>
-              <DataList.Label>{i18n.t('profile:clientId')}</DataList.Label>
-              <DataList.Value>{session.user.clientId}</DataList.Value>
+              <DataList.Label>{i18n.t('profile:clientCode')}</DataList.Label>
+              <DataList.Value>{client.code}</DataList.Value>
             </DataList.Item>
 
             <DataList.Item>

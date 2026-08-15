@@ -9,7 +9,7 @@ import { ParcelCardsList } from '../../../../../features/parcels/components/parc
 import { ParcelsTable } from '../../../../../features/parcels/components/parcels-table'
 import { PARCEL_STATUS_LABELS } from '../../../../../features/parcels/lib/parcel-status-labels'
 import { ParcelStatus } from '../../../../../lib/api/api.gen'
-import { getUserQueryOptions } from '../../../../../lib/api/queries'
+import { getClientQueryOptions } from '../../../../../lib/api/queries'
 import i18n from '../../../../../lib/i18n'
 import { formatPhoneNumber } from '../../../../../lib/phone-number'
 
@@ -22,7 +22,7 @@ export const Route = createFileRoute(
   },
   loader: async ({ params: { clientId }, context: { queryClient } }) => {
     const initialClient = await queryClient.ensureQueryData(
-      getUserQueryOptions(clientId)
+      getClientQueryOptions(clientId)
     )
 
     return { initialClient }
@@ -39,7 +39,7 @@ function AdminClientDetailsPage() {
   )
 
   const { data: client } = useQuery({
-    ...getUserQueryOptions(initialClient.id),
+    ...getClientQueryOptions(initialClient.id),
     initialData: initialClient,
   })
 
@@ -49,19 +49,21 @@ function AdminClientDetailsPage() {
         <Card size="3">
           <DataList.Root>
             <DataList.Item>
-              <DataList.Label>{i18n.t('clients:id')}</DataList.Label>
-              <DataList.Value>{client.clientId}</DataList.Value>
+              <DataList.Label>{i18n.t('clients:code')}</DataList.Label>
+              <DataList.Value>{client.code}</DataList.Value>
             </DataList.Item>
 
             <DataList.Item>
               <DataList.Label>{i18n.t('profile:name')}</DataList.Label>
-              <DataList.Value>{client.name}</DataList.Value>
+              <DataList.Value>{client.user?.name ?? '-'}</DataList.Value>
             </DataList.Item>
 
             <DataList.Item>
               <DataList.Label>{i18n.t('auth:phoneNumber')}</DataList.Label>
               <DataList.Value>
-                {formatPhoneNumber(client.phoneNumber ?? '')}
+                {formatPhoneNumber(
+                  client.user?.phoneNumber ?? client.legacyPhoneRaw ?? ''
+                ) ?? '-'}
               </DataList.Value>
             </DataList.Item>
           </DataList.Root>
@@ -98,7 +100,7 @@ function AdminClientDetailsPage() {
             <ParcelCardsList
               search={parcelsSearch}
               status={parcelsStatus === 'all' ? undefined : parcelsStatus}
-              userId={client.id}
+              clientId={client.id}
               isAdminPage
             />
           </Box>
@@ -107,7 +109,7 @@ function AdminClientDetailsPage() {
             <ParcelsTable
               search={parcelsSearch}
               status={parcelsStatus === 'all' ? undefined : parcelsStatus}
-              userId={client.id}
+              clientId={client.id}
               isAdminPage
             />
           </Box>

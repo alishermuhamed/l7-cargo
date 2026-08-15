@@ -52,6 +52,10 @@ export const Route = createFileRoute('/_authenticated/admin/parcels/add')({
 })
 
 const addAdminParcelSchema = z.object({
+  clientCode: z
+    .string()
+    .trim()
+    .regex(/^[1-9]\d*$/, i18n.t('parcels:invalidClientCode')),
   trackingNumber: z
     .string()
     .trim()
@@ -86,6 +90,7 @@ function AddAdminParcelPage() {
   const form = useForm<AddAdminParcelFormValues>({
     resolver: zodResolver(addAdminParcelSchema),
     defaultValues: {
+      clientCode: '',
       trackingNumber: '',
       weightKg: '',
       deliveryFee: '',
@@ -126,6 +131,7 @@ function AddAdminParcelPage() {
   })
 
   const onSubmit = async ({
+    clientCode,
     trackingNumber,
     weightKg,
     deliveryFee,
@@ -135,6 +141,7 @@ function AddAdminParcelPage() {
 
     try {
       const parcel = await createParcelMutation.mutateAsync({
+        clientCode: Number(clientCode),
         trackingNumber,
         weightKg:
           weightKg === '' ? undefined : new BigNumber(weightKg).toFixed(),
@@ -184,6 +191,29 @@ function AddAdminParcelPage() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Flex direction="column" gap="4">
+            <FormField
+              control={form.control}
+              name="clientCode"
+              render={({ field }) => (
+                <FormFieldItem>
+                  <FormFieldLabel>
+                    {i18n.t('parcels:clientCode')} *
+                  </FormFieldLabel>
+
+                  <FormFieldControl>
+                    <TextField.Root
+                      placeholder={i18n.t('parcels:clientCodePlaceholder')}
+                      autoComplete="off"
+                      inputMode="numeric"
+                      {...field}
+                    />
+                  </FormFieldControl>
+
+                  <FormFieldError />
+                </FormFieldItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="trackingNumber"

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -12,6 +13,7 @@ import {
 } from '@nestjs/common'
 import { ILike } from 'typeorm'
 
+import { ClientsService } from '../clients/clients.service'
 import { SuccessResponseDto } from '../common/dtos/success-response.dto'
 import { ContextService } from '../context/context.service'
 import { CreateParcelRequestDto } from './dtos/create-parcel-request.dto'
@@ -33,6 +35,7 @@ const PARCEL_ID_PARAM = 'parcelId'
 export class ParcelsController {
   constructor(
     private readonly contextService: ContextService,
+    private readonly clientsService: ClientsService,
     private readonly parcelsPolicy: ParcelsPolicy,
     private readonly parcelsService: ParcelsService,
     private readonly parcelStatusHistoryService: ParcelStatusHistoryService
@@ -46,11 +49,27 @@ export class ParcelsController {
 
     const user = this.contextService.getUserOrThrow()
 
-    const { trackingNumber, source, description, weightKg, deliveryFee } =
-      createParcelRequestDto
+    const {
+      clientCode,
+      trackingNumber,
+      source,
+      description,
+      weightKg,
+      deliveryFee,
+    } = createParcelRequestDto
+
+    let clientId = user.clientId
+
+    if (user.role === 'admin') {
+      if (clientCode === undefined) {
+        throw new BadRequestException('CLIENT_CODE_REQUIRED')
+      }
+
+      clientId = (await this.clientsService.findOrCreateByCode(clientCode)).id
+    }
 
     const id = await this.parcelsService.create({
-      userId: user.role === 'admin' ? null : user.id,
+      clientId,
       trackingNumber,
       source,
       description,
@@ -63,11 +82,11 @@ export class ParcelsController {
 
   @Get()
   async getParcels(
-    @Query() { search, status, userId, limit, offset }: GetParcelsQueryDto
+    @Query() { search, status, clientId, limit, offset }: GetParcelsQueryDto
   ): Promise<GetParcelResponseDto[]> {
     const policyWhere = this.parcelsPolicy.getFindOptionsWhere()
 
-    const baseWhere = { status, userId, ...policyWhere }
+    const baseWhere = { status, clientId, ...policyWhere }
 
     const where = search
       ? [

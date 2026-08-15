@@ -65,13 +65,15 @@
   "rows": "Rows",
   "issue": "Issue",
   "rowNumber": "Row",
-  "clientId": "Client ID",
+  "clientCode": "Client code",
+  "clientCodePlaceholder": "Enter client code",
   "notes": "Notes",
-  "invalidClientId": "Invalid client ID",
+  "invalidClientCode": "Invalid client code",
   "invalidTrackingCode": "Invalid tracking number",
   "invalidWeightKg": "Invalid weight",
   "invalidDeliveryFee": "Invalid delivery fee",
   "invalidNotes": "Invalid notes",
   "unknownError": "Unknown error",
-  "parcelOwnerMismatch": "Parcel owner mismatch"
+  "parcelOwnerMismatch": "Parcel owner mismatch",
+  "unknownClient": "Client will be created when the import is committed"
 }

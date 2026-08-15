@@ -31,9 +31,11 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
     }
 
     can('create', Parcel, ['trackingNumber', 'source', 'description'])
-    can('read', Parcel, { userId: user.id })
-    can('update', Parcel, ['source', 'description'], { userId: user.id })
-    can('delete', Parcel, { userId: user.id })
+    can('read', Parcel, { clientId: user.clientId })
+    can('update', Parcel, ['source', 'description'], {
+      clientId: user.clientId,
+    })
+    can('delete', Parcel, { clientId: user.clientId })
   }
 
   checkCanCreate(createParcelRequestDto: CreateParcelRequestDto): void {
@@ -104,6 +106,6 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
       return {}
     }
 
-    return { userId: user.id }
+    return { clientId: user.clientId }
   }
 }

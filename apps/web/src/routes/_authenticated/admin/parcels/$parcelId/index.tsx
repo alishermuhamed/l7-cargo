@@ -26,9 +26,9 @@ import { formatWeightKg } from '../../../../../features/parcels/lib/format-weigh
 import { PARCEL_STATUS_LABELS } from '../../../../../features/parcels/lib/parcel-status-labels'
 import { deleteParcel, ParcelStatus } from '../../../../../lib/api/api.gen'
 import {
+  getClientQueryOptions,
   getParcelQueryOptions,
   getParcelStatusHistoryQueryOptions,
-  getUserQueryOptions,
 } from '../../../../../lib/api/queries'
 import { formatDate } from '../../../../../lib/date-time'
 import i18n from '../../../../../lib/i18n'
@@ -62,8 +62,7 @@ function AdminParcelPage() {
     initialData: initialParcel,
   })
   const { data: owner } = useQuery({
-    ...getUserQueryOptions(parcel.userId ?? ''),
-    enabled: parcel.userId !== null,
+    ...getClientQueryOptions(parcel.clientId),
   })
   const { data: statusHistory } = useQuery({
     ...getParcelStatusHistoryQueryOptions(initialParcel.id),
@@ -112,7 +111,8 @@ function AdminParcelPage() {
                       to="/admin/clients/$clientId"
                       params={{ clientId: owner.id }}
                     >
-                      {owner.name} ({i18n.t('clients:id')}: {owner.clientId})
+                      {owner.user?.name ?? '-'} ({i18n.t('clients:code')}:{' '}
+                      {owner.code})
                     </RouterLink>
                   </Text>
                 ) : (

@@ -11,8 +11,8 @@ export const MARKETPLACE_SLUGS = [
 export type MarketplaceSlug = (typeof MARKETPLACE_SLUGS)[number]
 
 export interface MarketplaceAddressInput {
-  clientId: number
-  clientName: string
+  clientCode: number
+  userName: string
   phoneNumber?: string | null
 }
 
@@ -134,19 +134,19 @@ function formatMarketplacePhoneNumber(phoneNumber?: string | null): string {
 }
 
 function formatPinduoduoAddress({
-  clientId,
-  clientName,
+  clientCode,
+  userName,
   phoneNumber,
 }: MarketplaceAddressInput): string[] {
   const clientPhoneNumber = formatMarketplacePhoneNumber(phoneNumber)
-  const latinClientName = cyrillicToLatin(clientName)
+  const latinUserName = cyrillicToLatin(userName)
 
   const recipientLine = clientPhoneNumber
-    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientId} ${latinClientName} ${clientPhoneNumber}`
-    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientId} ${latinClientName}`
+    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName} ${clientPhoneNumber}`
+    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName}`
 
   return [
-    `JL7182-${clientId}`,
+    `JL7182-${clientCode}`,
     '13661225513',
     '',
     '广东省',
@@ -158,16 +158,16 @@ function formatPinduoduoAddress({
 }
 
 function formatTaobaoAddress({
-  clientId,
-  clientName,
+  clientCode,
+  userName,
   phoneNumber,
 }: MarketplaceAddressInput): string[] {
   const clientPhoneNumber = formatMarketplacePhoneNumber(phoneNumber)
-  const latinClientName = cyrillicToLatin(clientName)
+  const latinUserName = cyrillicToLatin(userName)
 
   const recipientLine = clientPhoneNumber
-    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientId} ${latinClientName} ${clientPhoneNumber}`
-    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientId} ${latinClientName}`
+    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName} ${clientPhoneNumber}`
+    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName}`
 
   return [
     '广东省',
@@ -177,25 +177,25 @@ function formatTaobaoAddress({
     '',
     recipientLine,
     '',
-    `JL7182-${clientId}`,
+    `JL7182-${clientCode}`,
     '13661225513',
   ]
 }
 
 function formatPoizonAddress({
-  clientId,
-  clientName,
+  clientCode,
+  userName,
   phoneNumber,
 }: MarketplaceAddressInput): string[] {
   const clientPhoneNumber = formatMarketplacePhoneNumber(phoneNumber)
-  const latinClientName = cyrillicToLatin(clientName)
+  const latinUserName = cyrillicToLatin(userName)
 
   const recipientLine = clientPhoneNumber
-    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientId} ${latinClientName} ${clientPhoneNumber}`
-    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientId} ${latinClientName}`
+    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName} ${clientPhoneNumber}`
+    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName}`
 
   return [
-    `JL7182-${clientId}`,
+    `JL7182-${clientCode}`,
     '13661225513',
     '',
     '广东省',
@@ -208,19 +208,19 @@ function formatPoizonAddress({
 }
 
 function format1688Address({
-  clientId,
-  clientName,
+  clientCode,
+  userName,
   phoneNumber,
 }: MarketplaceAddressInput): string[] {
   const clientPhoneNumber = formatMarketplacePhoneNumber(phoneNumber)
-  const latinClientName = cyrillicToLatin(clientName)
+  const latinUserName = cyrillicToLatin(userName)
 
   const recipientLine = clientPhoneNumber
-    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientId} ${latinClientName} ${clientPhoneNumber}`
-    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientId} ${latinClientName}`
+    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName} ${clientPhoneNumber}`
+    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName}`
 
   return [
-    `JL7182-${clientId}`,
+    `JL7182-${clientCode}`,
     '13661225513',
     '',
     '广东省',
@@ -233,19 +233,19 @@ function format1688Address({
 }
 
 function formatWeChatAddress({
-  clientId,
-  clientName,
+  clientCode,
+  userName,
   phoneNumber,
 }: MarketplaceAddressInput): string[] {
   const clientPhoneNumber = formatMarketplacePhoneNumber(phoneNumber)
-  const latinClientName = cyrillicToLatin(clientName)
+  const latinUserName = cyrillicToLatin(userName)
 
   const recipientLine = clientPhoneNumber
-    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientId} ${latinClientName} ${clientPhoneNumber}`
-    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientId} ${latinClientName}`
+    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName} ${clientPhoneNumber}`
+    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName}`
 
   return [
-    `JL7182-${clientId}`,
+    `JL7182-${clientCode}`,
     '13661225513',
     '',
     '广东省',

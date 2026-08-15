@@ -40,6 +40,29 @@ export interface PhoneResetPasswordDto {
   newPassword: string
 }
 
+export interface LinkedUserDto {
+  id: string
+  name: string
+  /** @nullable */
+  phoneNumber: string | null
+}
+
+/**
+ * @nullable
+ */
+export type GetClientResponseDtoUser = LinkedUserDto | null
+
+export interface GetClientResponseDto {
+  id: string
+  code: number
+  /** @nullable */
+  legacyPhoneRaw: string | null
+  /** @nullable */
+  legacyPhoneNormalized: string | null
+  /** @nullable */
+  user: GetClientResponseDtoUser
+}
+
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 export const UserRole = {
@@ -50,13 +73,15 @@ export const UserRole = {
 export interface GetUserResponseDto {
   role: UserRole
   id: string
-  clientId: number
+  clientId: string
   name: string
   /** @nullable */
   phoneNumber: string | null
 }
 
 export interface CreateParcelRequestDto {
+  /** @minimum 1 */
+  clientCode?: number
   /**
    * @minLength 1
    * @pattern \S
@@ -93,8 +118,7 @@ export interface GetParcelResponseDto {
   createdAt: string
   updatedAt: string
   trackingNumber: string
-  /** @nullable */
-  userId: string | null
+  clientId: string
   /** @nullable */
   source: string | null
   /** @nullable */
@@ -162,7 +186,7 @@ export interface GetParcelsImportSummaryResponseDto {
 
 export interface ParsedParcelsImportRowDto {
   rowNumber: number
-  clientId: number
+  clientCode: number
   trackingNumber: string
   weightKg?: number
   deliveryFee?: number
@@ -174,6 +198,7 @@ export type ParcelsImportWarningCode =
 
 export const ParcelsImportWarningCode = {
   PARCEL_OWNER_MISMATCH: 'PARCEL_OWNER_MISMATCH',
+  UNKNOWN_CLIENT: 'UNKNOWN_CLIENT',
 } as const
 
 export interface ParsedParcelsImportWarningDto {
@@ -214,6 +239,18 @@ export interface GetParcelsImportResponseDto {
   parsedData: ParsedParcelsImportDataDto
 }
 
+export type GetClientsParams = {
+  /**
+   * @minimum 0
+   */
+  limit?: number
+  /**
+   * @minimum 0
+   */
+  offset?: number
+  search?: string
+}
+
 export type GetUsersParams = {
   /**
    * @minimum 0
@@ -238,7 +275,7 @@ export type GetParcelsParams = {
   offset?: number
   status?: ParcelStatus
   search?: string
-  userId?: string
+  clientId?: string
 }
 
 export type GetParcelsImportsParams = {
@@ -378,6 +415,46 @@ export const signOut = async (options?: RequestInit): Promise<void> => {
   return customFetch<void>(getSignOutUrl(), {
     ...options,
     method: 'POST',
+  })
+}
+
+export const getGetClientsUrl = (params?: GetClientsParams) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0
+    ? `/clients?${stringifiedParams}`
+    : `/clients`
+}
+
+export const getClients = async (
+  params?: GetClientsParams,
+  options?: RequestInit
+): Promise<GetClientResponseDto[]> => {
+  return customFetch<GetClientResponseDto[]>(getGetClientsUrl(params), {
+    ...options,
+    method: 'GET',
+  })
+}
+
+export const getGetClientUrl = (clientId: string) => {
+  return `/clients/${clientId}`
+}
+
+export const getClient = async (
+  clientId: string,
+  options?: RequestInit
+): Promise<GetClientResponseDto> => {
+  return customFetch<GetClientResponseDto>(getGetClientUrl(clientId), {
+    ...options,
+    method: 'GET',
   })
 }
 

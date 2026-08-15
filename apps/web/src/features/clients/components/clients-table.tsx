@@ -7,8 +7,7 @@ import { useEffect, useReducer } from 'react'
 import { Button } from '../../../components/button'
 import { IconButton } from '../../../components/icon-button'
 import { useDebounce } from '../../../hooks/use-debounce'
-import { UserRole } from '../../../lib/api/api.gen'
-import { getUsersQueryOptions } from '../../../lib/api/queries'
+import { getClientsQueryOptions } from '../../../lib/api/queries'
 import i18n from '../../../lib/i18n'
 import { formatPhoneNumber } from '../../../lib/phone-number'
 
@@ -43,12 +42,11 @@ export function ClientsTable({ search }: ClientsTableProps) {
   const params = {
     limit: CLIENTS_PAGE_SIZE,
     offset: page * CLIENTS_PAGE_SIZE,
-    role: UserRole.client,
     search: debouncedSearch.length === 0 ? undefined : debouncedSearch,
   }
 
   const { data: clients = [], isPending: isPageLoading } = useQuery(
-    getUsersQueryOptions(params)
+    getClientsQueryOptions(params)
   )
 
   const hasNextPage = clients.length === CLIENTS_PAGE_SIZE
@@ -59,7 +57,7 @@ export function ClientsTable({ search }: ClientsTableProps) {
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeaderCell>
-              {i18n.t('clients:id')}
+              {i18n.t('clients:code')}
             </Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>
               {i18n.t('profile:name')}
@@ -75,12 +73,16 @@ export function ClientsTable({ search }: ClientsTableProps) {
           {clients.length > 0 &&
             clients.map((client) => (
               <Table.Row key={client.id}>
-                <Table.Cell>{client.clientId}</Table.Cell>
+                <Table.Cell>{client.code}</Table.Cell>
 
-                <Table.RowHeaderCell>{client.name}</Table.RowHeaderCell>
+                <Table.RowHeaderCell>
+                  {client.user?.name ?? '-'}
+                </Table.RowHeaderCell>
 
                 <Table.Cell>
-                  {formatPhoneNumber(client.phoneNumber ?? '') ?? '-'}
+                  {formatPhoneNumber(
+                    client.user?.phoneNumber ?? client.legacyPhoneRaw ?? ''
+                  ) ?? '-'}
                 </Table.Cell>
 
                 <Table.Cell align="right">

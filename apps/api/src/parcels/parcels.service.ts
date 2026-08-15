@@ -11,7 +11,7 @@ export class ParcelsService {
   constructor(private readonly parcelsRepository: ParcelsRepository) {}
 
   async create({
-    userId,
+    clientId,
     trackingNumber,
     status,
     source,
@@ -20,7 +20,7 @@ export class ParcelsService {
     deliveryFee,
     notes,
   }: {
-    userId: string | null
+    clientId: string
     trackingNumber: string
     status?: ParcelStatus | null
     source?: string
@@ -40,7 +40,7 @@ export class ParcelsService {
 
     const parcel = this.parcelsRepository.create({
       trackingNumber: normalizedTrackingNumber,
-      userId,
+      clientId,
       status,
       source,
       description,
@@ -81,7 +81,7 @@ export class ParcelsService {
   async update(
     parcelId: string,
     {
-      userId,
+      clientId,
       status,
       source,
       description,
@@ -89,7 +89,7 @@ export class ParcelsService {
       deliveryFee,
       notes,
     }: {
-      userId?: string | null
+      clientId?: string
       status?: ParcelStatus | null
       source?: string | null
       description?: string | null
@@ -100,7 +100,7 @@ export class ParcelsService {
   ): Promise<void> {
     await this.parcelsRepository.update(
       { id: parcelId },
-      { userId, status, source, description, weightKg, deliveryFee, notes }
+      { clientId, status, source, description, weightKg, deliveryFee, notes }
     )
   }
 

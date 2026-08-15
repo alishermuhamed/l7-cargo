@@ -10,6 +10,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Link as RouterLink, useNavigate } from '@tanstack/react-router'
 
 import type { ThemePreference } from '../contexts/theme'
+import { useClientContext } from '../hooks/use-client-context'
 import { useLocaleContext } from '../hooks/use-locale-context'
 import { useSessionContext } from '../hooks/use-session-context'
 import { useThemeContext } from '../hooks/use-theme-context'
@@ -62,11 +63,7 @@ export function UserMenu() {
               {phoneNumber}
             </Text>
 
-            {session.user.role === UserRole.client && (
-              <Text size="1" color="gray">
-                {i18n.t('profile:clientId')}: {session.user.clientId}
-              </Text>
-            )}
+            {session.user.role === UserRole.client && <ClientCode />}
           </Flex>
         </Box>
 
@@ -127,5 +124,15 @@ export function UserMenu() {
         </DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu.Root>
+  )
+}
+
+function ClientCode() {
+  const client = useClientContext()
+
+  return (
+    <Text size="1" color="gray">
+      {i18n.t('profile:clientCode')}: {client.code}
+    </Text>
   )
 }

@@ -199,7 +199,7 @@ function AdminParcelsImportDetailsPage() {
                     {i18n.t('parcels:rowNumber')}
                   </Table.ColumnHeaderCell>
                   <Table.ColumnHeaderCell>
-                    {i18n.t('parcels:clientId')}
+                    {i18n.t('parcels:clientCode')}
                   </Table.ColumnHeaderCell>
                   <Table.ColumnHeaderCell>
                     {i18n.t('parcels:trackingNumber')}
@@ -221,7 +221,7 @@ function AdminParcelsImportDetailsPage() {
                   <Table.Row key={row.rowNumber}>
                     <Table.RowHeaderCell>{row.rowNumber}</Table.RowHeaderCell>
 
-                    <Table.Cell>{row.clientId}</Table.Cell>
+                    <Table.Cell>{row.clientCode}</Table.Cell>
 
                     <Table.Cell>{row.trackingNumber}</Table.Cell>
 

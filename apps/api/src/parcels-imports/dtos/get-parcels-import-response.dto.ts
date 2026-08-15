@@ -8,7 +8,7 @@ import {
 
 class ParsedParcelsImportRowDto {
   rowNumber!: number
-  clientId!: number
+  clientCode!: number
   trackingNumber!: string
   weightKg?: number
   deliveryFee?: number

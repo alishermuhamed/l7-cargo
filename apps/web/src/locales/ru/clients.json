@@ -1,6 +1,6 @@
 {
   "clientDetails": "Данные клиента",
   "details": "Детали",
-  "id": "ID",
+  "code": "Код",
   "noClientsFound": "Клиенты не найдены"
 }

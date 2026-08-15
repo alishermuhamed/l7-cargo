@@ -13,11 +13,11 @@ import {
 } from 'typeorm'
 import * as XLSX from 'xlsx'
 
+import { ClientsService } from '../clients/clients.service'
 import { WithRelations } from '../db/db.types'
 import { type ParcelStatus } from '../parcels/parcel-status'
 import { ParcelStatusHistoryService } from '../parcels/parcel-status-history.service'
 import { ParcelsService } from '../parcels/parcels.service'
-import { UsersService } from '../users/users.service'
 import {
   ParcelsImport,
   PARSE_ERROR_CODES,
@@ -35,7 +35,7 @@ export class ParcelsImportsService {
 
   constructor(
     private readonly parcelsImportsRepository: ParcelsImportsRepository,
-    private readonly usersService: UsersService,
+    private readonly clientsService: ClientsService,
     private readonly parcelsService: ParcelsService,
     private readonly parcelStatusHistoryService: ParcelStatusHistoryService
   ) {}
@@ -161,7 +161,7 @@ export class ParcelsImportsService {
         }
 
         try {
-          const clientId = this.parseClientId(row[0])
+          const clientCode = this.parseClientCode(row[0])
           const trackingNumber = this.parseTrackingNumber(row[1])
           const weightKg = this.parseWeightKg(row[2])
           const deliveryFee = this.parseDeliveryFee(row[3])
@@ -169,7 +169,7 @@ export class ParcelsImportsService {
 
           rows.push({
             rowNumber,
-            clientId,
+            clientCode,
             trackingNumber,
             weightKg,
             deliveryFee,
@@ -198,8 +198,8 @@ export class ParcelsImportsService {
     }
   }
 
-  private parseClientId(cell: unknown): number {
-    if (typeof cell !== 'number' || !Number.isInteger(cell)) {
+  private parseClientCode(cell: unknown): number {
+    if (typeof cell !== 'number' || !Number.isInteger(cell) || cell < 1) {
       throw new Error('INVALID_CLIENT_ID' satisfies ParseErrorCode)
     }
 
@@ -256,25 +256,29 @@ export class ParcelsImportsService {
   private async buildWarnings(
     rows: ParsedParcelsImportRow[]
   ): Promise<ParsedParcelsImportWarning[]> {
-    const { existingUsersByIds, existingParcelsByTrackingNumbers } =
+    const { existingClientsByCodes, existingParcelsByTrackingNumbers } =
       await this.loadExistingData(rows)
 
     const warnings: ParsedParcelsImportWarning[] = []
 
     rows.forEach((row) => {
+      const matchingClient = existingClientsByCodes.get(row.clientCode)
       const existingParcel = existingParcelsByTrackingNumbers.get(
         row.trackingNumber
       )
 
-      if (existingParcel?.userId) {
-        const existingUser = existingUsersByIds.get(existingParcel.userId)
+      if (!matchingClient) {
+        warnings.push({
+          rowNumber: row.rowNumber,
+          code: 'UNKNOWN_CLIENT',
+        })
+      }
 
-        if (existingUser && existingUser.clientId !== row.clientId) {
-          warnings.push({
-            rowNumber: row.rowNumber,
-            code: 'PARCEL_OWNER_MISMATCH',
-          })
-        }
+      if (existingParcel && existingParcel.client.code !== row.clientCode) {
+        warnings.push({
+          rowNumber: row.rowNumber,
+          code: 'PARCEL_OWNER_MISMATCH',
+        })
       }
     })
 
@@ -286,7 +290,7 @@ export class ParcelsImportsService {
     parcelStatus: ParcelStatus,
     achievedAt: string
   ): Promise<void> {
-    const { existingUsersByClientIds, existingParcelsByTrackingNumbers } =
+    const { existingClientsByCodes, existingParcelsByTrackingNumbers } =
       await this.loadExistingData(rows)
 
     for (const row of rows) {
@@ -294,16 +298,21 @@ export class ParcelsImportsService {
         row.trackingNumber
       )
 
-      const matchingUser = existingUsersByClientIds.get(row.clientId) ?? null
+      let matchingClient = existingClientsByCodes.get(row.clientCode)
+
+      if (!matchingClient) {
+        matchingClient = await this.clientsService.findOrCreateByCode(
+          row.clientCode
+        )
+        existingClientsByCodes.set(row.clientCode, matchingClient)
+      }
 
       let parcelId: string
 
       if (existingParcel) {
         parcelId = existingParcel.id
-        const userId = existingParcel.userId ?? matchingUser?.id ?? null
 
         await this.parcelsService.update(parcelId, {
-          userId,
           weightKg: row.weightKg?.toFixed(3),
           deliveryFee: row.deliveryFee?.toFixed(),
           notes: row.notes,
@@ -311,7 +320,7 @@ export class ParcelsImportsService {
       } else {
         parcelId = await this.parcelsService.create({
           trackingNumber: row.trackingNumber,
-          userId: matchingUser?.id ?? null,
+          clientId: matchingClient.id,
           weightKg: row.weightKg?.toFixed(3),
           deliveryFee: row.deliveryFee?.toFixed(),
           notes: row.notes,
@@ -327,39 +336,38 @@ export class ParcelsImportsService {
   }
 
   private async loadExistingData(rows: ParsedParcelsImportRow[]): Promise<{
-    existingUsersByIds: Map<string, { id: string; clientId: number }>
-    existingUsersByClientIds: Map<number, { id: string; clientId: number }>
+    existingClientsByCodes: Map<number, { id: string; code: number }>
     existingParcelsByTrackingNumbers: Map<
       string,
-      { id: string; userId: string | null }
+      { id: string; clientId: string; client: { code: number } }
     >
   }> {
-    const clientIdsSet = new Set<number>()
+    const clientCodesSet = new Set<number>()
     const trackingNumbersSet = new Set<string>()
 
     rows.forEach((row) => {
-      clientIdsSet.add(row.clientId)
+      clientCodesSet.add(row.clientCode)
       trackingNumbersSet.add(row.trackingNumber)
     })
 
-    const clientIds = [...clientIdsSet]
+    const clientCodes = [...clientCodesSet]
     const trackingNumbers = [...trackingNumbersSet]
 
-    const [existingParcels, users] = await Promise.all([
+    const [existingParcels, clients] = await Promise.all([
       trackingNumbers.length
         ? this.parcelsService.find({
             where: { trackingNumber: In(trackingNumbers) },
+            relations: { client: true },
           })
         : Promise.resolve([]),
-      clientIds.length
-        ? this.usersService.find({ where: { clientId: In(clientIds) } })
+      clientCodes.length
+        ? this.clientsService.find({ where: { code: In(clientCodes) } })
         : Promise.resolve([]),
     ])
 
     return {
-      existingUsersByIds: new Map(users.map((user) => [user.id, user])),
-      existingUsersByClientIds: new Map(
-        users.map((user) => [user.clientId, user])
+      existingClientsByCodes: new Map(
+        clients.map((client) => [client.code, client])
       ),
       existingParcelsByTrackingNumbers: new Map(
         existingParcels.map((parcel) => [parcel.trackingNumber, parcel])
