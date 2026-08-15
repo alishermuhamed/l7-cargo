@@ -18,7 +18,7 @@ export interface ParsedParcelsImportRow {
 }
 
 export const PARSE_WARNING_CODES = [
-  'PARCEL_OWNER_MISMATCH',
+  'PARCEL_CLIENT_MISMATCH',
   'UNKNOWN_CLIENT',
 ] as const
 

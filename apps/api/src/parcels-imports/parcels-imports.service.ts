@@ -277,7 +277,7 @@ export class ParcelsImportsService {
       if (existingParcel && existingParcel.client.code !== row.clientCode) {
         warnings.push({
           rowNumber: row.rowNumber,
-          code: 'PARCEL_OWNER_MISMATCH',
+          code: 'PARCEL_CLIENT_MISMATCH',
         })
       }
     })

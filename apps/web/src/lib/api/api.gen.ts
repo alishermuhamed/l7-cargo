@@ -197,7 +197,7 @@ export type ParcelsImportWarningCode =
   (typeof ParcelsImportWarningCode)[keyof typeof ParcelsImportWarningCode]
 
 export const ParcelsImportWarningCode = {
-  PARCEL_OWNER_MISMATCH: 'PARCEL_OWNER_MISMATCH',
+  PARCEL_CLIENT_MISMATCH: 'PARCEL_CLIENT_MISMATCH',
   UNKNOWN_CLIENT: 'UNKNOWN_CLIENT',
 } as const
 

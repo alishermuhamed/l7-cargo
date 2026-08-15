@@ -5,6 +5,7 @@ import {
   DataList,
   Flex,
   Heading,
+  Skeleton,
   Text,
 } from '@radix-ui/themes'
 import { useMutation, useQuery } from '@tanstack/react-query'
@@ -61,7 +62,7 @@ function AdminParcelPage() {
     ...getParcelQueryOptions(initialParcel.id),
     initialData: initialParcel,
   })
-  const { data: owner } = useQuery({
+  const { data: client, isPending: isClientPending } = useQuery({
     ...getClientQueryOptions(parcel.clientId),
   })
   const { data: statusHistory } = useQuery({
@@ -103,16 +104,17 @@ function AdminParcelPage() {
             </DataList.Item>
 
             <DataList.Item>
-              <DataList.Label>{i18n.t('parcels:owner')}</DataList.Label>
+              <DataList.Label>{i18n.t('parcels:clientCode')}</DataList.Label>
               <DataList.Value>
-                {owner ? (
+                {isClientPending ? (
+                  <Skeleton width="140px" />
+                ) : client ? (
                   <Text asChild weight="medium">
                     <RouterLink
                       to="/admin/clients/$clientId"
-                      params={{ clientId: owner.id }}
+                      params={{ clientId: client.id }}
                     >
-                      {owner.user?.name ?? '-'} ({i18n.t('clients:code')}:{' '}
-                      {owner.code})
+                      {client.code}
                     </RouterLink>
                   </Text>
                 ) : (

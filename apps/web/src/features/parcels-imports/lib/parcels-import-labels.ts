@@ -14,6 +14,6 @@ export const PARSE_ERROR_LABELS: Record<ParcelsImportErrorCode, string> = {
 }
 
 export const PARSE_WARNING_LABELS: Record<ParcelsImportWarningCode, string> = {
-  PARCEL_OWNER_MISMATCH: i18n.t('parcels:parcelOwnerMismatch'),
+  PARCEL_CLIENT_MISMATCH: i18n.t('parcels:parcelClientMismatch'),
   UNKNOWN_CLIENT: i18n.t('parcels:unknownClient'),
 }

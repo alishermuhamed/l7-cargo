@@ -12,7 +12,6 @@
   "status": "Статус",
   "createdAt": "Создано",
   "trackingNumber": "Трек-номер",
-  "owner": "Владелец",
   "weight": "Вес",
   "weightValue": "{{weight}} кг",
   "weightPlaceholder": "Введите вес",
@@ -74,6 +73,6 @@
   "invalidDeliveryFee": "Неверная стоимость доставки",
   "invalidNotes": "Неверные заметки",
   "unknownError": "Неизвестная ошибка",
-  "parcelOwnerMismatch": "Владелец посылки не совпадает",
+  "parcelClientMismatch": "Клиент посылки не совпадает",
   "unknownClient": "Клиент будет создан при применении импорта"
 }

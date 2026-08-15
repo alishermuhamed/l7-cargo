@@ -12,7 +12,6 @@
   "status": "Статус",
   "createdAt": "Жасалған уақыты",
   "trackingNumber": "Трек-нөмір",
-  "owner": "Иесі",
   "weight": "Салмақ",
   "weightValue": "{{weight}} кг",
   "weightPlaceholder": "Салмақты енгізіңіз",
@@ -74,6 +73,6 @@
   "invalidDeliveryFee": "Жеткізу құны қате",
   "invalidNotes": "Ескертпелер қате",
   "unknownError": "Белгісіз қате",
-  "parcelOwnerMismatch": "Сәлемдеме иесі сәйкес келмейді",
+  "parcelClientMismatch": "Сәлемдеме клиенті сәйкес келмейді",
   "unknownClient": "Импорт қолданылған кезде клиент жасалады"
 }

@@ -12,7 +12,6 @@
   "status": "Status",
   "createdAt": "Created at",
   "trackingNumber": "Tracking number",
-  "owner": "Owner",
   "weight": "Weight",
   "weightValue": "{{weight}} kg",
   "weightPlaceholder": "Enter weight",
@@ -74,6 +73,6 @@
   "invalidDeliveryFee": "Invalid delivery fee",
   "invalidNotes": "Invalid notes",
   "unknownError": "Unknown error",
-  "parcelOwnerMismatch": "Parcel owner mismatch",
+  "parcelClientMismatch": "Parcel client mismatch",
   "unknownClient": "Client will be created when the import is committed"
 }
