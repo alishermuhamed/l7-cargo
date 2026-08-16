@@ -7,6 +7,7 @@ import {
   Flex,
   Grid,
   Heading,
+  Link,
   Text,
 } from '@radix-ui/themes'
 import { createFileRoute, redirect } from '@tanstack/react-router'
@@ -21,6 +22,8 @@ import {
   MARKETPLACES_BY_SLUGS,
 } from '../../../../lib/address-marketplaces'
 import i18n from '../../../../lib/i18n'
+
+const MANAGER_WHATSAPP_URL = 'https://wa.me/77007182717'
 
 export const Route = createFileRoute(
   '/_authenticated/_client/address/$marketplace'
@@ -72,6 +75,19 @@ function MarketplaceAddressPage() {
   return (
     <Container p="4">
       <Flex direction="column" gap="4">
+        <Callout.Root color="blue">
+          <Callout.Icon>
+            <InfoCircledIcon />
+          </Callout.Icon>
+
+          <Callout.Text>
+            {i18n.t('address:addressHelpCallout')}{' '}
+            <Link href={MANAGER_WHATSAPP_URL} rel="noreferrer" target="_blank">
+              {i18n.t('address:whatsappLinkLabel')}
+            </Link>
+          </Callout.Text>
+        </Callout.Root>
+
         <Flex align="center" gap="2">
           <Box asChild flexShrink="0" width="36px" height="36px">
             <img

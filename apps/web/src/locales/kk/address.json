@@ -1,5 +1,7 @@
 {
   "title": "Мекенжай",
+  "addressHelpCallout": "Мекенжайдың дұрыс енгізілгеніне күмәндансаңыз немесе сұрақтарыңыз болса, L7 Cargo менеджеріне хабарласыңыз:",
+  "whatsappLinkLabel": "WhatsApp",
   "copyFullAddress": "Мекенжайды толық көшіру",
   "exampleScreenshotsTitle": "{{marketplace}} сервисінде мекенжайды дұрыс толтыру мысалы:",
   "exampleScreenshotAlt": "{{marketplace}} скриншот мысалы {{index}}",

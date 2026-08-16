@@ -1,5 +1,7 @@
 {
   "title": "Адрес",
+  "addressHelpCallout": "Если вы сомневаетесь в корректности внесения адреса или у вас есть вопросы, пожалуйста, свяжитесь с менеджером L7 Cargo:",
+  "whatsappLinkLabel": "WhatsApp",
   "copyFullAddress": "Скопировать адрес полностью",
   "exampleScreenshotsTitle": "Пример правильно заполненного адреса на {{marketplace}}:",
   "exampleScreenshotAlt": "Пример скриншота {{marketplace}} {{index}}",
