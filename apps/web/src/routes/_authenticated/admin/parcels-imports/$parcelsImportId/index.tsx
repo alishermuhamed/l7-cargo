@@ -26,7 +26,7 @@ import {
   deleteParcelsImport as deleteParcelsImportRequest,
 } from '../../../../../lib/api/api.gen'
 import { getParcelsImportQueryOptions } from '../../../../../lib/api/queries'
-import { formatDateTime } from '../../../../../lib/date-time'
+import { formatDate, formatDateTime } from '../../../../../lib/date-time'
 import i18n from '../../../../../lib/i18n'
 import { formatMoneyAmount } from '../../../../../lib/money'
 
@@ -99,6 +99,13 @@ function AdminParcelsImportDetailsPage() {
               <DataList.Label>{i18n.t('parcels:parcelStatus')}</DataList.Label>
               <DataList.Value>
                 <ParcelStatusBadge status={parcelsImport.parcelStatus} />
+              </DataList.Value>
+            </DataList.Item>
+
+            <DataList.Item>
+              <DataList.Label>{i18n.t('parcels:achievedAt')}</DataList.Label>
+              <DataList.Value>
+                {formatDate(parcelsImport.achievedAt)}
               </DataList.Value>
             </DataList.Item>
 
