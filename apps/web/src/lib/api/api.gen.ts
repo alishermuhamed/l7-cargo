@@ -91,6 +91,7 @@ export interface CreateParcelRequestDto {
   description?: string
   weightKg?: string
   deliveryFee?: string
+  comments?: string
 }
 
 export interface CreateParcelResponseDto {
@@ -161,6 +162,8 @@ export interface UpdateParcelRequestDto {
   weightKg?: string | null
   /** @nullable */
   deliveryFee?: string | null
+  /** @nullable */
+  comments?: string | null
 }
 
 export interface CreateParcelsImportRequestDto {

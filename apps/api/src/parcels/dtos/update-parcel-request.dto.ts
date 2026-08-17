@@ -21,4 +21,8 @@ export class UpdateParcelRequestDto {
   @IsOptional()
   @IsMoneyString()
   deliveryFee?: string | null
+
+  @IsOptional()
+  @IsString()
+  comments?: string | null
 }

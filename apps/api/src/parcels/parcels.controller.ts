@@ -56,6 +56,7 @@ export class ParcelsController {
       description,
       weightKg,
       deliveryFee,
+      comments,
     } = createParcelRequestDto
 
     let clientId = user.clientId
@@ -75,6 +76,7 @@ export class ParcelsController {
       description,
       weightKg,
       deliveryFee,
+      comments,
     })
 
     return ParcelsMapper.toCreateParcelResponseDto(id)
@@ -159,7 +161,7 @@ export class ParcelsController {
   ): Promise<SuccessResponseDto> {
     await this.parcelsPolicy.checkCanUpdate(parcelId, updateParcelRequestDto)
 
-    const { source, description, weightKg, deliveryFee } =
+    const { source, description, weightKg, deliveryFee, comments } =
       updateParcelRequestDto
 
     await this.parcelsService.update(parcelId, {
@@ -167,6 +169,7 @@ export class ParcelsController {
       description,
       weightKg,
       deliveryFee,
+      comments,
     })
 
     return new SuccessResponseDto()

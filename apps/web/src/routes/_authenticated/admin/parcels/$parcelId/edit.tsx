@@ -83,6 +83,7 @@ const editAdminParcelSchema = z.object({
       (value) => value === '' || isValidMoneyAmount(value),
       i18n.t('validation:deliveryFee.invalid')
     ),
+  comments: z.string().trim(),
   statusHistory: z
     .object({
       status: z.enum(ParcelStatus),
@@ -103,6 +104,7 @@ function EditAdminParcelPage() {
     defaultValues: {
       weightKg: initialParcel.weightKg ?? '',
       deliveryFee: initialParcel.deliveryFee ?? '',
+      comments: initialParcel.comments ?? '',
       statusHistory: Object.values(ParcelStatus).map((status) => {
         const existingEntry = initialStatusHistory.find(
           (item) => item.status === status
@@ -141,6 +143,7 @@ function EditAdminParcelPage() {
   const onSubmit = async ({
     weightKg,
     deliveryFee,
+    comments,
     statusHistory,
   }: EditAdminParcelFormValues) => {
     try {
@@ -151,6 +154,7 @@ function EditAdminParcelPage() {
             : new BigNumber(normalizeDecimalSeparator(weightKg)).toFixed(),
         deliveryFee:
           deliveryFee === '' ? null : normalizeMoneyAmount(deliveryFee),
+        comments: comments === '' ? null : comments,
       })
     } catch {
       toast.error(i18n.t('parcels:unableToEditParcel'))
@@ -217,6 +221,22 @@ function EditAdminParcelPage() {
                       autoComplete="off"
                       {...field}
                     />
+                  </FormFieldControl>
+
+                  <FormFieldError />
+                </FormFieldItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="comments"
+              render={({ field }) => (
+                <FormFieldItem>
+                  <FormFieldLabel>{i18n.t('parcels:comments')}</FormFieldLabel>
+
+                  <FormFieldControl>
+                    <TextField.Root autoComplete="off" {...field} />
                   </FormFieldControl>
 
                   <FormFieldError />

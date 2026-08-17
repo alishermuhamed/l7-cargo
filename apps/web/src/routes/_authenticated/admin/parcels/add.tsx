@@ -80,6 +80,7 @@ const addAdminParcelSchema = z.object({
       (value) => value === '' || isValidMoneyAmount(value),
       i18n.t('validation:deliveryFee.invalid')
     ),
+  comments: z.string().trim(),
   statusHistory: z
     .object({
       status: z.enum(ParcelStatus),
@@ -100,6 +101,7 @@ function AddAdminParcelPage() {
       trackingNumber: '',
       weightKg: '',
       deliveryFee: '',
+      comments: '',
       statusHistory: Object.values(ParcelStatus).map((status) => ({
         status,
         achievedAt: '',
@@ -141,6 +143,7 @@ function AddAdminParcelPage() {
     trackingNumber,
     weightKg,
     deliveryFee,
+    comments,
     statusHistory,
   }: AddAdminParcelFormValues) => {
     let parcelId: string
@@ -155,6 +158,7 @@ function AddAdminParcelPage() {
             : new BigNumber(normalizeDecimalSeparator(weightKg)).toFixed(),
         deliveryFee:
           deliveryFee === '' ? undefined : normalizeMoneyAmount(deliveryFee),
+        comments: comments === '' ? undefined : comments,
       })
       parcelId = parcel.id
     } catch (error) {
@@ -281,6 +285,22 @@ function AddAdminParcelPage() {
                       autoComplete="off"
                       {...field}
                     />
+                  </FormFieldControl>
+
+                  <FormFieldError />
+                </FormFieldItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="comments"
+              render={({ field }) => (
+                <FormFieldItem>
+                  <FormFieldLabel>{i18n.t('parcels:comments')}</FormFieldLabel>
+
+                  <FormFieldControl>
+                    <TextField.Root autoComplete="off" {...field} />
                   </FormFieldControl>
 
                   <FormFieldError />

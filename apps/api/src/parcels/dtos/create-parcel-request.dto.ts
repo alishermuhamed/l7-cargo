@@ -38,4 +38,8 @@ export class CreateParcelRequestDto {
   @IsOptional()
   @IsMoneyString()
   deliveryFee?: string
+
+  @IsOptional()
+  @IsString()
+  comments?: string
 }
