@@ -41,6 +41,12 @@ export function ClientNavBar({ onNavigate }: ClientNavBarProps) {
               <Text size="3">{i18n.t('nav:address')}</Text>
             </RouterLink>
           </RouterLinkWrapper>
+
+          <RouterLinkWrapper>
+            <RouterLink onClick={onNavigate} to="/training">
+              <Text size="3">{i18n.t('nav:training')}</Text>
+            </RouterLink>
+          </RouterLinkWrapper>
         </Flex>
       </Flex>
     </Flex>

@@ -20,6 +20,7 @@ import { Route as AuthenticatedClientRouteRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminParcelsIndexRouteImport } from './routes/_authenticated/admin/parcels/index'
 import { Route as AuthenticatedAdminParcelsImportsIndexRouteImport } from './routes/_authenticated/admin/parcels-imports/index'
 import { Route as AuthenticatedAdminClientsIndexRouteImport } from './routes/_authenticated/admin/clients/index'
+import { Route as AuthenticatedClientTrainingIndexRouteImport } from './routes/_authenticated/_client/training/index'
 import { Route as AuthenticatedClientProfileIndexRouteImport } from './routes/_authenticated/_client/profile/index'
 import { Route as AuthenticatedClientParcelsIndexRouteImport } from './routes/_authenticated/_client/parcels/index'
 import { Route as AuthenticatedClientAddressIndexRouteImport } from './routes/_authenticated/_client/address/index'
@@ -91,6 +92,12 @@ const AuthenticatedAdminClientsIndexRoute =
     id: '/clients/',
     path: '/clients/',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedClientTrainingIndexRoute =
+  AuthenticatedClientTrainingIndexRouteImport.update({
+    id: '/training/',
+    path: '/training/',
+    getParentRoute: () => AuthenticatedClientRouteRoute,
   } as any)
 const AuthenticatedClientProfileIndexRoute =
   AuthenticatedClientProfileIndexRouteImport.update({
@@ -192,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/address/': typeof AuthenticatedClientAddressIndexRoute
   '/parcels/': typeof AuthenticatedClientParcelsIndexRoute
   '/profile/': typeof AuthenticatedClientProfileIndexRoute
+  '/training/': typeof AuthenticatedClientTrainingIndexRoute
   '/admin/clients/': typeof AuthenticatedAdminClientsIndexRoute
   '/admin/parcels-imports/': typeof AuthenticatedAdminParcelsImportsIndexRoute
   '/admin/parcels/': typeof AuthenticatedAdminParcelsIndexRoute
@@ -217,6 +225,7 @@ export interface FileRoutesByTo {
   '/address': typeof AuthenticatedClientAddressIndexRoute
   '/parcels': typeof AuthenticatedClientParcelsIndexRoute
   '/profile': typeof AuthenticatedClientProfileIndexRoute
+  '/training': typeof AuthenticatedClientTrainingIndexRoute
   '/admin/clients': typeof AuthenticatedAdminClientsIndexRoute
   '/admin/parcels-imports': typeof AuthenticatedAdminParcelsImportsIndexRoute
   '/admin/parcels': typeof AuthenticatedAdminParcelsIndexRoute
@@ -245,6 +254,7 @@ export interface FileRoutesById {
   '/_authenticated/_client/address/': typeof AuthenticatedClientAddressIndexRoute
   '/_authenticated/_client/parcels/': typeof AuthenticatedClientParcelsIndexRoute
   '/_authenticated/_client/profile/': typeof AuthenticatedClientProfileIndexRoute
+  '/_authenticated/_client/training/': typeof AuthenticatedClientTrainingIndexRoute
   '/_authenticated/admin/clients/': typeof AuthenticatedAdminClientsIndexRoute
   '/_authenticated/admin/parcels-imports/': typeof AuthenticatedAdminParcelsImportsIndexRoute
   '/_authenticated/admin/parcels/': typeof AuthenticatedAdminParcelsIndexRoute
@@ -272,6 +282,7 @@ export interface FileRouteTypes {
     | '/address/'
     | '/parcels/'
     | '/profile/'
+    | '/training/'
     | '/admin/clients/'
     | '/admin/parcels-imports/'
     | '/admin/parcels/'
@@ -297,6 +308,7 @@ export interface FileRouteTypes {
     | '/address'
     | '/parcels'
     | '/profile'
+    | '/training'
     | '/admin/clients'
     | '/admin/parcels-imports'
     | '/admin/parcels'
@@ -324,6 +336,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_client/address/'
     | '/_authenticated/_client/parcels/'
     | '/_authenticated/_client/profile/'
+    | '/_authenticated/_client/training/'
     | '/_authenticated/admin/clients/'
     | '/_authenticated/admin/parcels-imports/'
     | '/_authenticated/admin/parcels/'
@@ -419,6 +432,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/clients/'
       preLoaderRoute: typeof AuthenticatedAdminClientsIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/_client/training/': {
+      id: '/_authenticated/_client/training/'
+      path: '/training'
+      fullPath: '/training/'
+      preLoaderRoute: typeof AuthenticatedClientTrainingIndexRouteImport
+      parentRoute: typeof AuthenticatedClientRouteRoute
     }
     '/_authenticated/_client/profile/': {
       id: '/_authenticated/_client/profile/'
@@ -528,6 +548,7 @@ interface AuthenticatedClientRouteRouteChildren {
   AuthenticatedClientAddressIndexRoute: typeof AuthenticatedClientAddressIndexRoute
   AuthenticatedClientParcelsIndexRoute: typeof AuthenticatedClientParcelsIndexRoute
   AuthenticatedClientProfileIndexRoute: typeof AuthenticatedClientProfileIndexRoute
+  AuthenticatedClientTrainingIndexRoute: typeof AuthenticatedClientTrainingIndexRoute
   AuthenticatedClientParcelsParcelIdEditRoute: typeof AuthenticatedClientParcelsParcelIdEditRoute
   AuthenticatedClientParcelsParcelIdIndexRoute: typeof AuthenticatedClientParcelsParcelIdIndexRoute
 }
@@ -541,6 +562,8 @@ const AuthenticatedClientRouteRouteChildren: AuthenticatedClientRouteRouteChildr
     AuthenticatedClientAddressIndexRoute: AuthenticatedClientAddressIndexRoute,
     AuthenticatedClientParcelsIndexRoute: AuthenticatedClientParcelsIndexRoute,
     AuthenticatedClientProfileIndexRoute: AuthenticatedClientProfileIndexRoute,
+    AuthenticatedClientTrainingIndexRoute:
+      AuthenticatedClientTrainingIndexRoute,
     AuthenticatedClientParcelsParcelIdEditRoute:
       AuthenticatedClientParcelsParcelIdEditRoute,
     AuthenticatedClientParcelsParcelIdIndexRoute:
