@@ -23,6 +23,8 @@ import {
 } from '../../../../lib/api/api.gen'
 import i18n from '../../../../lib/i18n'
 
+const SUSPICIOUS_TRACKING_NUMBER_PATTERN = /^\d{6}-\d+$/
+
 export const Route = createFileRoute('/_authenticated/_client/parcels/add')({
   staticData: {
     title: i18n.t('parcels:addParcel'),
@@ -35,7 +37,11 @@ const addParcelSchema = z.object({
   trackingNumber: z
     .string()
     .trim()
-    .min(1, i18n.t('validation:trackingNumber.required')),
+    .min(1, i18n.t('validation:trackingNumber.required'))
+    .refine(
+      (value) => !SUSPICIOUS_TRACKING_NUMBER_PATTERN.test(value),
+      i18n.t('validation:trackingNumber.suspicious')
+    ),
   source: z.string(),
   description: z.string().trim(),
 })

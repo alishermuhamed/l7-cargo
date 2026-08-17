@@ -42,6 +42,7 @@ import { normalizeDecimalSeparator } from '../../../../lib/decimal'
 import i18n from '../../../../lib/i18n'
 import { isValidMoneyAmount, normalizeMoneyAmount } from '../../../../lib/money'
 
+const SUSPICIOUS_TRACKING_NUMBER_PATTERN = /^\d{6}-\d+$/
 const WEIGHT_KG_PATTERN = /^(?:0|[1-9]\d{0,3})(?:[.,]\d{1,3})?$/
 
 export const Route = createFileRoute('/_authenticated/admin/parcels/add')({
@@ -60,7 +61,11 @@ const addAdminParcelSchema = z.object({
   trackingNumber: z
     .string()
     .trim()
-    .min(1, i18n.t('validation:trackingNumber.required')),
+    .min(1, i18n.t('validation:trackingNumber.required'))
+    .refine(
+      (value) => !SUSPICIOUS_TRACKING_NUMBER_PATTERN.test(value),
+      i18n.t('validation:trackingNumber.suspicious')
+    ),
   weightKg: z
     .string()
     .trim()

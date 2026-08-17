@@ -7,7 +7,8 @@
   },
   "trackingNumber": {
     "required": "Tracking number is required",
-    "duplicate": "A parcel with this tracking number already exists"
+    "duplicate": "A parcel with this tracking number already exists",
+    "suspicious": "This does not look like a tracking number. Tracking numbers usually start with YT, JT, SF, 78, 98, 43, 777, or DPK."
   },
   "file": {
     "required": "File is required",
