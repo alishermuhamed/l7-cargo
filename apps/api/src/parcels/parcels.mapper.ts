@@ -19,7 +19,7 @@ export class ParcelsMapper {
       description: parcel.description,
       weightKg: parcel.weightKg,
       deliveryFee: parcel.deliveryFee,
-      notes: parcel.notes,
+      comments: parcel.comments,
     }
   }
 }

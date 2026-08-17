@@ -36,5 +36,5 @@ export class Parcel extends BaseEntity {
   deliveryFee!: string | null
 
   @TextColumn({ nullable: true })
-  notes!: string | null
+  comments!: string | null
 }

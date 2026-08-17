@@ -18,7 +18,7 @@ export class ParcelsService {
     description,
     weightKg,
     deliveryFee,
-    notes,
+    comments,
   }: {
     clientId: string
     trackingNumber: string
@@ -27,7 +27,7 @@ export class ParcelsService {
     description?: string
     weightKg?: string | null
     deliveryFee?: string | null
-    notes?: string | null
+    comments?: string | null
   }): Promise<Parcel['id']> {
     const normalizedTrackingNumber = trackingNumber.trim()
     const existingParcel = await this.parcelsRepository.findOne({
@@ -46,7 +46,7 @@ export class ParcelsService {
       description,
       weightKg,
       deliveryFee,
-      notes,
+      comments,
     })
 
     await this.parcelsRepository.insert(parcel)
@@ -87,7 +87,7 @@ export class ParcelsService {
       description,
       weightKg,
       deliveryFee,
-      notes,
+      comments,
     }: {
       clientId?: string
       status?: ParcelStatus | null
@@ -95,12 +95,12 @@ export class ParcelsService {
       description?: string | null
       weightKg?: string | null
       deliveryFee?: string | null
-      notes?: string | null
+      comments?: string | null
     }
   ): Promise<void> {
     await this.parcelsRepository.update(
       { id: parcelId },
-      { clientId, status, source, description, weightKg, deliveryFee, notes }
+      { clientId, status, source, description, weightKg, deliveryFee, comments }
     )
   }
 

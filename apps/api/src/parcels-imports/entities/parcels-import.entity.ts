@@ -14,7 +14,7 @@ export interface ParsedParcelsImportRow {
   trackingNumber: string
   weightKg?: number
   deliveryFee?: number
-  notes?: string
+  comments?: string
 }
 
 export const PARSE_WARNING_CODES = [
@@ -35,7 +35,7 @@ export const PARSE_ERROR_CODES = [
   'INVALID_TRACKING_CODE',
   'INVALID_WEIGHT_KG',
   'INVALID_DELIVERY_FEE',
-  'INVALID_NOTES',
+  'INVALID_COMMENTS',
   'UNKNOWN',
 ] as const
 

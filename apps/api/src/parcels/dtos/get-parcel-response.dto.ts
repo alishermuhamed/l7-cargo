@@ -20,5 +20,5 @@ export class GetParcelResponseDto {
   description!: string | null
   weightKg!: string | null
   deliveryFee!: string | null
-  notes!: string | null
+  comments!: string | null
 }

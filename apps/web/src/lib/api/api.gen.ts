@@ -128,7 +128,7 @@ export interface GetParcelResponseDto {
   /** @nullable */
   deliveryFee: string | null
   /** @nullable */
-  notes: string | null
+  comments: string | null
 }
 
 export interface GetParcelStatusHistoryResponseDto {
@@ -190,7 +190,7 @@ export interface ParsedParcelsImportRowDto {
   trackingNumber: string
   weightKg?: number
   deliveryFee?: number
-  notes?: string
+  comments?: string
 }
 
 export type ParcelsImportWarningCode =
@@ -215,7 +215,7 @@ export const ParcelsImportErrorCode = {
   INVALID_TRACKING_CODE: 'INVALID_TRACKING_CODE',
   INVALID_WEIGHT_KG: 'INVALID_WEIGHT_KG',
   INVALID_DELIVERY_FEE: 'INVALID_DELIVERY_FEE',
-  INVALID_NOTES: 'INVALID_NOTES',
+  INVALID_COMMENTS: 'INVALID_COMMENTS',
   UNKNOWN: 'UNKNOWN',
 } as const
 

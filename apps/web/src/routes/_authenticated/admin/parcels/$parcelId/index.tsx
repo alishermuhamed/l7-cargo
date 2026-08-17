@@ -141,10 +141,10 @@ function AdminParcelPage() {
               </DataList.Value>
             </DataList.Item>
 
-            {parcel.notes && (
+            {parcel.comments && (
               <DataList.Item>
-                <DataList.Label>{i18n.t('parcels:notes')}</DataList.Label>
-                <DataList.Value>{parcel.notes}</DataList.Value>
+                <DataList.Label>{i18n.t('parcels:comments')}</DataList.Label>
+                <DataList.Value>{parcel.comments}</DataList.Value>
               </DataList.Item>
             )}
           </DataList.Root>

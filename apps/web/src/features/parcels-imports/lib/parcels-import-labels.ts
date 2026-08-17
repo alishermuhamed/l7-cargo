@@ -10,7 +10,7 @@ export const PARSE_ERROR_LABELS: Record<ParcelsImportErrorCode, string> = {
   INVALID_TRACKING_CODE: i18n.t('parcels:invalidTrackingCode'),
   INVALID_WEIGHT_KG: i18n.t('parcels:invalidWeightKg'),
   INVALID_DELIVERY_FEE: i18n.t('parcels:invalidDeliveryFee'),
-  INVALID_NOTES: i18n.t('parcels:invalidNotes'),
+  INVALID_COMMENTS: i18n.t('parcels:invalidComments'),
   UNKNOWN: i18n.t('parcels:unknownError'),
 }
 

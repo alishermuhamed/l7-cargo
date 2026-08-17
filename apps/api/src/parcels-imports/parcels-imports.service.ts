@@ -171,7 +171,7 @@ export class ParcelsImportsService {
           const clientCode = this.parseClientCode(row[1])
           const weightKg = this.parseWeightKg(row[2])
           const deliveryFee = this.parseDeliveryFee(row[3])
-          const notes = this.parseNotes(row[4])
+          const comments = this.parseComments(row[4])
 
           rows.push({
             rowNumber,
@@ -179,7 +179,7 @@ export class ParcelsImportsService {
             trackingNumber,
             weightKg,
             deliveryFee,
-            notes,
+            comments,
           })
         } catch (e: unknown) {
           const errorMessage = e instanceof Error ? e.message : String(e)
@@ -277,13 +277,13 @@ export class ParcelsImportsService {
     return deliveryFee
   }
 
-  private parseNotes(cell: unknown): string | undefined {
+  private parseComments(cell: unknown): string | undefined {
     if (cell === undefined || cell === '') {
       return undefined
     }
 
     if (typeof cell !== 'string') {
-      throw new Error('INVALID_NOTES' satisfies ParseErrorCode)
+      throw new Error('INVALID_COMMENTS' satisfies ParseErrorCode)
     }
 
     return cell.trim()
@@ -352,7 +352,7 @@ export class ParcelsImportsService {
         await this.parcelsService.update(existingParcel.id, {
           weightKg: row.weightKg?.toFixed(3),
           deliveryFee: row.deliveryFee?.toFixed(),
-          notes: row.notes,
+          comments: row.comments,
         })
 
         await this.parcelStatusHistoryService.upsert({
@@ -383,7 +383,7 @@ export class ParcelsImportsService {
         clientId: matchingClient.id,
         weightKg: row.weightKg?.toFixed(3),
         deliveryFee: row.deliveryFee?.toFixed(),
-        notes: row.notes,
+        comments: row.comments,
       })
 
       await this.parcelStatusHistoryService.upsert({

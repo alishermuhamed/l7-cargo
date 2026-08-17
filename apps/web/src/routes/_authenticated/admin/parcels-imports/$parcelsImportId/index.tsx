@@ -211,7 +211,7 @@ function AdminParcelsImportDetailsPage() {
                     {i18n.t('parcels:deliveryFee')}
                   </Table.ColumnHeaderCell>
                   <Table.ColumnHeaderCell>
-                    {i18n.t('parcels:notes')}
+                    {i18n.t('parcels:comments')}
                   </Table.ColumnHeaderCell>
                 </Table.Row>
               </Table.Header>
@@ -235,7 +235,7 @@ function AdminParcelsImportDetailsPage() {
                         : '-'}
                     </Table.Cell>
 
-                    <Table.Cell>{row.notes ?? '-'}</Table.Cell>
+                    <Table.Cell>{row.comments ?? '-'}</Table.Cell>
                   </Table.Row>
                 ))}
               </Table.Body>

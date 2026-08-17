@@ -12,7 +12,7 @@ class ParsedParcelsImportRowDto {
   trackingNumber!: string
   weightKg?: number
   deliveryFee?: number
-  notes?: string
+  comments?: string
 }
 
 class ParsedParcelsImportWarningDto {
