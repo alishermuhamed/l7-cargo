@@ -5,6 +5,7 @@ import {
 import i18n from '../../../lib/i18n'
 
 export const PARSE_ERROR_LABELS: Record<ParcelsImportErrorCode, string> = {
+  CLIENT_CODE_REQUIRED: i18n.t('parcels:clientCodeRequired'),
   INVALID_CLIENT_ID: i18n.t('parcels:invalidClientCode'),
   INVALID_TRACKING_CODE: i18n.t('parcels:invalidTrackingCode'),
   INVALID_WEIGHT_KG: i18n.t('parcels:invalidWeightKg'),

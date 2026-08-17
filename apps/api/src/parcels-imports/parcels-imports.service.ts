@@ -123,10 +123,16 @@ export class ParcelsImportsService {
     file: Express.Multer.File,
     withHeader: boolean
   ): Promise<ParsedParcelsImportData> {
-    const { rows, errors } = this.parseFile(file, withHeader)
-    const warnings = await this.buildWarnings(rows)
+    const { rows, errors: parseErrors } = this.parseFile(file, withHeader)
+    const { warnings, errors: validationErrors } = await this.buildIssues(rows)
 
-    return { rows, warnings, errors }
+    return {
+      rows,
+      warnings,
+      errors: [...parseErrors, ...validationErrors].sort(
+        (a, b) => a.rowNumber - b.rowNumber
+      ),
+    }
   }
 
   private parseFile(
@@ -161,8 +167,8 @@ export class ParcelsImportsService {
         }
 
         try {
-          const clientCode = this.parseClientCode(row[0])
-          const trackingNumber = this.parseTrackingNumber(row[1])
+          const trackingNumber = this.parseTrackingNumber(row[0])
+          const clientCode = this.parseClientCode(row[1])
           const weightKg = this.parseWeightKg(row[2])
           const deliveryFee = this.parseDeliveryFee(row[3])
           const notes = this.parseNotes(row[4])
@@ -198,23 +204,37 @@ export class ParcelsImportsService {
     }
   }
 
-  private parseClientCode(cell: unknown): number {
-    if (typeof cell !== 'number' || !Number.isInteger(cell) || cell < 1) {
-      throw new Error('INVALID_CLIENT_ID' satisfies ParseErrorCode)
-    }
-
-    return cell
-  }
-
   private parseTrackingNumber(cell: unknown): string {
-    if (
-      (typeof cell !== 'number' || !Number.isInteger(cell)) &&
-      (typeof cell !== 'string' || cell === '')
-    ) {
+    const isValidNumber = typeof cell === 'number' && Number.isInteger(cell)
+    const isValidString = typeof cell === 'string' && cell.trim() !== ''
+
+    if (!isValidNumber && !isValidString) {
       throw new Error('INVALID_TRACKING_CODE' satisfies ParseErrorCode)
     }
 
     return cell.toString().trim()
+  }
+
+  private parseClientCode(cell: unknown): number | undefined {
+    if (
+      cell === undefined ||
+      cell === '' ||
+      (typeof cell === 'string' && cell.trim() === '')
+    ) {
+      return undefined
+    }
+
+    const clientCode = typeof cell === 'string' ? Number(cell.trim()) : cell
+
+    if (
+      typeof clientCode !== 'number' ||
+      !Number.isInteger(clientCode) ||
+      clientCode < 1
+    ) {
+      throw new Error('INVALID_CLIENT_ID' satisfies ParseErrorCode)
+    }
+
+    return clientCode
   }
 
   private parseWeightKg(cell: unknown): number | undefined {
@@ -240,15 +260,21 @@ export class ParcelsImportsService {
   }
 
   private parseDeliveryFee(cell: unknown): number | undefined {
-    if (cell === undefined || cell === '') {
+    if (
+      cell === undefined ||
+      cell === '' ||
+      (typeof cell === 'string' && cell.trim() === '')
+    ) {
       return undefined
     }
 
-    if (typeof cell !== 'number' || Number.isNaN(cell)) {
+    const deliveryFee = typeof cell === 'string' ? Number(cell.trim()) : cell
+
+    if (typeof deliveryFee !== 'number' || !Number.isFinite(deliveryFee)) {
       throw new Error('INVALID_DELIVERY_FEE' satisfies ParseErrorCode)
     }
 
-    return cell
+    return deliveryFee
   }
 
   private parseNotes(cell: unknown): string | undefined {
@@ -263,19 +289,33 @@ export class ParcelsImportsService {
     return cell.trim()
   }
 
-  private async buildWarnings(
-    rows: ParsedParcelsImportRow[]
-  ): Promise<ParsedParcelsImportWarning[]> {
+  private async buildIssues(rows: ParsedParcelsImportRow[]): Promise<{
+    warnings: ParsedParcelsImportWarning[]
+    errors: ParsedParcelsImportError[]
+  }> {
     const { existingClientsByCodes, existingParcelsByTrackingNumbers } =
       await this.loadExistingData(rows)
 
     const warnings: ParsedParcelsImportWarning[] = []
+    const errors: ParsedParcelsImportError[] = []
 
     rows.forEach((row) => {
-      const matchingClient = existingClientsByCodes.get(row.clientCode)
       const existingParcel = existingParcelsByTrackingNumbers.get(
         row.trackingNumber
       )
+
+      if (row.clientCode === undefined) {
+        if (!existingParcel) {
+          errors.push({
+            rowNumber: row.rowNumber,
+            code: 'CLIENT_CODE_REQUIRED',
+          })
+        }
+
+        return
+      }
+
+      const matchingClient = existingClientsByCodes.get(row.clientCode)
 
       if (!matchingClient) {
         warnings.push({
@@ -292,7 +332,7 @@ export class ParcelsImportsService {
       }
     })
 
-    return warnings
+    return { warnings, errors }
   }
 
   private async commitParsedRows(
@@ -308,34 +348,43 @@ export class ParcelsImportsService {
         row.trackingNumber
       )
 
+      if (existingParcel) {
+        await this.parcelsService.update(existingParcel.id, {
+          weightKg: row.weightKg?.toFixed(3),
+          deliveryFee: row.deliveryFee?.toFixed(),
+          notes: row.notes,
+        })
+
+        await this.parcelStatusHistoryService.upsert({
+          parcelId: existingParcel.id,
+          status: parcelStatus,
+          achievedAt,
+        })
+
+        continue
+      }
+
+      if (row.clientCode === undefined) {
+        continue
+      }
+
       let matchingClient = existingClientsByCodes.get(row.clientCode)
 
       if (!matchingClient) {
         matchingClient = await this.clientsService.findOrCreateByCode(
           row.clientCode
         )
+
         existingClientsByCodes.set(row.clientCode, matchingClient)
       }
 
-      let parcelId: string
-
-      if (existingParcel) {
-        parcelId = existingParcel.id
-
-        await this.parcelsService.update(parcelId, {
-          weightKg: row.weightKg?.toFixed(3),
-          deliveryFee: row.deliveryFee?.toFixed(),
-          notes: row.notes,
-        })
-      } else {
-        parcelId = await this.parcelsService.create({
-          trackingNumber: row.trackingNumber,
-          clientId: matchingClient.id,
-          weightKg: row.weightKg?.toFixed(3),
-          deliveryFee: row.deliveryFee?.toFixed(),
-          notes: row.notes,
-        })
-      }
+      const parcelId = await this.parcelsService.create({
+        trackingNumber: row.trackingNumber,
+        clientId: matchingClient.id,
+        weightKg: row.weightKg?.toFixed(3),
+        deliveryFee: row.deliveryFee?.toFixed(),
+        notes: row.notes,
+      })
 
       await this.parcelStatusHistoryService.upsert({
         parcelId,
@@ -356,7 +405,10 @@ export class ParcelsImportsService {
     const trackingNumbersSet = new Set<string>()
 
     rows.forEach((row) => {
-      clientCodesSet.add(row.clientCode)
+      if (row.clientCode !== undefined) {
+        clientCodesSet.add(row.clientCode)
+      }
+
       trackingNumbersSet.add(row.trackingNumber)
     })
 

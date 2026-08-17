@@ -11,6 +11,7 @@ import {
   Form,
   FormField,
   FormFieldControl,
+  FormFieldDescription,
   FormFieldError,
   FormFieldItem,
   FormFieldLabel,
@@ -121,6 +122,10 @@ function AdminAddParcelsImportPage() {
                           onBlur={field.onBlur}
                         />
                       </FormFieldControl>
+
+                      <FormFieldDescription>
+                        {i18n.t('parcels:importFileDescription')}
+                      </FormFieldDescription>
 
                       <FormFieldError />
                     </FormFieldItem>

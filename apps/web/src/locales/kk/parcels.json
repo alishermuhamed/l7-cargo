@@ -27,6 +27,7 @@
   "deleteStatusDateDescription": "Күн сәлемдеме статустарының тарихынан жойылады.",
   "trackingNumberPlaceholder": "Трек-нөмірді енгізіңіз",
   "importFile": "XLSX файлы",
+  "importFileDescription": "Бағандар: трек-нөмір (міндетті), клиент коды, салмақ, жеткізу құны, ескертпелер",
   "withHeader": "Файлда тақырып жолы бар",
   "achievedAt": "Қол жеткізілген күні",
   "description": "Сипаттама",
@@ -67,6 +68,7 @@
   "clientCode": "Клиент коды",
   "clientCodePlaceholder": "Клиент кодын енгізіңіз",
   "notes": "Ескертпелер",
+  "clientCodeRequired": "Сәлемдеме табылмағандықтан, клиент коды міндетті",
   "invalidClientCode": "Клиент коды қате",
   "invalidTrackingCode": "Трек-нөмір қате",
   "invalidWeightKg": "Салмақ қате",
@@ -74,5 +76,5 @@
   "invalidNotes": "Ескертпелер қате",
   "unknownError": "Белгісіз қате",
   "parcelClientMismatch": "Сәлемдеме клиенті сәйкес келмейді",
-  "unknownClient": "Импорт қолданылған кезде клиент жасалады"
+  "unknownClient": "Қолданыстағы клиент табылмады — жаңасы автоматты түрде жасалады."
 }

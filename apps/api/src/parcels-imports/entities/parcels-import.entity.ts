@@ -10,7 +10,7 @@ import type { ParcelStatus } from '../../parcels/parcel-status'
 
 export interface ParsedParcelsImportRow {
   rowNumber: number
-  clientCode: number
+  clientCode?: number
   trackingNumber: string
   weightKg?: number
   deliveryFee?: number
@@ -30,6 +30,7 @@ export interface ParsedParcelsImportWarning {
 }
 
 export const PARSE_ERROR_CODES = [
+  'CLIENT_CODE_REQUIRED',
   'INVALID_CLIENT_ID',
   'INVALID_TRACKING_CODE',
   'INVALID_WEIGHT_KG',

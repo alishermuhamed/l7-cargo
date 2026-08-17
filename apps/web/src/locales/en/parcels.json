@@ -27,6 +27,7 @@
   "deleteStatusDateDescription": "This date will be removed from the parcel status history.",
   "trackingNumberPlaceholder": "Enter tracking number",
   "importFile": "XLSX file",
+  "importFileDescription": "Columns: tracking number (required), client code, weight, delivery fee, notes",
   "withHeader": "File has header row",
   "achievedAt": "Achieved at",
   "description": "Description",
@@ -67,6 +68,7 @@
   "clientCode": "Client code",
   "clientCodePlaceholder": "Enter client code",
   "notes": "Notes",
+  "clientCodeRequired": "Client code is required because the parcel was not found",
   "invalidClientCode": "Invalid client code",
   "invalidTrackingCode": "Invalid tracking number",
   "invalidWeightKg": "Invalid weight",
@@ -74,5 +76,5 @@
   "invalidNotes": "Invalid notes",
   "unknownError": "Unknown error",
   "parcelClientMismatch": "Parcel client mismatch",
-  "unknownClient": "Client will be created when the import is committed"
+  "unknownClient": "No existing client found; one will be created automatically."
 }

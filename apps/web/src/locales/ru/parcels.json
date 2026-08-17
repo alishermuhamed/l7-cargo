@@ -27,6 +27,7 @@
   "deleteStatusDateDescription": "Дата будет удалена из истории статусов посылки.",
   "trackingNumberPlaceholder": "Введите трек-номер",
   "importFile": "XLSX-файл",
+  "importFileDescription": "Столбцы: трек-номер (обязателен), код клиента, вес, стоимость доставки, заметки",
   "withHeader": "В файле есть строка заголовков",
   "achievedAt": "Дата достижения статуса",
   "description": "Описание",
@@ -67,6 +68,7 @@
   "clientCode": "Код клиента",
   "clientCodePlaceholder": "Введите код клиента",
   "notes": "Заметки",
+  "clientCodeRequired": "Код клиента обязателен, так как посылка не найдена",
   "invalidClientCode": "Неверный код клиента",
   "invalidTrackingCode": "Неверный трек-номер",
   "invalidWeightKg": "Неверный вес",
@@ -74,5 +76,5 @@
   "invalidNotes": "Неверные заметки",
   "unknownError": "Неизвестная ошибка",
   "parcelClientMismatch": "Клиент посылки не совпадает",
-  "unknownClient": "Клиент будет создан при применении импорта"
+  "unknownClient": "Существующий клиент не найден — новый будет создан автоматически."
 }

@@ -186,7 +186,7 @@ export interface GetParcelsImportSummaryResponseDto {
 
 export interface ParsedParcelsImportRowDto {
   rowNumber: number
-  clientCode: number
+  clientCode?: number
   trackingNumber: string
   weightKg?: number
   deliveryFee?: number
@@ -210,6 +210,7 @@ export type ParcelsImportErrorCode =
   (typeof ParcelsImportErrorCode)[keyof typeof ParcelsImportErrorCode]
 
 export const ParcelsImportErrorCode = {
+  CLIENT_CODE_REQUIRED: 'CLIENT_CODE_REQUIRED',
   INVALID_CLIENT_ID: 'INVALID_CLIENT_ID',
   INVALID_TRACKING_CODE: 'INVALID_TRACKING_CODE',
   INVALID_WEIGHT_KG: 'INVALID_WEIGHT_KG',
