@@ -222,11 +222,21 @@ export class ParcelsImportsService {
       return undefined
     }
 
-    if (typeof cell !== 'number' || Number.isNaN(cell)) {
+    let weightKg: number
+
+    if (typeof cell === 'number') {
+      weightKg = cell
+    } else if (typeof cell === 'string') {
+      weightKg = Number(cell.trim().replace(',', '.'))
+    } else {
       throw new Error('INVALID_WEIGHT_KG' satisfies ParseErrorCode)
     }
 
-    return Math.round(cell * 1000) / 1000
+    if (!Number.isFinite(weightKg)) {
+      throw new Error('INVALID_WEIGHT_KG' satisfies ParseErrorCode)
+    }
+
+    return Math.round(weightKg * 1000) / 1000
   }
 
   private parseDeliveryFee(cell: unknown): number | undefined {
