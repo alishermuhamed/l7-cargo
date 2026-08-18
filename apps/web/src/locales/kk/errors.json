@@ -3,5 +3,5 @@
   "invalidPhoneNumberOrPassword": "Телефон нөмірі немесе құпия сөз қате",
   "unableToSendVerificationCode": "Растау кодын жіберу мүмкін болмады",
   "invalidOrExpiredCode": "Код қате немесе мерзімі өтіп кеткен",
-  "unableToSaveYourName": "Атыңызды сақтау мүмкін болмады"
+  "unableToCompleteOnboarding": "Аккаунтты баптауды аяқтау мүмкін болмады"
 }

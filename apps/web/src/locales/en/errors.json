@@ -3,5 +3,5 @@
   "invalidPhoneNumberOrPassword": "Invalid phone number or password",
   "unableToSendVerificationCode": "Unable to send verification code",
   "invalidOrExpiredCode": "The code is invalid or has expired",
-  "unableToSaveYourName": "Unable to save your name"
+  "unableToCompleteOnboarding": "Unable to complete account setup"
 }

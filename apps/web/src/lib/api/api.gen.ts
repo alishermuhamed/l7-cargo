@@ -10,6 +10,14 @@ export interface UpdateUserDto {
   image?: string | null
 }
 
+export interface SetPasswordDto {
+  newPassword: string
+}
+
+export interface SuccessResponseDto {
+  success: boolean
+}
+
 export type SignInMethod = (typeof SignInMethod)[keyof typeof SignInMethod]
 
 export const SignInMethod = {
@@ -158,10 +166,6 @@ export interface PutParcelStatusHistoryEntryRequestDto {
 
 export interface PutParcelStatusHistoryRequestDto {
   entries: PutParcelStatusHistoryEntryRequestDto[]
-}
-
-export interface SuccessResponseDto {
-  success: boolean
 }
 
 export interface UpdateParcelRequestDto {
@@ -343,6 +347,22 @@ export const updateUser = async (
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(updateUserDto),
+  })
+}
+
+export const getSetPasswordUrl = () => {
+  return `/auth/set-password`
+}
+
+export const setPassword = async (
+  setPasswordDto: SetPasswordDto,
+  options?: RequestInit
+): Promise<SuccessResponseDto> => {
+  return customFetch<SuccessResponseDto>(getSetPasswordUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(setPasswordDto),
   })
 }
 

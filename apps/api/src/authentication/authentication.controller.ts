@@ -1,8 +1,20 @@
-import { Body, Controller, Get, Post, Query, Req, Res } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  InternalServerErrorException,
+  Post,
+  Query,
+  Req,
+  Res,
+} from '@nestjs/common'
 import { Throttle } from '@nestjs/throttler'
-import { toNodeHandler } from 'better-auth/node'
+import { APIError } from 'better-auth/api'
+import { fromNodeHeaders, toNodeHandler } from 'better-auth/node'
 import type { Request, Response } from 'express'
 
+import { SuccessResponseDto } from '../common/dtos/success-response.dto'
 import { AuthenticationService } from './authentication.service'
 import { Public } from './decorators/public.decorator'
 import { GetSignInMethodQueryDto } from './dtos/get-sign-in-method-query.dto'
@@ -12,6 +24,7 @@ import { PhoneResetPasswordDto } from './dtos/phone-reset-password.dto'
 import { PhoneSendOtpDto } from './dtos/phone-send-otp.dto'
 import { PhoneSignInDto } from './dtos/phone-sign-in.dto'
 import { PhoneVerifyDto } from './dtos/phone-verify.dto'
+import { SetPasswordDto } from './dtos/set-password.dto'
 import { UpdateUserDto } from './dtos/update-user.dto'
 
 @Public()
@@ -31,6 +44,27 @@ export class AuthenticationController {
     @Body() _: UpdateUserDto
   ) {
     await toNodeHandler(this.authenticationService.betterAuth)(req, res)
+  }
+
+  @Post('/set-password')
+  async setPassword(
+    @Req() req: Request,
+    @Body() body: SetPasswordDto
+  ): Promise<SuccessResponseDto> {
+    try {
+      await this.authenticationService.betterAuth.api.setPassword({
+        body,
+        headers: fromNodeHeaders(req.headers),
+      })
+
+      return new SuccessResponseDto()
+    } catch (error: unknown) {
+      if (error instanceof APIError) {
+        throw new HttpException(error.body ?? error.message, error.statusCode)
+      }
+
+      throw new InternalServerErrorException()
+    }
   }
 
   @Throttle({ default: { limit: 3, ttl: 60000 } })

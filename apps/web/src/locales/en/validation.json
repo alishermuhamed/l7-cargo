@@ -3,7 +3,9 @@
     "required": "Phone number is required"
   },
   "password": {
-    "required": "Password is required"
+    "required": "Password is required",
+    "tooShort": "Password must be at least 8 characters",
+    "tooLong": "Password must be 128 characters or fewer"
   },
   "otpCode": {
     "required": "Verification code is required"
