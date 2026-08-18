@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import {
   betterAuth as betterAuthFactory,
   type BetterAuthOptions,
@@ -12,7 +12,9 @@ import { ClientsService } from '../clients/clients.service'
 import { ConfigService } from '../config/config.service'
 import { BetterAuthTypeOrmAdapter } from '../db/adapters/better-auth-typeorm.adapter'
 import { DEFAULT_USER_ROLE } from '../users/user-role'
+import { AccountsRepository } from './accounts.repository'
 import { OtpDeliveryService } from './otp/otp-delivery.service'
+import type { SignInMethod } from './sign-in-method'
 
 function createBetterAuth({
   typeOrmAdapter,
@@ -106,7 +108,8 @@ export class AuthenticationService {
     private readonly configService: ConfigService,
     private readonly betterAuthTypeOrmAdapter: BetterAuthTypeOrmAdapter,
     private readonly otpDeliveryService: OtpDeliveryService,
-    private readonly clientsService: ClientsService
+    private readonly clientsService: ClientsService,
+    private readonly accountsRepository: AccountsRepository
   ) {
     this.betterAuth = createBetterAuth({
       typeOrmAdapter: this.betterAuthTypeOrmAdapter,
@@ -128,6 +131,20 @@ export class AuthenticationService {
     return this.betterAuth.api.getSession({
       headers: fromNodeHeaders(headers),
     })
+  }
+
+  async getSignInMethod(input: string): Promise<SignInMethod> {
+    const phoneNumber = parsePhoneNumberFromString(input)
+
+    if (!phoneNumber?.isValid()) {
+      throw new BadRequestException('INVALID_PHONE_NUMBER')
+    }
+
+    const hasPassword = await this.accountsRepository.hasPasswordForPhoneNumber(
+      phoneNumber.number
+    )
+
+    return hasPassword ? 'password' : 'otp'
   }
 
   private validatePhoneNumber(input: string): boolean {

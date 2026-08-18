@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common'
+import { Body, Controller, Get, Post, Query, Req, Res } from '@nestjs/common'
 import { Throttle } from '@nestjs/throttler'
 import { toNodeHandler } from 'better-auth/node'
 import type { Request, Response } from 'express'
 
 import { AuthenticationService } from './authentication.service'
 import { Public } from './decorators/public.decorator'
+import { GetSignInMethodQueryDto } from './dtos/get-sign-in-method-query.dto'
+import { GetSignInMethodResponseDto } from './dtos/get-sign-in-method-response.dto'
 import { PhoneRequestPasswordResetDto } from './dtos/phone-request-password-reset.dto'
 import { PhoneResetPasswordDto } from './dtos/phone-reset-password.dto'
 import { PhoneSendOtpDto } from './dtos/phone-send-otp.dto'
@@ -29,6 +31,16 @@ export class AuthenticationController {
     @Body() _: UpdateUserDto
   ) {
     await toNodeHandler(this.authenticationService.betterAuth)(req, res)
+  }
+
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @Get('/get-sign-in-method')
+  async getSignInMethod(
+    @Query() { phoneNumber }: GetSignInMethodQueryDto
+  ): Promise<GetSignInMethodResponseDto> {
+    return {
+      method: await this.authenticationService.getSignInMethod(phoneNumber),
+    }
   }
 
   @Post('/sign-in/phone-number')

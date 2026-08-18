@@ -10,6 +10,17 @@ export interface UpdateUserDto {
   image?: string | null
 }
 
+export type SignInMethod = (typeof SignInMethod)[keyof typeof SignInMethod]
+
+export const SignInMethod = {
+  password: 'password',
+  otp: 'otp',
+} as const
+
+export interface GetSignInMethodResponseDto {
+  method: SignInMethod
+}
+
 export interface PhoneSignInDto {
   phoneNumber: string
   password: string
@@ -243,6 +254,10 @@ export interface GetParcelsImportResponseDto {
   parsedData: ParsedParcelsImportDataDto
 }
 
+export type GetSignInMethodParams = {
+  phoneNumber: string
+}
+
 export type GetClientsParams = {
   /**
    * @minimum 0
@@ -329,6 +344,35 @@ export const updateUser = async (
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(updateUserDto),
   })
+}
+
+export const getGetSignInMethodUrl = (params: GetSignInMethodParams) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0
+    ? `/auth/get-sign-in-method?${stringifiedParams}`
+    : `/auth/get-sign-in-method`
+}
+
+export const getSignInMethod = async (
+  params: GetSignInMethodParams,
+  options?: RequestInit
+): Promise<GetSignInMethodResponseDto> => {
+  return customFetch<GetSignInMethodResponseDto>(
+    getGetSignInMethodUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    }
+  )
 }
 
 export const getSignInPhoneNumberUrl = () => {
