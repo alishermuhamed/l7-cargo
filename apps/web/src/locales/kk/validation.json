@@ -2,6 +2,9 @@
   "phoneNumber": {
     "required": "Телефон нөмірі міндетті"
   },
+  "password": {
+    "required": "Құпия сөз міндетті"
+  },
   "otpCode": {
     "required": "Растау коды міндетті"
   },

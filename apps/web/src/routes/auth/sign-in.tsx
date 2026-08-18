@@ -1,6 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons'
 import { Card, Container, Flex, Heading } from '@radix-ui/themes'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import PhoneInput from 'react-phone-number-input/input'
@@ -15,7 +17,9 @@ import {
   FormFieldItem,
   FormFieldLabel,
 } from '../../components/form'
+import { IconButton } from '../../components/icon-button'
 import { TextField } from '../../components/text-field'
+import { getSignInMethod, SignInMethod } from '../../lib/api/api.gen'
 import { authClient } from '../../lib/auth-client'
 import i18n from '../../lib/i18n'
 
@@ -32,6 +36,7 @@ const signInSchema = z.object({
     .string(i18n.t('validation:phoneNumber.required'))
     .trim()
     .min(1, i18n.t('validation:phoneNumber.required')),
+  password: z.string().optional(),
 })
 
 type SignInFormValues = z.infer<typeof signInSchema>
@@ -41,12 +46,54 @@ function SignInPage() {
 
   const { phoneNumber, redirectTo } = Route.useSearch()
 
+  const [isPasswordRequired, setIsPasswordRequired] = useState(false)
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
+
   const form = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
     defaultValues: { phoneNumber: phoneNumber ?? '' },
   })
 
-  const onSubmit = async ({ phoneNumber }: SignInFormValues) => {
+  const onSubmit = async ({ phoneNumber, password }: SignInFormValues) => {
+    if (isPasswordRequired) {
+      if (!password) {
+        form.setError('password', {
+          message: i18n.t('validation:password.required'),
+        })
+        return
+      }
+
+      try {
+        const result = await authClient.signIn.phoneNumber({
+          phoneNumber,
+          password,
+        })
+
+        if (result.error) {
+          toast.error(i18n.t('errors:invalidPhoneNumberOrPassword'))
+          return
+        }
+
+        await navigate({ to: redirectTo ?? '/' })
+      } catch {
+        toast.error(i18n.t('errors:invalidPhoneNumberOrPassword'))
+      }
+
+      return
+    }
+
+    try {
+      const { method } = await getSignInMethod({ phoneNumber })
+
+      if (method === SignInMethod.password) {
+        setIsPasswordRequired(true)
+        return
+      }
+    } catch {
+      toast.error(i18n.t('errors:unableToSignIn'))
+      return
+    }
+
     try {
       const result = await authClient.phoneNumber.sendOtp({
         phoneNumber,
@@ -87,7 +134,15 @@ function SignInPage() {
                       <PhoneInput
                         placeholder={i18n.t('auth:phoneNumberPlaceholder')}
                         value={field.value}
-                        onChange={field.onChange}
+                        onChange={(value) => {
+                          field.onChange(value)
+
+                          if (isPasswordRequired) {
+                            setIsPasswordRequired(false)
+                            setIsPasswordVisible(false)
+                            form.resetField('password')
+                          }
+                        }}
                         inputComponent={TextField.Root}
                       />
                     </FormFieldControl>
@@ -97,8 +152,60 @@ function SignInPage() {
                 )}
               />
 
+              {isPasswordRequired && (
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormFieldItem>
+                      <FormFieldLabel>{i18n.t('auth:password')}</FormFieldLabel>
+
+                      <FormFieldControl>
+                        <TextField.Root
+                          type={isPasswordVisible ? 'text' : 'password'}
+                          placeholder={i18n.t('auth:passwordPlaceholder')}
+                          autoComplete="current-password"
+                          {...field}
+                          value={field.value ?? ''}
+                        >
+                          <TextField.Slot side="right">
+                            <IconButton
+                              type="button"
+                              size="1"
+                              variant="ghost"
+                              color="gray"
+                              tooltip={i18n.t(
+                                isPasswordVisible
+                                  ? 'auth:hidePassword'
+                                  : 'auth:showPassword'
+                              )}
+                              aria-label={i18n.t(
+                                isPasswordVisible
+                                  ? 'auth:hidePassword'
+                                  : 'auth:showPassword'
+                              )}
+                              onClick={() =>
+                                setIsPasswordVisible((isVisible) => !isVisible)
+                              }
+                            >
+                              {isPasswordVisible ? (
+                                <EyeClosedIcon />
+                              ) : (
+                                <EyeOpenIcon />
+                              )}
+                            </IconButton>
+                          </TextField.Slot>
+                        </TextField.Root>
+                      </FormFieldControl>
+
+                      <FormFieldError />
+                    </FormFieldItem>
+                  )}
+                />
+              )}
+
               <Button type="submit" loading={form.formState.isSubmitting}>
-                {i18n.t('auth:signIn')}
+                {i18n.t(isPasswordRequired ? 'auth:signIn' : 'common:continue')}
               </Button>
             </Flex>
           </form>

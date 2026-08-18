@@ -2,6 +2,9 @@
   "phoneNumber": {
     "required": "Номер телефона обязателен"
   },
+  "password": {
+    "required": "Пароль обязателен"
+  },
   "otpCode": {
     "required": "Код подтверждения обязателен"
   },

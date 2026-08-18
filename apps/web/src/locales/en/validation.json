@@ -2,6 +2,9 @@
   "phoneNumber": {
     "required": "Phone number is required"
   },
+  "password": {
+    "required": "Password is required"
+  },
   "otpCode": {
     "required": "Verification code is required"
   },
