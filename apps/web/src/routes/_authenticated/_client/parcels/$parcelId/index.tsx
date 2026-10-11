@@ -8,7 +8,11 @@ import {
   Text,
 } from '@radix-ui/themes'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { createFileRoute, Link as RouterLink } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  Link as RouterLink,
+  useNavigate,
+} from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { AlertDialog } from '../../../../../components/alert-dialog'
@@ -48,6 +52,7 @@ export const Route = createFileRoute(
 })
 
 function ParcelPage() {
+  const navigate = useNavigate()
   const { initialParcel, initialStatusHistory } = Route.useLoaderData()
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
@@ -63,6 +68,9 @@ function ParcelPage() {
 
   const deleteParcelMutation = useMutation({
     mutationFn: () => deleteParcel(initialParcel.id),
+    onSuccess: async () => {
+      await navigate({ to: '/parcels', replace: true })
+    },
   })
 
   return (
