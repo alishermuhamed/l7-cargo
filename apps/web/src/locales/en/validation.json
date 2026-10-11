@@ -8,7 +8,8 @@
     "tooLong": "Password must be 128 characters or fewer"
   },
   "otpCode": {
-    "required": "Verification code is required"
+    "required": "Verification code is required",
+    "invalid": "Verification code must be 6 digits"
   },
   "trackingNumber": {
     "required": "Tracking number is required",

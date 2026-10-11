@@ -45,6 +45,10 @@ function createBetterAuth({
     secret,
     baseURL,
     trustedOrigins: webUrl ? [webUrl] : undefined,
+    emailAndPassword: {
+      enabled: false,
+      revokeSessionsOnPasswordReset: true,
+    },
     plugins: [
       phoneNumber({
         phoneNumberValidator: validatePhoneNumber,

@@ -1,7 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons'
-import { Card, Container, Flex, Heading } from '@radix-ui/themes'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import {
+  Card,
+  Container,
+  Flex,
+  Heading,
+  Link as RadixLink,
+} from '@radix-ui/themes'
+import {
+  createFileRoute,
+  Link as RouterLink,
+  useNavigate,
+} from '@tanstack/react-router'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -153,55 +163,73 @@ function SignInPage() {
               />
 
               {isPasswordRequired && (
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormFieldItem>
-                      <FormFieldLabel>{i18n.t('auth:password')}</FormFieldLabel>
+                <Flex direction="column" gap="2">
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormFieldItem>
+                        <FormFieldLabel>
+                          {i18n.t('auth:password')}
+                        </FormFieldLabel>
 
-                      <FormFieldControl>
-                        <TextField.Root
-                          type={isPasswordVisible ? 'text' : 'password'}
-                          placeholder={i18n.t('auth:passwordPlaceholder')}
-                          autoComplete="current-password"
-                          {...field}
-                          value={field.value ?? ''}
-                        >
-                          <TextField.Slot side="right">
-                            <IconButton
-                              type="button"
-                              size="1"
-                              variant="ghost"
-                              color="gray"
-                              tooltip={i18n.t(
-                                isPasswordVisible
-                                  ? 'auth:hidePassword'
-                                  : 'auth:showPassword'
-                              )}
-                              aria-label={i18n.t(
-                                isPasswordVisible
-                                  ? 'auth:hidePassword'
-                                  : 'auth:showPassword'
-                              )}
-                              onClick={() =>
-                                setIsPasswordVisible((isVisible) => !isVisible)
-                              }
-                            >
-                              {isPasswordVisible ? (
-                                <EyeClosedIcon />
-                              ) : (
-                                <EyeOpenIcon />
-                              )}
-                            </IconButton>
-                          </TextField.Slot>
-                        </TextField.Root>
-                      </FormFieldControl>
+                        <FormFieldControl>
+                          <TextField.Root
+                            type={isPasswordVisible ? 'text' : 'password'}
+                            placeholder={i18n.t('auth:passwordPlaceholder')}
+                            autoComplete="current-password"
+                            {...field}
+                            value={field.value ?? ''}
+                          >
+                            <TextField.Slot side="right">
+                              <IconButton
+                                type="button"
+                                size="1"
+                                variant="ghost"
+                                color="gray"
+                                tooltip={i18n.t(
+                                  isPasswordVisible
+                                    ? 'auth:hidePassword'
+                                    : 'auth:showPassword'
+                                )}
+                                aria-label={i18n.t(
+                                  isPasswordVisible
+                                    ? 'auth:hidePassword'
+                                    : 'auth:showPassword'
+                                )}
+                                onClick={() =>
+                                  setIsPasswordVisible(
+                                    (isVisible) => !isVisible
+                                  )
+                                }
+                              >
+                                {isPasswordVisible ? (
+                                  <EyeClosedIcon />
+                                ) : (
+                                  <EyeOpenIcon />
+                                )}
+                              </IconButton>
+                            </TextField.Slot>
+                          </TextField.Root>
+                        </FormFieldControl>
 
-                      <FormFieldError />
-                    </FormFieldItem>
-                  )}
-                />
+                        <FormFieldError />
+                      </FormFieldItem>
+                    )}
+                  />
+
+                  <RadixLink asChild size="2">
+                    <RouterLink
+                      to="/auth/forgot-password"
+                      search={{
+                        phoneNumber: form.getValues('phoneNumber'),
+                        redirectTo,
+                      }}
+                    >
+                      {i18n.t('auth:forgotPassword')}
+                    </RouterLink>
+                  </RadixLink>
+                </Flex>
               )}
 
               <Button type="submit" loading={form.formState.isSubmitting}>

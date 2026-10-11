@@ -67,7 +67,7 @@ export class AuthenticationController {
     }
   }
 
-  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @Throttle({ default: { limit: 5, ttl: 60000 * 60 * 24 } })
   @Get('/get-sign-in-method')
   async getSignInMethod(
     @Query() { phoneNumber }: GetSignInMethodQueryDto
@@ -86,7 +86,7 @@ export class AuthenticationController {
     await toNodeHandler(this.authenticationService.betterAuth)(req, res)
   }
 
-  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @Throttle({ default: { limit: 5, ttl: 60000 * 60 * 24 } })
   @Post('/phone-number/send-otp')
   async sendOtp(
     @Req() req: Request,
@@ -105,6 +105,7 @@ export class AuthenticationController {
     await toNodeHandler(this.authenticationService.betterAuth)(req, res)
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 * 60 * 24 } })
   @Post('/phone-number/request-password-reset')
   async requestPhonePasswordReset(
     @Req() req: Request,

@@ -3,5 +3,8 @@
   "invalidPhoneNumberOrPassword": "Invalid phone number or password",
   "unableToSendVerificationCode": "Unable to send verification code",
   "invalidOrExpiredCode": "The code is invalid or has expired",
+  "unableToRequestPasswordReset": "Unable to send password reset code",
+  "unableToResetPassword": "Unable to reset password",
+  "tooManyResetAttempts": "Too many incorrect attempts. Request a new code.",
   "unableToCompleteOnboarding": "Unable to complete account setup"
 }

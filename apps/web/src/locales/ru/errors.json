@@ -3,5 +3,8 @@
   "invalidPhoneNumberOrPassword": "Неверный номер телефона или пароль",
   "unableToSendVerificationCode": "Не удалось отправить код подтверждения",
   "invalidOrExpiredCode": "Код неверный или срок его действия истек",
+  "unableToRequestPasswordReset": "Не удалось отправить код для сброса пароля",
+  "unableToResetPassword": "Не удалось сбросить пароль",
+  "tooManyResetAttempts": "Слишком много неверных попыток. Запросите новый код.",
   "unableToCompleteOnboarding": "Не удалось завершить настройку аккаунта"
 }
