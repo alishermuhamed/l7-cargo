@@ -24,6 +24,7 @@ import { ConvertAchievedAtToDateOnly1783368829744 } from './migrations/178336882
 import { MakeParcelStatusHistoryUnique1786125107169 } from './migrations/1786125107169-make-parcel-status-history-unique'
 import { AddClientEntity1786808443379 } from './migrations/1786808443379-add-client-entity'
 import { RenameParcelNotesToComments1786999166153 } from './migrations/1786999166153-rename-parcel-notes-to-comments'
+import { AddClientDeletedAtToParcel1791713298338 } from './migrations/1791713298338-add-client-deleted-at-to-parcel'
 
 export function buildDataSourceOptions(
   db: EnvConfig['database']
@@ -64,6 +65,7 @@ export function buildDataSourceOptions(
       MakeParcelStatusHistoryUnique1786125107169,
       AddClientEntity1786808443379,
       RenameParcelNotesToComments1786999166153,
+      AddClientDeletedAtToParcel1791713298338,
     ],
   }
 }

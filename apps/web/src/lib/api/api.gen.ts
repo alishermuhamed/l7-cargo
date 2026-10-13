@@ -11,6 +11,10 @@ export interface UpdateUserDto {
 }
 
 export interface SetPasswordDto {
+  /**
+   * @minLength 8
+   * @maxLength 128
+   */
   newPassword: string
 }
 
@@ -149,6 +153,10 @@ export interface GetParcelResponseDto {
   deliveryFee: string | null
   /** @nullable */
   comments: string | null
+}
+
+export interface GetReadyForPickupBalanceResponseDto {
+  totalDeliveryFee: string
 }
 
 export interface GetParcelStatusHistoryResponseDto {
@@ -604,6 +612,22 @@ export const getParcels = async (
     ...options,
     method: 'GET',
   })
+}
+
+export const getGetReadyForPickupBalanceUrl = () => {
+  return `/parcels/ready-for-pickup-balance`
+}
+
+export const getReadyForPickupBalance = async (
+  options?: RequestInit
+): Promise<GetReadyForPickupBalanceResponseDto> => {
+  return customFetch<GetReadyForPickupBalanceResponseDto>(
+    getGetReadyForPickupBalanceUrl(),
+    {
+      ...options,
+      method: 'GET',
+    }
+  )
 }
 
 export const getGetParcelUrl = (parcelId: string) => {

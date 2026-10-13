@@ -21,6 +21,7 @@ import { CreateParcelResponseDto } from './dtos/create-parcel-response.dto'
 import { GetParcelResponseDto } from './dtos/get-parcel-response.dto'
 import { GetParcelStatusHistoryResponseDto } from './dtos/get-parcel-status-history-response.dto'
 import { GetParcelsQueryDto } from './dtos/get-parcels-query.dto'
+import { GetReadyForPickupBalanceResponseDto } from './dtos/get-ready-for-pickup-balance-response.dto'
 import { PutParcelStatusHistoryRequestDto } from './dtos/put-parcel-status-history-request.dto'
 import { UpdateParcelRequestDto } from './dtos/update-parcel-request.dto'
 import { ParcelStatusHistoryMapper } from './parcel-status-history.mapper'
@@ -113,6 +114,18 @@ export class ParcelsController {
     return parcels.map((p) => ParcelsMapper.toGetParcelResponseDto(p))
   }
 
+  @Get('ready-for-pickup-balance')
+  async getReadyForPickupBalance(): Promise<GetReadyForPickupBalanceResponseDto> {
+    this.parcelsPolicy.checkCanReadReadyForPickupBalance()
+
+    const user = this.contextService.getUserOrThrow()
+    const totalDeliveryFee = await this.parcelsService.getReadyForPickupBalance(
+      user.clientId
+    )
+
+    return { totalDeliveryFee }
+  }
+
   @Get(`:${PARCEL_ID_PARAM}`)
   async getParcel(
     @Param(PARCEL_ID_PARAM, ParseUUIDPipe) parcelId: string
@@ -181,7 +194,13 @@ export class ParcelsController {
   ): Promise<SuccessResponseDto> {
     await this.parcelsPolicy.checkCanDelete(parcelId)
 
-    await this.parcelsService.delete(parcelId)
+    const user = this.contextService.getUserOrThrow()
+
+    if (user.role === 'admin') {
+      await this.parcelsService.delete(parcelId)
+    } else {
+      await this.parcelsService.hideFromClient(parcelId)
+    }
 
     return new SuccessResponseDto()
   }

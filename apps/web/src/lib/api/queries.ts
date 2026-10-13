@@ -11,6 +11,7 @@ import {
   type GetParcelsImportsParams,
   type GetParcelsParams,
   getParcelStatusHistory,
+  getReadyForPickupBalance,
   getUser,
   getUsers,
   type GetUsersParams,
@@ -113,7 +114,15 @@ export const parcelsKeys = {
   detail: (parcelId: string) => [...parcelsKeys.details(), parcelId] as const,
   statusHistory: (parcelId: string) =>
     [...parcelsKeys.detail(parcelId), 'statusHistory'] as const,
+  readyForPickupBalance: () =>
+    [...parcelsKeys.all, 'readyForPickupBalance'] as const,
 }
+
+export const getReadyForPickupBalanceQueryOptions = () =>
+  queryOptions({
+    queryKey: parcelsKeys.readyForPickupBalance(),
+    queryFn: () => getReadyForPickupBalance(),
+  })
 
 export const getParcelsQueryOptions = (params?: GetParcelsParams) =>
   queryOptions({

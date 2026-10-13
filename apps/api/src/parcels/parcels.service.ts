@@ -1,6 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common'
 import { FindManyOptions, FindOneOptions, FindOptionsRelations } from 'typeorm'
 
+import { addMoneyAmounts } from '../common/money'
 import { WithRelations } from '../db/db.types'
 import { Parcel } from './entities/parcel.entity'
 import type { ParcelStatus } from './parcel-status'
@@ -106,5 +107,25 @@ export class ParcelsService {
 
   async delete(parcelId: string): Promise<void> {
     await this.parcelsRepository.delete({ id: parcelId })
+  }
+
+  async getReadyForPickupBalance(clientId: string): Promise<string> {
+    const parcels = await this.find({
+      where: { clientId, status: 'ready_for_pickup' },
+      select: { deliveryFee: true },
+    })
+
+    const deliveryFees = parcels
+      .map((parcel) => parcel.deliveryFee)
+      .filter((deliveryFee): deliveryFee is string => deliveryFee !== null)
+
+    return addMoneyAmounts(deliveryFees)
+  }
+
+  async hideFromClient(parcelId: string): Promise<void> {
+    await this.parcelsRepository.update(
+      { id: parcelId },
+      { clientDeletedAt: new Date() }
+    )
   }
 }

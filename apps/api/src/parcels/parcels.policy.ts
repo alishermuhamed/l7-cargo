@@ -1,6 +1,10 @@
 import { AbilityBuilder } from '@casl/ability'
-import { ForbiddenException, Injectable } from '@nestjs/common'
-import { FindOptionsWhere } from 'typeorm'
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
+import { FindOptionsWhere, IsNull } from 'typeorm'
 
 import { Ability } from '../authorization/authorization.types'
 import { EntityPolicyProvider } from '../authorization/decorators/entity-policy-provider.decorator'
@@ -52,9 +56,7 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
   }
 
   async checkCanRead(parcelId: string): Promise<void> {
-    const parcel = await this.parcelsService.findOneOrThrow({
-      where: { id: parcelId },
-    })
+    const parcel = await this.findVisibleParcelOrThrow(parcelId)
 
     if (!this.ability.can('read', parcel)) {
       throw new ForbiddenException()
@@ -65,9 +67,7 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
     parcelId: string,
     updateParcelRequestDto: UpdateParcelRequestDto
   ): Promise<void> {
-    const parcel = await this.parcelsService.findOneOrThrow({
-      where: { id: parcelId },
-    })
+    const parcel = await this.findVisibleParcelOrThrow(parcelId)
 
     for (const field of Object.keys(updateParcelRequestDto) as Array<
       keyof UpdateParcelRequestDto
@@ -82,9 +82,7 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
   }
 
   async checkCanDelete(parcelId: string): Promise<void> {
-    const parcel = await this.parcelsService.findOneOrThrow({
-      where: { id: parcelId },
-    })
+    const parcel = await this.findVisibleParcelOrThrow(parcelId)
 
     if (!this.ability.can('delete', parcel)) {
       throw new ForbiddenException()
@@ -99,6 +97,14 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
     }
   }
 
+  checkCanReadReadyForPickupBalance(): void {
+    const user = this.contextService.getUserOrThrow()
+
+    if (user.role !== 'client') {
+      throw new ForbiddenException()
+    }
+  }
+
   getFindOptionsWhere(): FindOptionsWhere<Parcel> {
     const user = this.contextService.getUserOrThrow()
 
@@ -106,6 +112,20 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
       return {}
     }
 
-    return { clientId: user.clientId }
+    return { clientId: user.clientId, clientDeletedAt: IsNull() }
+  }
+
+  private async findVisibleParcelOrThrow(parcelId: string): Promise<Parcel> {
+    const parcel = await this.parcelsService.findOneOrThrow({
+      where: { id: parcelId },
+    })
+
+    const user = this.contextService.getUserOrThrow()
+
+    if (user.role !== 'admin' && parcel.clientDeletedAt !== null) {
+      throw new NotFoundException()
+    }
+
+    return parcel
   }
 }

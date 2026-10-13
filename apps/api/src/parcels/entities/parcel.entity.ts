@@ -2,6 +2,7 @@ import { Entity, Index, ManyToOne } from 'typeorm'
 
 import { Client } from '../../clients/entities/client.entity'
 import { BaseEntity } from '../../db/base.entity'
+import { DateTimeColumn } from '../../db/columns/date-time-column'
 import { DecimalColumn, MoneyColumn } from '../../db/columns/decimal-column'
 import { TextColumn } from '../../db/columns/text-column'
 import { UUIDColumn } from '../../db/columns/uuid-column'
@@ -37,4 +38,7 @@ export class Parcel extends BaseEntity {
 
   @TextColumn({ nullable: true })
   comments!: string | null
+
+  @DateTimeColumn({ nullable: true })
+  clientDeletedAt!: Date | null
 }
