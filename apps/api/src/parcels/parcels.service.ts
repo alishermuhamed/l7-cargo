@@ -1,6 +1,11 @@
-import { ConflictException, Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common'
 import { FindManyOptions, FindOneOptions, FindOptionsRelations } from 'typeorm'
 
+import { ClientsService } from '../clients/clients.service'
 import { addMoneyAmounts } from '../common/money'
 import { WithRelations } from '../db/db.types'
 import { Parcel } from './entities/parcel.entity'
@@ -9,7 +14,10 @@ import { ParcelsRepository } from './parcels.repository'
 
 @Injectable()
 export class ParcelsService {
-  constructor(private readonly parcelsRepository: ParcelsRepository) {}
+  constructor(
+    private readonly parcelsRepository: ParcelsRepository,
+    private readonly clientsService: ClientsService
+  ) {}
 
   async create({
     clientId,
@@ -89,7 +97,7 @@ export class ParcelsService {
   async update(
     parcelId: string,
     {
-      clientId,
+      clientCode,
       status,
       source,
       description,
@@ -97,7 +105,7 @@ export class ParcelsService {
       deliveryFee,
       comments,
     }: {
-      clientId?: string
+      clientCode?: number
       status?: ParcelStatus | null
       source?: string | null
       description?: string | null
@@ -106,9 +114,30 @@ export class ParcelsService {
       comments?: string | null
     }
   ): Promise<void> {
+    let clientId: string | undefined
+
+    if (clientCode !== undefined && clientCode !== null) {
+      const client = await this.clientsService.findOneByClientCode(clientCode)
+
+      if (!client) {
+        throw new BadRequestException('CLIENT_CODE_NOT_FOUND')
+      }
+
+      clientId = client.id
+    }
+
     await this.parcelsRepository.update(
       { id: parcelId },
-      { clientId, status, source, description, weightKg, deliveryFee, comments }
+      {
+        clientId,
+        clientDeletedAt: clientId !== undefined ? null : undefined,
+        status,
+        source,
+        description,
+        weightKg,
+        deliveryFee,
+        comments,
+      }
     )
   }
 

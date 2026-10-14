@@ -72,6 +72,10 @@ export class ClientsService {
     return this.clientsRepository.find(options)
   }
 
+  async findOneByClientCode(code: number): Promise<Client | null> {
+    return this.clientsRepository.findOne({ where: { code } })
+  }
+
   async findOneOrThrow<R extends FindOptionsRelations<Client>>(
     options: Omit<FindOneOptions<Client>, 'relations'> & {
       relations?: R

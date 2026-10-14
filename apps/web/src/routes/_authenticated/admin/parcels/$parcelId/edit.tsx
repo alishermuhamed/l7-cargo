@@ -37,7 +37,9 @@ import {
   updateParcel,
   type UpdateParcelRequestDto,
 } from '../../../../../lib/api/api.gen'
+import { ApiError } from '../../../../../lib/api/custom-fetch'
 import {
+  getClientQueryOptions,
   getParcelQueryOptions,
   getParcelStatusHistoryQueryOptions,
 } from '../../../../../lib/api/queries'
@@ -63,12 +65,24 @@ export const Route = createFileRoute(
       queryClient.ensureQueryData(getParcelStatusHistoryQueryOptions(parcelId)),
     ])
 
-    return { initialParcel, initialStatusHistory }
+    const initialClient = await queryClient.ensureQueryData(
+      getClientQueryOptions(initialParcel.clientId)
+    )
+
+    return { initialParcel, initialStatusHistory, initialClient }
   },
   component: EditAdminParcelPage,
 })
 
 const editAdminParcelSchema = z.object({
+  clientCode: z
+    .string()
+    .trim()
+    .regex(/^[1-9]\d*$/, i18n.t('parcels:invalidClientCode'))
+    .refine(
+      (value) => Number.isSafeInteger(Number(value)),
+      i18n.t('parcels:invalidClientCode')
+    ),
   weightKg: z
     .string()
     .trim()
@@ -97,11 +111,13 @@ type EditAdminParcelFormValues = z.infer<typeof editAdminParcelSchema>
 function EditAdminParcelPage() {
   const navigate = useNavigate()
 
-  const { initialParcel, initialStatusHistory } = Route.useLoaderData()
+  const { initialParcel, initialStatusHistory, initialClient } =
+    Route.useLoaderData()
 
   const form = useForm<EditAdminParcelFormValues>({
     resolver: zodResolver(editAdminParcelSchema),
     defaultValues: {
+      clientCode: String(initialClient.code),
       weightKg: initialParcel.weightKg ?? '',
       deliveryFee: initialParcel.deliveryFee ?? '',
       comments: initialParcel.comments ?? '',
@@ -141,6 +157,7 @@ function EditAdminParcelPage() {
   })
 
   const onSubmit = async ({
+    clientCode,
     weightKg,
     deliveryFee,
     comments,
@@ -148,6 +165,10 @@ function EditAdminParcelPage() {
   }: EditAdminParcelFormValues) => {
     try {
       await updateParcelMutation.mutateAsync({
+        clientCode:
+          Number(clientCode) === initialClient.code
+            ? undefined
+            : Number(clientCode),
         weightKg:
           weightKg === ''
             ? null
@@ -156,7 +177,21 @@ function EditAdminParcelPage() {
           deliveryFee === '' ? null : normalizeMoneyAmount(deliveryFee),
         comments: comments === '' ? null : comments,
       })
-    } catch {
+    } catch (error) {
+      if (
+        error instanceof ApiError &&
+        error.status === 400 &&
+        typeof error.data === 'object' &&
+        error.data !== null &&
+        'message' in error.data &&
+        error.data.message === 'CLIENT_CODE_NOT_FOUND'
+      ) {
+        form.setError('clientCode', {
+          message: i18n.t('parcels:clientCodeNotFound'),
+        })
+        return
+      }
+
       toast.error(i18n.t('parcels:unableToEditParcel'))
       return
     }
@@ -184,6 +219,29 @@ function EditAdminParcelPage() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Flex direction="column" gap="4">
+            <FormField
+              control={form.control}
+              name="clientCode"
+              render={({ field }) => (
+                <FormFieldItem>
+                  <FormFieldLabel>
+                    {i18n.t('parcels:clientCode')} *
+                  </FormFieldLabel>
+
+                  <FormFieldControl>
+                    <TextField.Root
+                      placeholder={i18n.t('parcels:clientCodePlaceholder')}
+                      autoComplete="off"
+                      inputMode="numeric"
+                      {...field}
+                    />
+                  </FormFieldControl>
+
+                  <FormFieldError />
+                </FormFieldItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="weightKg"

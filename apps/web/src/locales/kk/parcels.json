@@ -75,6 +75,7 @@
   "comments": "Түсініктемелер",
   "clientCodeRequired": "Сәлемдеме табылмағандықтан, клиент коды міндетті",
   "invalidClientCode": "Клиент коды қате",
+  "clientCodeNotFound": "Бұл кодпен клиент табылмады",
   "invalidTrackingCode": "Трек-нөмір қате",
   "invalidWeightKg": "Салмақ қате",
   "invalidDeliveryFee": "Жеткізу құны қате",

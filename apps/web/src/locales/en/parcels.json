@@ -75,6 +75,7 @@
   "comments": "Comments",
   "clientCodeRequired": "Client code is required because the parcel was not found",
   "invalidClientCode": "Invalid client code",
+  "clientCodeNotFound": "No client has this code",
   "invalidTrackingCode": "Invalid tracking number",
   "invalidWeightKg": "Invalid weight",
   "invalidDeliveryFee": "Invalid delivery fee",

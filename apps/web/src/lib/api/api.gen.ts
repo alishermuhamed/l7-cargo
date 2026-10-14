@@ -177,6 +177,8 @@ export interface PutParcelStatusHistoryRequestDto {
 }
 
 export interface UpdateParcelRequestDto {
+  /** @minimum 1 */
+  clientCode?: number
   /** @nullable */
   source?: string | null
   /** @nullable */

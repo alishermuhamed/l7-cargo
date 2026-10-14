@@ -75,6 +75,7 @@
   "comments": "Комментарии",
   "clientCodeRequired": "Код клиента обязателен, так как посылка не найдена",
   "invalidClientCode": "Неверный код клиента",
+  "clientCodeNotFound": "Клиент с таким кодом не найден",
   "invalidTrackingCode": "Неверный трек-номер",
   "invalidWeightKg": "Неверный вес",
   "invalidDeliveryFee": "Неверная стоимость доставки",
