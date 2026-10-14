@@ -36,6 +36,13 @@ export class ParcelsService {
     })
 
     if (existingParcel) {
+      if (existingParcel.clientId === clientId) {
+        throw new ConflictException({
+          message: 'PARCEL_ALREADY_OWNED_BY_CLIENT',
+          parcelId: existingParcel.id,
+        })
+      }
+
       throw new ConflictException('PARCEL_TRACKING_NUMBER_EXISTS')
     }
 

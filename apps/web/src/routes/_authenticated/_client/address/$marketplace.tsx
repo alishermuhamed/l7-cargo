@@ -21,9 +21,8 @@ import {
   isMarketplaceSlug,
   MARKETPLACES_BY_SLUGS,
 } from '../../../../lib/address-marketplaces'
+import { MANAGER_WHATSAPP_URL } from '../../../../lib/contact'
 import i18n from '../../../../lib/i18n'
-
-const MANAGER_WHATSAPP_URL = 'https://wa.me/77007182717'
 
 export const Route = createFileRoute(
   '/_authenticated/_client/address/$marketplace'
