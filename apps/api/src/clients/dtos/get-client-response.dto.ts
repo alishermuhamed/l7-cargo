@@ -7,6 +7,7 @@ class LinkedUserDto {
 export class GetClientResponseDto {
   id!: string
   code!: number
+  legacyCodes!: number[]
   legacyPhoneRaw!: string | null
   legacyPhoneNormalized!: string | null
   user!: LinkedUserDto | null

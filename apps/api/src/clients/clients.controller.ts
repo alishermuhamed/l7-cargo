@@ -29,6 +29,13 @@ export class ClientsController {
               search: `%${search}%`,
             }),
           },
+          {
+            id: Raw(
+              (alias) =>
+                `EXISTS (SELECT 1 FROM "legacy_client_code_alias" "legacyAlias" WHERE "legacyAlias"."clientId" = ${alias} AND CAST("legacyAlias"."code" AS text) ILIKE :search)`,
+              { search: `%${search}%` }
+            ),
+          },
           { legacyPhoneRaw: ILike(`%${search}%`) },
           { user: { name: ILike(`%${search}%`) } },
           { user: { phoneNumber: ILike(`%${search}%`) } },
@@ -42,8 +49,17 @@ export class ClientsController {
       take: limit,
       skip: offset,
     })
+    const legacyCodesByClientId =
+      await this.clientsService.findLegacyCodesByClientIds(
+        clients.map((client) => client.id)
+      )
 
-    return clients.map((client) => ClientsMapper.toGetClientResponseDto(client))
+    return clients.map((client) =>
+      ClientsMapper.toGetClientResponseDto(
+        client,
+        legacyCodesByClientId.get(client.id) ?? []
+      )
+    )
   }
 
   @Get(`:${CLIENT_ID_PARAM}`)
@@ -56,7 +72,12 @@ export class ClientsController {
       where: { id: clientId },
       relations: { user: true },
     })
+    const legacyCodesByClientId =
+      await this.clientsService.findLegacyCodesByClientIds([client.id])
 
-    return ClientsMapper.toGetClientResponseDto(client)
+    return ClientsMapper.toGetClientResponseDto(
+      client,
+      legacyCodesByClientId.get(client.id) ?? []
+    )
   }
 }

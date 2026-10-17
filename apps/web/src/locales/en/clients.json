@@ -2,5 +2,6 @@
   "clientDetails": "Client details",
   "details": "Details",
   "code": "Code",
+  "legacyCodes": "Legacy codes",
   "noClientsFound": "No clients found"
 }

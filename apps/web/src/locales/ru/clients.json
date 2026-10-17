@@ -2,5 +2,6 @@
   "clientDetails": "Данные клиента",
   "details": "Детали",
   "code": "Код",
+  "legacyCodes": "Старые коды",
   "noClientsFound": "Клиенты не найдены"
 }

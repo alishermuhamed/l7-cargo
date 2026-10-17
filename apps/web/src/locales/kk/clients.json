@@ -2,5 +2,6 @@
   "clientDetails": "Клиент мәліметтері",
   "details": "Толығырақ",
   "code": "Код",
+  "legacyCodes": "Ескі кодтар",
   "noClientsFound": "Клиенттер табылмады"
 }

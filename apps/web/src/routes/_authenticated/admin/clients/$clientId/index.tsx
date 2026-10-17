@@ -1,4 +1,12 @@
-import { Box, Card, Container, DataList, Flex, Heading } from '@radix-ui/themes'
+import {
+  Badge,
+  Box,
+  Card,
+  Container,
+  DataList,
+  Flex,
+  Heading,
+} from '@radix-ui/themes'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
@@ -52,6 +60,21 @@ function AdminClientDetailsPage() {
               <DataList.Label>{i18n.t('clients:code')}</DataList.Label>
               <DataList.Value>{client.code}</DataList.Value>
             </DataList.Item>
+
+            {client.legacyCodes.length > 0 && (
+              <DataList.Item>
+                <DataList.Label>{i18n.t('clients:legacyCodes')}</DataList.Label>
+                <DataList.Value>
+                  <Flex wrap="wrap" gap="2">
+                    {client.legacyCodes.map((code) => (
+                      <Badge key={code} color="gray" variant="soft">
+                        {code}
+                      </Badge>
+                    ))}
+                  </Flex>
+                </DataList.Value>
+              </DataList.Item>
+            )}
 
             <DataList.Item>
               <DataList.Label>{i18n.t('profile:name')}</DataList.Label>

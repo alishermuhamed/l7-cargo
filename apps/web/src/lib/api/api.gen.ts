@@ -78,6 +78,7 @@ export type GetClientResponseDtoUser = LinkedUserDto | null
 export interface GetClientResponseDto {
   id: string
   code: number
+  legacyCodes: number[]
   /** @nullable */
   legacyPhoneRaw: string | null
   /** @nullable */

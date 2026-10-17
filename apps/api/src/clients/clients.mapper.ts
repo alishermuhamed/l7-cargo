@@ -3,11 +3,13 @@ import { Client } from './entities/client.entity'
 
 export class ClientsMapper {
   static toGetClientResponseDto(
-    client: Client & { user: Client['user'] | null }
+    client: Client & { user: Client['user'] | null },
+    legacyCodes: number[]
   ): GetClientResponseDto {
     return {
       id: client.id,
       code: client.code,
+      legacyCodes,
       legacyPhoneRaw: client.legacyPhoneRaw,
       legacyPhoneNormalized: client.legacyPhoneNormalized,
       user: client.user

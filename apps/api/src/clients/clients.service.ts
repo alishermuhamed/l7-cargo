@@ -120,6 +120,26 @@ export class ClientsService {
     return clientsByCode
   }
 
+  async findLegacyCodesByClientIds(
+    clientIds: string[]
+  ): Promise<Map<string, number[]>> {
+    const aliases =
+      await this.legacyClientCodeAliasRepository.findByClientIds(clientIds)
+    const codesByClientId = new Map<string, number[]>()
+
+    for (const alias of aliases) {
+      const codes = codesByClientId.get(alias.clientId) ?? []
+      codes.push(alias.code)
+      codesByClientId.set(alias.clientId, codes)
+    }
+
+    for (const codes of codesByClientId.values()) {
+      codes.sort((first, second) => first - second)
+    }
+
+    return codesByClientId
+  }
+
   async findOneOrThrow<R extends FindOptionsRelations<Client>>(
     options: Omit<FindOneOptions<Client>, 'relations'> & {
       relations?: R
