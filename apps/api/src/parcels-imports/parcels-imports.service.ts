@@ -324,7 +324,10 @@ export class ParcelsImportsService {
         })
       }
 
-      if (existingParcel && existingParcel.client.code !== row.clientCode) {
+      if (
+        existingParcel?.client &&
+        existingParcel.client.code !== row.clientCode
+      ) {
         warnings.push({
           rowNumber: row.rowNumber,
           code: 'PARCEL_CLIENT_MISMATCH',
@@ -398,7 +401,7 @@ export class ParcelsImportsService {
     existingClientsByCodes: Map<number, { id: string; code: number }>
     existingParcelsByTrackingNumbers: Map<
       string,
-      { id: string; clientId: string; client: { code: number } }
+      { id: string; clientId: string | null; client: { code: number } | null }
     >
   }> {
     const clientCodesSet = new Set<number>()

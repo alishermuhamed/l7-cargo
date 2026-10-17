@@ -8,7 +8,7 @@ export class UpdateParcelRequestDto {
   @IsOptional()
   @IsInt()
   @Min(1)
-  clientCode?: number
+  clientCode?: number | null
 
   @IsOptional()
   @IsString()

@@ -29,7 +29,7 @@ export class ParcelsService {
     deliveryFee,
     comments,
   }: {
-    clientId: string
+    clientId: string | null
     trackingNumber: string
     status?: ParcelStatus | null
     source?: string
@@ -44,7 +44,7 @@ export class ParcelsService {
     })
 
     if (existingParcel) {
-      if (existingParcel.clientId === clientId) {
+      if (clientId !== null && existingParcel.clientId === clientId) {
         throw new ConflictException({
           message: 'PARCEL_ALREADY_OWNED_BY_CLIENT',
           parcelId: existingParcel.id,
@@ -105,7 +105,7 @@ export class ParcelsService {
       deliveryFee,
       comments,
     }: {
-      clientCode?: number
+      clientCode?: number | null
       status?: ParcelStatus | null
       source?: string | null
       description?: string | null
@@ -114,9 +114,11 @@ export class ParcelsService {
       comments?: string | null
     }
   ): Promise<void> {
-    let clientId: string | undefined
+    let clientId: string | null | undefined
 
-    if (clientCode !== undefined && clientCode !== null) {
+    if (clientCode === null) {
+      clientId = null
+    } else if (clientCode !== undefined) {
       const client = await this.clientsService.findOneByClientCode(clientCode)
 
       if (!client) {

@@ -15,11 +15,11 @@ export class Parcel extends BaseEntity {
   trackingNumber!: string
 
   @Index()
-  @UUIDColumn()
-  clientId!: string
+  @UUIDColumn({ nullable: true })
+  clientId!: string | null
 
-  @ManyToOne(() => Client, { nullable: false, onDelete: 'RESTRICT' })
-  client?: Client
+  @ManyToOne(() => Client, { nullable: true, onDelete: 'RESTRICT' })
+  client?: Client | null
 
   @TextColumn({ nullable: true })
   status!: ParcelStatus | null

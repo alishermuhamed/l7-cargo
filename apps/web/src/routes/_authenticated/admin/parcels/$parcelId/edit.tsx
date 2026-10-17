@@ -65,9 +65,11 @@ export const Route = createFileRoute(
       queryClient.ensureQueryData(getParcelStatusHistoryQueryOptions(parcelId)),
     ])
 
-    const initialClient = await queryClient.ensureQueryData(
-      getClientQueryOptions(initialParcel.clientId)
-    )
+    const initialClient = initialParcel.clientId
+      ? await queryClient.ensureQueryData(
+          getClientQueryOptions(initialParcel.clientId)
+        )
+      : null
 
     return { initialParcel, initialStatusHistory, initialClient }
   },
@@ -78,9 +80,10 @@ const editAdminParcelSchema = z.object({
   clientCode: z
     .string()
     .trim()
-    .regex(/^[1-9]\d*$/, i18n.t('parcels:invalidClientCode'))
     .refine(
-      (value) => Number.isSafeInteger(Number(value)),
+      (value) =>
+        value === '' ||
+        (/^[1-9]\d*$/.test(value) && Number.isSafeInteger(Number(value))),
       i18n.t('parcels:invalidClientCode')
     ),
   weightKg: z
@@ -117,7 +120,7 @@ function EditAdminParcelPage() {
   const form = useForm<EditAdminParcelFormValues>({
     resolver: zodResolver(editAdminParcelSchema),
     defaultValues: {
-      clientCode: String(initialClient.code),
+      clientCode: initialClient ? String(initialClient.code) : '',
       weightKg: initialParcel.weightKg ?? '',
       deliveryFee: initialParcel.deliveryFee ?? '',
       comments: initialParcel.comments ?? '',
@@ -166,9 +169,13 @@ function EditAdminParcelPage() {
     try {
       await updateParcelMutation.mutateAsync({
         clientCode:
-          Number(clientCode) === initialClient.code
-            ? undefined
-            : Number(clientCode),
+          clientCode === ''
+            ? initialClient
+              ? null
+              : undefined
+            : Number(clientCode) === initialClient?.code
+              ? undefined
+              : Number(clientCode),
         weightKg:
           weightKg === ''
             ? null
@@ -225,7 +232,7 @@ function EditAdminParcelPage() {
               render={({ field }) => (
                 <FormFieldItem>
                   <FormFieldLabel>
-                    {i18n.t('parcels:clientCode')} *
+                    {i18n.t('parcels:clientCode')}
                   </FormFieldLabel>
 
                   <FormFieldControl>

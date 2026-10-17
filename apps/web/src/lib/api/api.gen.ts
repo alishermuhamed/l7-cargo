@@ -142,7 +142,8 @@ export interface GetParcelResponseDto {
   createdAt: string
   updatedAt: string
   trackingNumber: string
-  clientId: string
+  /** @nullable */
+  clientId: string | null
   /** @nullable */
   source: string | null
   /** @nullable */
@@ -177,8 +178,11 @@ export interface PutParcelStatusHistoryRequestDto {
 }
 
 export interface UpdateParcelRequestDto {
-  /** @minimum 1 */
-  clientCode?: number
+  /**
+   * @minimum 1
+   * @nullable
+   */
+  clientCode?: number | null
   /** @nullable */
   source?: string | null
   /** @nullable */

@@ -57,7 +57,12 @@ const addAdminParcelSchema = z.object({
   clientCode: z
     .string()
     .trim()
-    .regex(/^[1-9]\d*$/, i18n.t('parcels:invalidClientCode')),
+    .refine(
+      (value) =>
+        value === '' ||
+        (/^[1-9]\d*$/.test(value) && Number.isSafeInteger(Number(value))),
+      i18n.t('parcels:invalidClientCode')
+    ),
   trackingNumber: z
     .string()
     .trim()
@@ -150,7 +155,7 @@ function AddAdminParcelPage() {
 
     try {
       const parcel = await createParcelMutation.mutateAsync({
-        clientCode: Number(clientCode),
+        clientCode: clientCode === '' ? undefined : Number(clientCode),
         trackingNumber,
         weightKg:
           weightKg === ''
@@ -209,7 +214,7 @@ function AddAdminParcelPage() {
               render={({ field }) => (
                 <FormFieldItem>
                   <FormFieldLabel>
-                    {i18n.t('parcels:clientCode')} *
+                    {i18n.t('parcels:clientCode')}
                   </FormFieldLabel>
 
                   <FormFieldControl>

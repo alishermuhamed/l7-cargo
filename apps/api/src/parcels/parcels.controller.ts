@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -60,14 +59,16 @@ export class ParcelsController {
       comments,
     } = createParcelRequestDto
 
-    let clientId = user.clientId
+    let clientId: string | null
 
-    if (user.role === 'admin') {
-      if (clientCode === undefined) {
-        throw new BadRequestException('CLIENT_CODE_REQUIRED')
+    if (user.role === 'client') {
+      clientId = user.clientId
+    } else {
+      if (clientCode !== undefined) {
+        clientId = (await this.clientsService.findOrCreateByCode(clientCode)).id
+      } else {
+        clientId = null
       }
-
-      clientId = (await this.clientsService.findOrCreateByCode(clientCode)).id
     }
 
     const id = await this.parcelsService.create({

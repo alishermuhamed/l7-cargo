@@ -63,7 +63,8 @@ function AdminParcelPage() {
     initialData: initialParcel,
   })
   const { data: client, isPending: isClientPending } = useQuery({
-    ...getClientQueryOptions(parcel.clientId),
+    ...getClientQueryOptions(parcel.clientId ?? ''),
+    enabled: parcel.clientId !== null,
   })
   const { data: statusHistory } = useQuery({
     ...getParcelStatusHistoryQueryOptions(initialParcel.id),
@@ -106,7 +107,7 @@ function AdminParcelPage() {
             <DataList.Item>
               <DataList.Label>{i18n.t('parcels:clientCode')}</DataList.Label>
               <DataList.Value>
-                {isClientPending ? (
+                {parcel.clientId !== null && isClientPending ? (
                   <Skeleton width="140px" />
                 ) : client ? (
                   <Text asChild weight="medium">
