@@ -1,9 +1,8 @@
 import { BadGatewayException, Injectable, Logger } from '@nestjs/common'
 
 import { ConfigService } from '../../config/config.service'
-import { MobizonOtpProvider } from './providers/mobizon-otp.provider'
+import { AutocallOtpProvider } from './providers/autocall-otp.provider'
 import { OtpProvider } from './providers/otp.provider'
-import { SmscOtpProvider } from './providers/smsc-otp.provider'
 
 @Injectable()
 export class OtpDeliveryService {
@@ -12,10 +11,9 @@ export class OtpDeliveryService {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly mobizonOtpProvider: MobizonOtpProvider,
-    private readonly smscOtpProvider: SmscOtpProvider
+    private readonly autocallOtpProvider: AutocallOtpProvider
   ) {
-    this.providers = [this.mobizonOtpProvider, this.smscOtpProvider]
+    this.providers = [this.autocallOtpProvider]
   }
 
   async send({
