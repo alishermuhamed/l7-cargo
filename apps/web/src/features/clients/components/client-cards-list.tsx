@@ -63,7 +63,10 @@ export function ClientCardsList({ search }: ClientCardsListProps) {
 
                   <Text as="p" color="gray" size="2" truncate>
                     {formatPhoneNumber(
-                      client.user?.phoneNumber ?? client.legacyPhoneRaw ?? ''
+                      client.user?.phoneNumber ??
+                        client.legacyPhoneNormalized ??
+                        client.legacyPhoneRaw ??
+                        ''
                     ) ?? '-'}
                   </Text>
                 </Box>

@@ -85,7 +85,10 @@ function AdminClientDetailsPage() {
               <DataList.Label>{i18n.t('auth:phoneNumber')}</DataList.Label>
               <DataList.Value>
                 {formatPhoneNumber(
-                  client.user?.phoneNumber ?? client.legacyPhoneRaw ?? ''
+                  client.user?.phoneNumber ??
+                    client.legacyPhoneNormalized ??
+                    client.legacyPhoneRaw ??
+                    ''
                 ) ?? '-'}
               </DataList.Value>
             </DataList.Item>

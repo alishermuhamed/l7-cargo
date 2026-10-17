@@ -81,7 +81,10 @@ export function ClientsTable({ search }: ClientsTableProps) {
 
                 <Table.Cell>
                   {formatPhoneNumber(
-                    client.user?.phoneNumber ?? client.legacyPhoneRaw ?? ''
+                    client.user?.phoneNumber ??
+                      client.legacyPhoneNormalized ??
+                      client.legacyPhoneRaw ??
+                      ''
                   ) ?? '-'}
                 </Table.Cell>
 
