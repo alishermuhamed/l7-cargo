@@ -7,6 +7,7 @@ import { Account } from '../authentication/entities/account.entity'
 import { Session } from '../authentication/entities/session.entity'
 import { Verification } from '../authentication/entities/verification.entity'
 import { Client } from '../clients/entities/client.entity'
+import { LegacyClientCodeAlias } from '../clients/entities/legacy-client-code-alias.entity'
 import { Parcel } from '../parcels/entities/parcel.entity'
 import { ParcelStatusHistory } from '../parcels/entities/parcel-status-history.entity'
 import { ParcelsImport } from '../parcels-imports/entities/parcels-import.entity'
@@ -26,6 +27,7 @@ import { AddClientEntity1786808443379 } from './migrations/1786808443379-add-cli
 import { RenameParcelNotesToComments1786999166153 } from './migrations/1786999166153-rename-parcel-notes-to-comments'
 import { AddClientDeletedAtToParcel1791713298338 } from './migrations/1791713298338-add-client-deleted-at-to-parcel'
 import { MakeParcelClientNullable1792252874197 } from './migrations/1792252874197-make-parcel-client-nullable'
+import { AddLegacyClientCodeAlias1792260357130 } from './migrations/1792260357130-add-legacy-client-code-alias'
 
 export function buildDataSourceOptions(
   db: EnvConfig['database']
@@ -49,6 +51,7 @@ export function buildDataSourceOptions(
       Session,
       Verification,
       Client,
+      LegacyClientCodeAlias,
       Parcel,
       ParcelStatusHistory,
       ParcelsImport,
@@ -68,6 +71,7 @@ export function buildDataSourceOptions(
       RenameParcelNotesToComments1786999166153,
       AddClientDeletedAtToParcel1791713298338,
       MakeParcelClientNullable1792252874197,
+      AddLegacyClientCodeAlias1792260357130,
     ],
   }
 }
