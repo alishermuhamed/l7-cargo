@@ -5,15 +5,24 @@ import {
 } from '@nestjs/common'
 import { Transactional } from '@nestjs-cls/transactional'
 import parsePhoneNumberFromString from 'libphonenumber-js'
-import { FindManyOptions, FindOneOptions, FindOptionsRelations } from 'typeorm'
+import {
+  FindManyOptions,
+  FindOneOptions,
+  FindOptionsRelations,
+  In,
+} from 'typeorm'
 
 import { WithRelations } from '../db/db.types'
 import { ClientsRepository } from './clients.repository'
 import { Client } from './entities/client.entity'
+import { LegacyClientCodeAliasRepository } from './legacy-client-code-alias.repository'
 
 @Injectable()
 export class ClientsService {
-  constructor(private readonly clientsRepository: ClientsRepository) {}
+  constructor(
+    private readonly clientsRepository: ClientsRepository,
+    private readonly legacyClientCodeAliasRepository: LegacyClientCodeAliasRepository
+  ) {}
 
   @Transactional()
   async createWithGeneratedCode(): Promise<Client> {
@@ -31,9 +40,7 @@ export class ClientsService {
 
     await this.clientsRepository.lockCodeAllocation()
 
-    const existingClient = await this.clientsRepository.findOne({
-      where: { code },
-    })
+    const existingClient = await this.findOneByClientCode(code)
 
     if (existingClient) {
       return existingClient
@@ -73,7 +80,44 @@ export class ClientsService {
   }
 
   async findOneByClientCode(code: number): Promise<Client | null> {
-    return this.clientsRepository.findOne({ where: { code } })
+    const client = await this.clientsRepository.findOne({ where: { code } })
+
+    if (client) {
+      return client
+    }
+
+    const alias = await this.legacyClientCodeAliasRepository.findOne({
+      where: { code },
+      relations: { client: true },
+    })
+
+    return alias?.client ?? null
+  }
+
+  async findByCodes(codes: number[]): Promise<Map<number, Client>> {
+    const clientsByCode = new Map<number, Client>()
+
+    if (codes.length === 0) {
+      return clientsByCode
+    }
+
+    const [clients, aliases] = await Promise.all([
+      this.clientsRepository.find({ where: { code: In(codes) } }),
+      this.legacyClientCodeAliasRepository.find({
+        where: { code: In(codes) },
+        relations: { client: true },
+      }),
+    ])
+
+    for (const alias of aliases) {
+      clientsByCode.set(alias.code, alias.client)
+    }
+
+    for (const client of clients) {
+      clientsByCode.set(client.code, client)
+    }
+
+    return clientsByCode
   }
 
   async findOneOrThrow<R extends FindOptionsRelations<Client>>(

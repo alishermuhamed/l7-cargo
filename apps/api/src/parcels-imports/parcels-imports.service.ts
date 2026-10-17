@@ -325,8 +325,9 @@ export class ParcelsImportsService {
       }
 
       if (
-        existingParcel?.client &&
-        existingParcel.client.code !== row.clientCode
+        existingParcel?.clientId &&
+        matchingClient &&
+        existingParcel.clientId !== matchingClient.id
       ) {
         warnings.push({
           rowNumber: row.rowNumber,
@@ -401,7 +402,7 @@ export class ParcelsImportsService {
     existingClientsByCodes: Map<number, { id: string; code: number }>
     existingParcelsByTrackingNumbers: Map<
       string,
-      { id: string; clientId: string | null; client: { code: number } | null }
+      { id: string; clientId: string | null }
     >
   }> {
     const clientCodesSet = new Set<number>()
@@ -418,22 +419,17 @@ export class ParcelsImportsService {
     const clientCodes = [...clientCodesSet]
     const trackingNumbers = [...trackingNumbersSet]
 
-    const [existingParcels, clients] = await Promise.all([
+    const [existingParcels, existingClientsByCodes] = await Promise.all([
       trackingNumbers.length
         ? this.parcelsService.find({
             where: { trackingNumber: In(trackingNumbers) },
-            relations: { client: true },
           })
         : Promise.resolve([]),
-      clientCodes.length
-        ? this.clientsService.find({ where: { code: In(clientCodes) } })
-        : Promise.resolve([]),
+      this.clientsService.findByCodes(clientCodes),
     ])
 
     return {
-      existingClientsByCodes: new Map(
-        clients.map((client) => [client.code, client])
-      ),
+      existingClientsByCodes,
       existingParcelsByTrackingNumbers: new Map(
         existingParcels.map((parcel) => [parcel.trackingNumber, parcel])
       ),
