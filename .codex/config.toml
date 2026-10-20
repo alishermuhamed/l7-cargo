@@ -3,3 +3,9 @@ url = "https://mcp.render.com/mcp"
 
 [mcp_servers.render.oauth]
 client_id = "codex"
+
+[mcp_servers.neon]
+url = "https://mcp.neon.tech/mcp"
+
+[mcp_servers.supabase]
+url = "https://mcp.supabase.com/mcp?project_ref=apohwrfyhchvjvporrzw&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching"
