@@ -33,6 +33,17 @@ This file defines repo-specific instructions for coding agents working in this p
 
 - When adding, renaming, or removing an environment variable in code, update the relevant `.env.example` file in the same change.
 
+## Render MCP
+
+For this repository, use Render workspace `tea-cspvfd0gph6c738kqa30` (Alisher Mukhametzhanov's Workspace). Pass this `workspaceId` explicitly to Render MCP tools that support it. Do not rely on the session's selected workspace.
+
+The Render services connected to `https://github.com/alishermuhamed/l7-cargo` are:
+
+- Staging API: `srv-d8gk1vuk1jcs73d37uvg` (`l7-cargo-api-staging`)
+- Staging web: `srv-d8gk2vmgvqtc73es5qog` (`l7-cargo-web-staging`)
+
+Both services are in environment `evm-d8ethfa8qa3s73dsnhr0`. Before changing a Render resource, verify its ID and repository match this list. Ask which environment to use if a request does not clearly target staging.
+
 ## Finish Checklist
 
 Before finishing work, run formatting and lint autofix for files changed in the task:
