@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common'
 import { Transactional } from '@nestjs-cls/transactional'
 import parsePhoneNumberFromString from 'libphonenumber-js'
@@ -12,6 +13,7 @@ import {
   In,
 } from 'typeorm'
 
+import { INT32_MAX } from '../common/integer.constants'
 import { WithRelations } from '../db/db.types'
 import { ClientsRepository } from './clients.repository'
 import { Client } from './entities/client.entity'
@@ -34,9 +36,7 @@ export class ClientsService {
 
   @Transactional()
   async findOrCreateByCode(code: number): Promise<Client> {
-    if (!Number.isInteger(code) || code < 1) {
-      throw new BadRequestException('INVALID_CLIENT_CODE')
-    }
+    this.validatePositiveCode(code)
 
     await this.clientsRepository.lockCodeAllocation()
 
@@ -69,6 +69,84 @@ export class ClientsService {
     }
 
     return this.createWithGeneratedCode()
+  }
+
+  @Transactional()
+  async updateCode(
+    clientId: string,
+    code: number,
+    expectedCode: number
+  ): Promise<void> {
+    this.validatePositiveCode(code)
+    const client = await this.getClientForCodeChange(clientId)
+    if (client.code !== expectedCode) {
+      throw new ConflictException('CLIENT_CODES_CHANGED')
+    }
+    if (client.code === code) {
+      return
+    }
+    await this.assertCodeAvailable(clientId, code)
+    await this.legacyClientCodeAliasRepository.delete({ clientId, code })
+    await this.clientsRepository.update({ id: clientId }, { code })
+  }
+
+  @Transactional()
+  async addAlias(clientId: string, code: number): Promise<void> {
+    this.validatePositiveCode(code)
+    const client = await this.getClientForCodeChange(clientId)
+    if (client.code === code) {
+      throw new ConflictException('CLIENT_CODE_IS_PRIMARY')
+    }
+    await this.assertCodeAvailable(clientId, code)
+    await this.insertAlias(clientId, code)
+  }
+
+  @Transactional()
+  async removeAlias(clientId: string, code: number): Promise<void> {
+    this.validatePositiveCode(code)
+    const client = await this.getClientForCodeChange(clientId)
+    if (client.code === code) {
+      throw new ConflictException('CLIENT_CODE_IS_PRIMARY')
+    }
+    await this.legacyClientCodeAliasRepository.delete({ clientId, code })
+  }
+
+  private validatePositiveCode(code: number): void {
+    if (!Number.isInteger(code) || code < 1 || code > INT32_MAX) {
+      throw new BadRequestException('INVALID_CLIENT_CODE')
+    }
+  }
+
+  private async getClientForCodeChange(clientId: string): Promise<Client> {
+    await this.clientsRepository.lockCodeAllocation()
+    const client = await this.clientsRepository.findOne({
+      where: { id: clientId },
+    })
+    if (!client) {
+      throw new NotFoundException('CLIENT_NOT_FOUND')
+    }
+    return client
+  }
+
+  private async assertCodeAvailable(
+    clientId: string,
+    code: number
+  ): Promise<void> {
+    const owner = await this.findOneByClientCode(code)
+    if (owner && owner.id !== clientId) {
+      throw new ConflictException('CLIENT_CODE_IN_USE')
+    }
+  }
+
+  private async insertAlias(clientId: string, code: number): Promise<void> {
+    const existing = await this.legacyClientCodeAliasRepository.findOne({
+      where: { clientId, code },
+    })
+    if (!existing) {
+      await this.legacyClientCodeAliasRepository.insert(
+        this.legacyClientCodeAliasRepository.create({ clientId, code })
+      )
+    }
   }
 
   async find<R extends FindOptionsRelations<Client>>(

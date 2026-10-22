@@ -1,11 +1,25 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common'
 import { ILike, Raw } from 'typeorm'
 
+import { SuccessResponseDto } from '../common/dtos/success-response.dto'
 import { ClientsMapper } from './clients.mapper'
 import { ClientsPolicy } from './clients.policy'
 import { ClientsService } from './clients.service'
+import { AddClientAliasRequestDto } from './dtos/add-client-alias-request.dto'
 import { GetClientResponseDto } from './dtos/get-client-response.dto'
 import { GetClientsQueryDto } from './dtos/get-clients-query.dto'
+import { UpdateClientCodeRequestDto } from './dtos/update-client-code-request.dto'
 
 const CLIENT_ID_PARAM = 'clientId'
 
@@ -60,6 +74,36 @@ export class ClientsController {
         legacyCodesByClientId.get(client.id) ?? []
       )
     )
+  }
+
+  @Patch(`:${CLIENT_ID_PARAM}/code`)
+  async updateClientCode(
+    @Param(CLIENT_ID_PARAM, ParseUUIDPipe) clientId: string,
+    @Body() body: UpdateClientCodeRequestDto
+  ): Promise<SuccessResponseDto> {
+    this.clientsPolicy.checkCanManageCodes()
+    await this.clientsService.updateCode(clientId, body.code, body.expectedCode)
+    return new SuccessResponseDto()
+  }
+
+  @Post(`:${CLIENT_ID_PARAM}/aliases`)
+  async addClientAlias(
+    @Param(CLIENT_ID_PARAM, ParseUUIDPipe) clientId: string,
+    @Body() body: AddClientAliasRequestDto
+  ): Promise<SuccessResponseDto> {
+    this.clientsPolicy.checkCanManageCodes()
+    await this.clientsService.addAlias(clientId, body.code)
+    return new SuccessResponseDto()
+  }
+
+  @Delete(`:${CLIENT_ID_PARAM}/aliases/:code`)
+  async removeClientAlias(
+    @Param(CLIENT_ID_PARAM, ParseUUIDPipe) clientId: string,
+    @Param('code', ParseIntPipe) code: number
+  ): Promise<SuccessResponseDto> {
+    this.clientsPolicy.checkCanManageCodes()
+    await this.clientsService.removeAlias(clientId, code)
+    return new SuccessResponseDto()
   }
 
   @Get(`:${CLIENT_ID_PARAM}`)

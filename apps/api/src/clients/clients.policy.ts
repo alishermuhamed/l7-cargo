@@ -23,11 +23,17 @@ export class ClientsPolicy extends EntityPolicy<Client> {
     const { can } = builder
 
     if (user.role === 'admin') {
-      can('read', Client)
+      can(['read', 'update'], Client)
       return
     }
 
     can('read', Client, { id: user.clientId })
+  }
+
+  checkCanManageCodes(): void {
+    if (this.contextService.getUserOrThrow().role !== 'admin') {
+      throw new ForbiddenException()
+    }
   }
 
   checkCanList(): void {
