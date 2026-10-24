@@ -28,7 +28,7 @@ export class ClientsRepository extends BaseRepository<Client> {
       SELECT (
         GREATEST(
           COALESCE((SELECT MAX("code") FROM "client"), 0),
-          COALESCE((SELECT MAX("code") FROM "legacy_client_code_alias"), 0)
+          COALESCE((SELECT MAX("code") FROM "client_code_alias"), 0)
         ) + 1
       )::integer AS "code"
     `)

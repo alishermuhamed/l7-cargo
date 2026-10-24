@@ -7,7 +7,7 @@ import { Client } from './client.entity'
 
 @Check('"code" > 0')
 @Entity()
-export class LegacyClientCodeAlias extends BaseEntity {
+export class ClientCodeAlias extends BaseEntity {
   @Index({ unique: true })
   @IntegerColumn()
   code!: number

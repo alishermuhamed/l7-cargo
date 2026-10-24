@@ -15,15 +15,15 @@ import {
 
 import { INT32_MAX } from '../common/integer.constants'
 import { WithRelations } from '../db/db.types'
+import { ClientCodeAliasRepository } from './client-code-alias.repository'
 import { ClientsRepository } from './clients.repository'
 import { Client } from './entities/client.entity'
-import { LegacyClientCodeAliasRepository } from './legacy-client-code-alias.repository'
 
 @Injectable()
 export class ClientsService {
   constructor(
     private readonly clientsRepository: ClientsRepository,
-    private readonly legacyClientCodeAliasRepository: LegacyClientCodeAliasRepository
+    private readonly clientCodeAliasRepository: ClientCodeAliasRepository
   ) {}
 
   @Transactional()
@@ -86,7 +86,7 @@ export class ClientsService {
       return
     }
     await this.assertCodeAvailable(clientId, code)
-    await this.legacyClientCodeAliasRepository.delete({ clientId, code })
+    await this.clientCodeAliasRepository.delete({ clientId, code })
     await this.clientsRepository.update({ id: clientId }, { code })
   }
 
@@ -108,7 +108,7 @@ export class ClientsService {
     if (client.code === code) {
       throw new ConflictException('CLIENT_CODE_IS_PRIMARY')
     }
-    await this.legacyClientCodeAliasRepository.delete({ clientId, code })
+    await this.clientCodeAliasRepository.delete({ clientId, code })
   }
 
   private validatePositiveCode(code: number): void {
@@ -139,12 +139,12 @@ export class ClientsService {
   }
 
   private async insertAlias(clientId: string, code: number): Promise<void> {
-    const existing = await this.legacyClientCodeAliasRepository.findOne({
+    const existing = await this.clientCodeAliasRepository.findOne({
       where: { clientId, code },
     })
     if (!existing) {
-      await this.legacyClientCodeAliasRepository.insert(
-        this.legacyClientCodeAliasRepository.create({ clientId, code })
+      await this.clientCodeAliasRepository.insert(
+        this.clientCodeAliasRepository.create({ clientId, code })
       )
     }
   }
@@ -164,7 +164,7 @@ export class ClientsService {
       return client
     }
 
-    const alias = await this.legacyClientCodeAliasRepository.findOne({
+    const alias = await this.clientCodeAliasRepository.findOne({
       where: { code },
       relations: { client: true },
     })
@@ -181,7 +181,7 @@ export class ClientsService {
 
     const [clients, aliases] = await Promise.all([
       this.clientsRepository.find({ where: { code: In(codes) } }),
-      this.legacyClientCodeAliasRepository.find({
+      this.clientCodeAliasRepository.find({
         where: { code: In(codes) },
         relations: { client: true },
       }),
@@ -198,11 +198,11 @@ export class ClientsService {
     return clientsByCode
   }
 
-  async findLegacyCodesByClientIds(
+  async findAliasesByClientIds(
     clientIds: string[]
   ): Promise<Map<string, number[]>> {
     const aliases =
-      await this.legacyClientCodeAliasRepository.findByClientIds(clientIds)
+      await this.clientCodeAliasRepository.findByClientIds(clientIds)
     const codesByClientId = new Map<string, number[]>()
 
     for (const alias of aliases) {

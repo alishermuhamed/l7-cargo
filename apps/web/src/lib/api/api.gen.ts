@@ -78,7 +78,7 @@ export type GetClientResponseDtoUser = LinkedUserDto | null
 export interface GetClientResponseDto {
   id: string
   code: number
-  legacyCodes: number[]
+  aliases: number[]
   /** @nullable */
   legacyPhoneRaw: string | null
   /** @nullable */
@@ -87,20 +87,25 @@ export interface GetClientResponseDto {
   user: GetClientResponseDtoUser
 }
 
-export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+export interface UpdateClientCodeRequestDto {
+  /**
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  code: number
+  /**
+   * @minimum -2147483648
+   * @maximum 2147483647
+   */
+  expectedCode: number
+}
 
-export const UserRole = {
-  admin: 'admin',
-  client: 'client',
-} as const
-
-export interface GetUserResponseDto {
-  role: UserRole
-  id: string
-  clientId: string
-  name: string
-  /** @nullable */
-  phoneNumber: string | null
+export interface AddClientAliasRequestDto {
+  /**
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  code: number
 }
 
 export interface CreateParcelRequestDto {
@@ -273,6 +278,22 @@ export interface GetParcelsImportResponseDto {
   parsedData: ParsedParcelsImportDataDto
 }
 
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
+export const UserRole = {
+  admin: 'admin',
+  client: 'client',
+} as const
+
+export interface GetUserResponseDto {
+  role: UserRole
+  id: string
+  clientId: string
+  name: string
+  /** @nullable */
+  phoneNumber: string | null
+}
+
 export type GetSignInMethodParams = {
   phoneNumber: string
 }
@@ -286,19 +307,6 @@ export type GetClientsParams = {
    * @minimum 0
    */
   offset?: number
-  search?: string
-}
-
-export type GetUsersParams = {
-  /**
-   * @minimum 0
-   */
-  limit?: number
-  /**
-   * @minimum 0
-   */
-  offset?: number
-  role?: UserRole
   search?: string
 }
 
@@ -325,6 +333,19 @@ export type GetParcelsImportsParams = {
    * @minimum 0
    */
   offset?: number
+}
+
+export type GetUsersParams = {
+  /**
+   * @minimum 0
+   */
+  limit?: number
+  /**
+   * @minimum 0
+   */
+  offset?: number
+  role?: UserRole
+  search?: string
 }
 
 export const getGetHealthUrl = () => {
@@ -527,6 +548,58 @@ export const getClients = async (
   })
 }
 
+export const getUpdateClientCodeUrl = (clientId: string) => {
+  return `/clients/${clientId}/code`
+}
+
+export const updateClientCode = async (
+  clientId: string,
+  updateClientCodeRequestDto: UpdateClientCodeRequestDto,
+  options?: RequestInit
+): Promise<SuccessResponseDto> => {
+  return customFetch<SuccessResponseDto>(getUpdateClientCodeUrl(clientId), {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateClientCodeRequestDto),
+  })
+}
+
+export const getAddClientAliasUrl = (clientId: string) => {
+  return `/clients/${clientId}/aliases`
+}
+
+export const addClientAlias = async (
+  clientId: string,
+  addClientAliasRequestDto: AddClientAliasRequestDto,
+  options?: RequestInit
+): Promise<SuccessResponseDto> => {
+  return customFetch<SuccessResponseDto>(getAddClientAliasUrl(clientId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(addClientAliasRequestDto),
+  })
+}
+
+export const getRemoveClientAliasUrl = (clientId: string, code: number) => {
+  return `/clients/${clientId}/aliases/${code}`
+}
+
+export const removeClientAlias = async (
+  clientId: string,
+  code: number,
+  options?: RequestInit
+): Promise<SuccessResponseDto> => {
+  return customFetch<SuccessResponseDto>(
+    getRemoveClientAliasUrl(clientId, code),
+    {
+      ...options,
+      method: 'DELETE',
+    }
+  )
+}
+
 export const getGetClientUrl = (clientId: string) => {
   return `/clients/${clientId}`
 }
@@ -536,44 +609,6 @@ export const getClient = async (
   options?: RequestInit
 ): Promise<GetClientResponseDto> => {
   return customFetch<GetClientResponseDto>(getGetClientUrl(clientId), {
-    ...options,
-    method: 'GET',
-  })
-}
-
-export const getGetUserUrl = (userId: string) => {
-  return `/users/${userId}`
-}
-
-export const getUser = async (
-  userId: string,
-  options?: RequestInit
-): Promise<GetUserResponseDto> => {
-  return customFetch<GetUserResponseDto>(getGetUserUrl(userId), {
-    ...options,
-    method: 'GET',
-  })
-}
-
-export const getGetUsersUrl = (params?: GetUsersParams) => {
-  const normalizedParams = new URLSearchParams()
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  })
-
-  const stringifiedParams = normalizedParams.toString()
-
-  return stringifiedParams.length > 0 ? `/users?${stringifiedParams}` : `/users`
-}
-
-export const getUsers = async (
-  params?: GetUsersParams,
-  options?: RequestInit
-): Promise<GetUserResponseDto[]> => {
-  return customFetch<GetUserResponseDto[]>(getGetUsersUrl(params), {
     ...options,
     method: 'GET',
   })
@@ -821,4 +856,42 @@ export const deleteParcelsImport = async (
       method: 'DELETE',
     }
   )
+}
+
+export const getGetUserUrl = (userId: string) => {
+  return `/users/${userId}`
+}
+
+export const getUser = async (
+  userId: string,
+  options?: RequestInit
+): Promise<GetUserResponseDto> => {
+  return customFetch<GetUserResponseDto>(getGetUserUrl(userId), {
+    ...options,
+    method: 'GET',
+  })
+}
+
+export const getGetUsersUrl = (params?: GetUsersParams) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0 ? `/users?${stringifiedParams}` : `/users`
+}
+
+export const getUsers = async (
+  params?: GetUsersParams,
+  options?: RequestInit
+): Promise<GetUserResponseDto[]> => {
+  return customFetch<GetUserResponseDto[]>(getGetUsersUrl(params), {
+    ...options,
+    method: 'GET',
+  })
 }

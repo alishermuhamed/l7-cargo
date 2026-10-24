@@ -1,11 +1,13 @@
+import { Pencil1Icon } from '@radix-ui/react-icons'
 import {
-  Badge,
   Box,
   Card,
   Container,
   DataList,
   Flex,
   Heading,
+  IconButton,
+  Text,
 } from '@radix-ui/themes'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
@@ -13,6 +15,8 @@ import { useState } from 'react'
 
 import { SearchField } from '../../../../../components/search-field/search-field'
 import { Select } from '../../../../../components/select/select'
+import { ChangeCodeDialog } from '../../../../../features/clients/components/change-code-dialog'
+import { ManageAlternativeCodesDialog } from '../../../../../features/clients/components/manage-alternative-codes-dialog'
 import { ParcelCardsList } from '../../../../../features/parcels/components/parcel-cards-list'
 import { ParcelsTable } from '../../../../../features/parcels/components/parcels-table'
 import { PARCEL_STATUS_LABELS } from '../../../../../features/parcels/lib/parcel-status-labels'
@@ -41,6 +45,10 @@ export const Route = createFileRoute(
 function AdminClientDetailsPage() {
   const { initialClient } = Route.useLoaderData()
 
+  const [changeCodeOpen, setChangeCodeOpen] = useState(false)
+  const [manageAlternativeCodesOpen, setManageAlternativeCodesOpen] =
+    useState(false)
+
   const [parcelsSearch, setParcelsSearch] = useState('')
   const [parcelsStatus, setParcelsStatus] = useState<ParcelStatus | 'all'>(
     'all'
@@ -58,23 +66,38 @@ function AdminClientDetailsPage() {
           <DataList.Root>
             <DataList.Item>
               <DataList.Label>{i18n.t('clients:code')}</DataList.Label>
-              <DataList.Value>{client.code}</DataList.Value>
+              <DataList.Value>
+                <Flex align="center" gap="3">
+                  <Text>{client.code}</Text>
+                  <IconButton
+                    variant="ghost"
+                    size="1"
+                    aria-label={i18n.t('clients:codes.change')}
+                    title={i18n.t('clients:codes.change')}
+                    onClick={() => setChangeCodeOpen(true)}
+                  >
+                    <Pencil1Icon />
+                  </IconButton>
+                </Flex>
+              </DataList.Value>
             </DataList.Item>
-
-            {client.legacyCodes.length > 0 && (
-              <DataList.Item>
-                <DataList.Label>{i18n.t('clients:legacyCodes')}</DataList.Label>
-                <DataList.Value>
-                  <Flex wrap="wrap" gap="2">
-                    {client.legacyCodes.map((code) => (
-                      <Badge key={code} color="gray" variant="soft">
-                        {code}
-                      </Badge>
-                    ))}
-                  </Flex>
-                </DataList.Value>
-              </DataList.Item>
-            )}
+            <DataList.Item>
+              <DataList.Label>{i18n.t('clients:aliases')}</DataList.Label>
+              <DataList.Value>
+                <Flex align="center" gap="3">
+                  <Text>{client.aliases.join(', ') || '-'}</Text>
+                  <IconButton
+                    variant="ghost"
+                    size="1"
+                    aria-label={i18n.t('clients:codes.manageAlternatives')}
+                    title={i18n.t('clients:codes.manageAlternatives')}
+                    onClick={() => setManageAlternativeCodesOpen(true)}
+                  >
+                    <Pencil1Icon />
+                  </IconButton>
+                </Flex>
+              </DataList.Value>
+            </DataList.Item>
 
             <DataList.Item>
               <DataList.Label>{i18n.t('profile:name')}</DataList.Label>
@@ -141,6 +164,18 @@ function AdminClientDetailsPage() {
           </Box>
         </Flex>
       </Flex>
+      {changeCodeOpen && (
+        <ChangeCodeDialog
+          client={client}
+          onClose={() => setChangeCodeOpen(false)}
+        />
+      )}
+      {manageAlternativeCodesOpen && (
+        <ManageAlternativeCodesDialog
+          client={client}
+          onClose={() => setManageAlternativeCodesOpen(false)}
+        />
+      )}
     </Container>
   )
 }

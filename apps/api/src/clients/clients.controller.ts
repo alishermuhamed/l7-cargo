@@ -46,7 +46,7 @@ export class ClientsController {
           {
             id: Raw(
               (alias) =>
-                `EXISTS (SELECT 1 FROM "legacy_client_code_alias" "legacyAlias" WHERE "legacyAlias"."clientId" = ${alias} AND CAST("legacyAlias"."code" AS text) ILIKE :search)`,
+                `EXISTS (SELECT 1 FROM "client_code_alias" "codeAlias" WHERE "codeAlias"."clientId" = ${alias} AND CAST("codeAlias"."code" AS text) ILIKE :search)`,
               { search: `%${search}%` }
             ),
           },
@@ -63,15 +63,14 @@ export class ClientsController {
       take: limit,
       skip: offset,
     })
-    const legacyCodesByClientId =
-      await this.clientsService.findLegacyCodesByClientIds(
-        clients.map((client) => client.id)
-      )
+    const aliasesByClientId = await this.clientsService.findAliasesByClientIds(
+      clients.map((client) => client.id)
+    )
 
     return clients.map((client) =>
       ClientsMapper.toGetClientResponseDto(
         client,
-        legacyCodesByClientId.get(client.id) ?? []
+        aliasesByClientId.get(client.id) ?? []
       )
     )
   }
@@ -116,12 +115,13 @@ export class ClientsController {
       where: { id: clientId },
       relations: { user: true },
     })
-    const legacyCodesByClientId =
-      await this.clientsService.findLegacyCodesByClientIds([client.id])
+    const aliasesByClientId = await this.clientsService.findAliasesByClientIds([
+      client.id,
+    ])
 
     return ClientsMapper.toGetClientResponseDto(
       client,
-      legacyCodesByClientId.get(client.id) ?? []
+      aliasesByClientId.get(client.id) ?? []
     )
   }
 }

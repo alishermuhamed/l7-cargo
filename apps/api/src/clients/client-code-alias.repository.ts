@@ -5,18 +5,18 @@ import { In } from 'typeorm'
 
 import { ContextService } from '../context/context.service'
 import { BaseRepository } from '../db/base.repository'
-import { LegacyClientCodeAlias } from './entities/legacy-client-code-alias.entity'
+import { ClientCodeAlias } from './entities/client-code-alias.entity'
 
 @Injectable()
-export class LegacyClientCodeAliasRepository extends BaseRepository<LegacyClientCodeAlias> {
+export class ClientCodeAliasRepository extends BaseRepository<ClientCodeAlias> {
   constructor(
     protected readonly txHost: TransactionHost<TransactionalAdapterTypeOrm>,
     protected readonly contextService: ContextService
   ) {
-    super(txHost, contextService, LegacyClientCodeAlias)
+    super(txHost, contextService, ClientCodeAlias)
   }
 
-  async findByClientIds(clientIds: string[]): Promise<LegacyClientCodeAlias[]> {
+  async findByClientIds(clientIds: string[]): Promise<ClientCodeAlias[]> {
     if (clientIds.length === 0) {
       return []
     }
