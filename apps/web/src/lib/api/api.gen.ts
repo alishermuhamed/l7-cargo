@@ -289,6 +289,7 @@ export interface GetUserResponseDto {
   role: UserRole
   id: string
   clientId: string
+  requiresCodeResolution: boolean
   name: string
   /** @nullable */
   phoneNumber: string | null

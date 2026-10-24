@@ -17,6 +17,7 @@ import { Route as AuthSignInRouteImport } from './routes/auth/sign-in'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedCodeResolutionRouteImport } from './routes/_authenticated/code-resolution'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedClientRouteRouteImport } from './routes/_authenticated/_client/route'
 import { Route as AuthenticatedAdminParcelsIndexRouteImport } from './routes/_authenticated/admin/parcels/index'
@@ -77,6 +78,12 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCodeResolutionRoute =
+  AuthenticatedCodeResolutionRouteImport.update({
+    id: '/code-resolution',
+    path: '/code-resolution',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -200,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/code-resolution': typeof AuthenticatedCodeResolutionRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -228,6 +236,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/code-resolution': typeof AuthenticatedCodeResolutionRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -259,6 +268,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRouteRouteWithChildren
   '/_authenticated/_client': typeof AuthenticatedClientRouteRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/_authenticated/code-resolution': typeof AuthenticatedCodeResolutionRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -289,6 +299,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
+    | '/code-resolution'
     | '/onboarding'
     | '/auth/forgot-password'
     | '/auth/reset-password'
@@ -317,6 +328,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
+    | '/code-resolution'
     | '/onboarding'
     | '/auth/forgot-password'
     | '/auth/reset-password'
@@ -347,6 +359,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/_client'
     | '/_authenticated/admin'
+    | '/_authenticated/code-resolution'
     | '/_authenticated/onboarding'
     | '/auth/forgot-password'
     | '/auth/reset-password'
@@ -434,6 +447,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/code-resolution': {
+      id: '/_authenticated/code-resolution'
+      path: '/code-resolution'
+      fullPath: '/code-resolution'
+      preLoaderRoute: typeof AuthenticatedCodeResolutionRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin': {
@@ -652,12 +672,14 @@ const AuthenticatedAdminRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedClientRouteRoute: typeof AuthenticatedClientRouteRouteWithChildren
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedCodeResolutionRoute: typeof AuthenticatedCodeResolutionRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClientRouteRoute: AuthenticatedClientRouteRouteWithChildren,
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
+  AuthenticatedCodeResolutionRoute: AuthenticatedCodeResolutionRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
 }
 

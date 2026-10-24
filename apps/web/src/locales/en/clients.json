@@ -27,5 +27,12 @@
     "manageDescription": "Add or remove alternative codes, or make one the primary client code.",
     "close": "Close"
   },
-  "aliases": "Alternative codes"
+  "aliases": "Alternative codes",
+  "resolution": {
+    "title": "Your client code needs to be confirmed",
+    "description": "Contact a manager to restore your code and access the app. Your parcels are saved. Reload this page after your code has been restored.",
+    "contactManager": "Contact manager",
+    "reload": "Reload page",
+    "signOutFailed": "Could not sign out. Please try again."
+  }
 }

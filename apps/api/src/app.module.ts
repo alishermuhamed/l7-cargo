@@ -7,6 +7,7 @@ import { AuthenticationModule } from './authentication/authentication.module'
 import { AuthorizationModule } from './authorization/authorization.module'
 import { ClientsModule } from './clients/clients.module'
 import { AuthenticationGuard } from './common/guards/authentication.guard'
+import { ClientAccessGuard } from './common/guards/client-access.guard'
 import { ConfigModule } from './config/config.module'
 import { ContextModule } from './context/context.module'
 import { DbModule } from './db/db.module'
@@ -41,6 +42,10 @@ import { UsersModule } from './users/users.module'
     {
       provide: APP_GUARD,
       useClass: AuthenticationGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ClientAccessGuard,
     },
     {
       provide: APP_PIPE,
