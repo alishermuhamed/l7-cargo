@@ -5,7 +5,6 @@ import { Link } from '@tanstack/react-router'
 
 import { Button } from '../../../components/button'
 import { IconButton } from '../../../components/icon-button'
-import { useDebounce } from '../../../hooks/use-debounce'
 import { getClientsQueryOptions } from '../../../lib/api/queries'
 import i18n from '../../../lib/i18n'
 import { formatPhoneNumber } from '../../../lib/phone-number'
@@ -23,12 +22,10 @@ export function ClientsTable({
   page,
   onPageChange,
 }: ClientsTableProps) {
-  const debouncedSearch = useDebounce(search, 500)
-
   const params = {
     limit: CLIENTS_PAGE_SIZE,
     offset: page * CLIENTS_PAGE_SIZE,
-    search: debouncedSearch.length === 0 ? undefined : debouncedSearch,
+    search: search.length === 0 ? undefined : search,
   }
 
   const { data: clients = [], isPending: isPageLoading } = useQuery(
