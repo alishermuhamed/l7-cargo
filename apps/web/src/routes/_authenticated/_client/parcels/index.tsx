@@ -1,7 +1,6 @@
 import { PlusIcon } from '@radix-ui/react-icons'
 import { Box, Container, Flex } from '@radix-ui/themes'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState } from 'react'
 
 import { Button } from '../../../../components/button'
 import { SearchField } from '../../../../components/search-field/search-field'
@@ -12,8 +11,10 @@ import { ReadyForPickupBalance } from '../../../../features/parcels/components/r
 import { PARCEL_STATUS_LABELS } from '../../../../features/parcels/lib/parcel-status-labels'
 import { ParcelStatus } from '../../../../lib/api/api.gen'
 import i18n from '../../../../lib/i18n'
+import { parcelsSearchSchema } from '../../../../lib/list-search'
 
 export const Route = createFileRoute('/_authenticated/_client/parcels/')({
+  validateSearch: parcelsSearchSchema,
   staticData: {
     title: i18n.t('parcels:parcels'),
   },
@@ -21,8 +22,43 @@ export const Route = createFileRoute('/_authenticated/_client/parcels/')({
 })
 
 function ParcelsPage() {
-  const [search, setSearch] = useState('')
-  const [status, setStatus] = useState<ParcelStatus | 'all'>('all')
+  const { search = '', page = 1, status = 'all' } = Route.useSearch()
+  const navigate = Route.useNavigate()
+
+  const setSearch = (value: string) => {
+    void navigate({
+      search: (previous) => ({
+        ...previous,
+        search: value || undefined,
+        page: undefined,
+      }),
+      replace: true,
+      resetScroll: false,
+    })
+  }
+
+  const setStatus = (value: ParcelStatus | 'all') => {
+    void navigate({
+      search: (previous) => ({
+        ...previous,
+        status: value === 'all' ? undefined : value,
+        page: undefined,
+      }),
+      replace: true,
+      resetScroll: false,
+    })
+  }
+
+  const setPage = (value: number) => {
+    void navigate({
+      search: (previous) => ({
+        ...previous,
+        page: value === 0 ? undefined : value + 1,
+      }),
+      replace: true,
+      resetScroll: false,
+    })
+  }
 
   return (
     <Container p="4">
@@ -77,6 +113,8 @@ function ParcelsPage() {
 
         <Box display={{ initial: 'none', xs: 'block' }}>
           <ParcelsTable
+            page={page - 1}
+            onPageChange={setPage}
             search={search}
             status={status === 'all' ? undefined : status}
           />

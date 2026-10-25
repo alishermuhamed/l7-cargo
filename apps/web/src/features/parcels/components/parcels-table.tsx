@@ -2,7 +2,6 @@ import { ArrowLeftIcon, ArrowRightIcon } from '@radix-ui/react-icons'
 import { Flex, Skeleton, Table, Text } from '@radix-ui/themes'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { useEffect, useReducer } from 'react'
 
 import { Button } from '../../../components/button'
 import { IconButton } from '../../../components/icon-button'
@@ -16,6 +15,8 @@ const PARCELS_PAGE_SIZE = 20
 
 interface ParcelsTableProps {
   search: string
+  page: number
+  onPageChange: (page: number) => void
   status?: ParcelStatus
   clientId?: string
   isAdminPage?: boolean
@@ -23,30 +24,13 @@ interface ParcelsTableProps {
 
 export function ParcelsTable({
   search,
+  page,
+  onPageChange,
   status,
   clientId,
   isAdminPage = false,
 }: ParcelsTableProps) {
-  const [page, dispatchPage] = useReducer(
-    (page: number, action: 'next' | 'prev' | 'reset') => {
-      switch (action) {
-        case 'next':
-          return page + 1
-
-        case 'prev':
-          return Math.max(0, page - 1)
-
-        case 'reset':
-          return 0
-      }
-    },
-    0
-  )
   const debouncedSearch = useDebounce(search, 500)
-
-  useEffect(() => {
-    dispatchPage('reset')
-  }, [clientId, search, status])
 
   const params: GetParcelsParams = {
     limit: PARCELS_PAGE_SIZE,
@@ -148,7 +132,7 @@ export function ParcelsTable({
           type="button"
           tooltip={i18n.t('common:previous')}
           variant="soft"
-          onClick={() => dispatchPage('prev')}
+          onClick={() => onPageChange(Math.max(0, page - 1))}
           disabled={page === 0 || isPageLoading}
         >
           <ArrowLeftIcon />
@@ -158,7 +142,7 @@ export function ParcelsTable({
           type="button"
           tooltip={i18n.t('common:next')}
           variant="soft"
-          onClick={() => dispatchPage('next')}
+          onClick={() => onPageChange(page + 1)}
           disabled={!hasNextPage || isPageLoading}
         >
           <ArrowRightIcon />

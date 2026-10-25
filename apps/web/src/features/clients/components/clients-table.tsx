@@ -2,7 +2,6 @@ import { ArrowLeftIcon, ArrowRightIcon } from '@radix-ui/react-icons'
 import { Flex, Skeleton, Table, Text } from '@radix-ui/themes'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { useEffect, useReducer } from 'react'
 
 import { Button } from '../../../components/button'
 import { IconButton } from '../../../components/icon-button'
@@ -15,29 +14,16 @@ const CLIENTS_PAGE_SIZE = 20
 
 interface ClientsTableProps {
   search: string
+  page: number
+  onPageChange: (page: number) => void
 }
 
-export function ClientsTable({ search }: ClientsTableProps) {
-  const [page, dispatchPage] = useReducer(
-    (currentPage: number, action: 'next' | 'prev' | 'reset') => {
-      switch (action) {
-        case 'next':
-          return currentPage + 1
-
-        case 'prev':
-          return Math.max(0, currentPage - 1)
-
-        case 'reset':
-          return 0
-      }
-    },
-    0
-  )
+export function ClientsTable({
+  search,
+  page,
+  onPageChange,
+}: ClientsTableProps) {
   const debouncedSearch = useDebounce(search, 500)
-
-  useEffect(() => {
-    dispatchPage('reset')
-  }, [search])
 
   const params = {
     limit: CLIENTS_PAGE_SIZE,
@@ -137,7 +123,7 @@ export function ClientsTable({ search }: ClientsTableProps) {
           tooltip={i18n.t('common:previous')}
           variant="soft"
           color="gray"
-          onClick={() => dispatchPage('prev')}
+          onClick={() => onPageChange(Math.max(0, page - 1))}
           disabled={page === 0 || isPageLoading}
         >
           <ArrowLeftIcon />
@@ -148,7 +134,7 @@ export function ClientsTable({ search }: ClientsTableProps) {
           tooltip={i18n.t('common:next')}
           variant="soft"
           color="gray"
-          onClick={() => dispatchPage('next')}
+          onClick={() => onPageChange(page + 1)}
           disabled={!hasNextPage || isPageLoading}
         >
           <ArrowRightIcon />
