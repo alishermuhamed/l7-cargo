@@ -59,7 +59,7 @@ export class ClientsController {
     const clients = await this.clientsService.find({
       where,
       relations: { user: true },
-      order: { createdAt: 'DESC' },
+      order: { code: 'ASC' },
       take: limit,
       skip: offset,
     })
