@@ -1,6 +1,38 @@
 {
   "clientDetails": "Client details",
   "details": "Details",
-  "id": "ID",
-  "noClientsFound": "No clients found"
+  "code": "Code",
+  "noClientsFound": "No clients found",
+  "codes": {
+    "title": "Client codes",
+    "primary": "Primary code",
+    "alternatives": "Alternative codes",
+    "unresolved": "Code not restored",
+    "temporary": "Temporary code: {{code}}",
+    "assign": "Assign primary code",
+    "change": "Change primary code",
+    "add": "Add alternative code",
+    "promote": "Make primary",
+    "remove": "Remove",
+    "newCode": "New code",
+    "empty": "No alternative codes",
+    "changeDescription": "Current primary code: {{code}}. The old code will not be saved automatically. Add it as an alternative after the change if needed.",
+    "addDescription": "Enter an additional code that can be used to find this client.",
+    "removeDescription": "Remove alternative code {{code}}? Existing parcels will remain with this client.",
+    "conflict": "This code is already assigned to another client",
+    "invalid": "Enter a whole number from 1 to 2147483647",
+    "failed": "Could not save changes. Please try again.",
+    "saved": "Client codes updated",
+    "manageAlternatives": "Edit alternative codes",
+    "manageDescription": "Add or remove alternative codes, or make one the primary client code.",
+    "close": "Close"
+  },
+  "aliases": "Alternative codes",
+  "resolution": {
+    "title": "Your client code needs to be confirmed",
+    "description": "Contact a manager to restore your code and access the app. Your parcels are saved. Reload this page after your code has been restored.",
+    "contactManager": "Contact manager",
+    "reload": "Reload page",
+    "signOutFailed": "Could not sign out. Please try again."
+  }
 }

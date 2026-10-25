@@ -1,6 +1,7 @@
 import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common'
-import { ILike, Raw } from 'typeorm'
+import { ILike } from 'typeorm'
 
+import { AllowUnresolvedClient } from '../clients/decorators/allow-unresolved-client.decorator'
 import { GetUserResponseDto } from './dtos/get-user-response.dto'
 import { GetUsersQueryDto } from './dtos/get-users-query.dto'
 import { UsersMapper } from './users.mapper'
@@ -14,6 +15,7 @@ export class UsersController {
     private readonly usersService: UsersService
   ) {}
 
+  @AllowUnresolvedClient()
   @Get(':userId')
   async getUser(
     @Param('userId', ParseUUIDPipe) userId: string
@@ -22,6 +24,7 @@ export class UsersController {
 
     const user = await this.usersService.findOneOrThrow({
       where: { id: userId },
+      relations: { client: true },
     })
 
     return UsersMapper.toGetUserResponseDto(user)
@@ -39,17 +42,12 @@ export class UsersController {
       ? [
           { ...baseWhere, name: ILike(`%${search}%`) },
           { ...baseWhere, phoneNumber: ILike(`%${search}%`) },
-          {
-            ...baseWhere,
-            clientId: Raw((alias) => `CAST(${alias} AS text) ILIKE :search`, {
-              search: `%${search}%`,
-            }),
-          },
         ]
       : baseWhere
 
     const users = await this.usersService.find({
       where,
+      relations: { client: true },
       order: { createdAt: 'DESC' },
       take: limit,
       skip: offset,

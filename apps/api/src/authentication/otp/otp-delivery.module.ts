@@ -2,12 +2,11 @@ import { Module } from '@nestjs/common'
 
 import { ConfigModule } from '../../config/config.module'
 import { OtpDeliveryService } from './otp-delivery.service'
-import { MobizonOtpProvider } from './providers/mobizon-otp.provider'
-import { SmscOtpProvider } from './providers/smsc-otp.provider'
+import { AutocallOtpProvider } from './providers/autocall-otp.provider'
 
 @Module({
   imports: [ConfigModule],
-  providers: [OtpDeliveryService, MobizonOtpProvider, SmscOtpProvider],
+  providers: [OtpDeliveryService, AutocallOtpProvider],
   exports: [OtpDeliveryService],
 })
 export class OtpDeliveryModule {}

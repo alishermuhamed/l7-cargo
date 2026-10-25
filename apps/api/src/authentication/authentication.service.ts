@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import {
   betterAuth as betterAuthFactory,
   type BetterAuthOptions,
@@ -8,10 +8,13 @@ import { phoneNumber } from 'better-auth/plugins'
 import type { IncomingHttpHeaders } from 'http'
 import parsePhoneNumberFromString from 'libphonenumber-js'
 
+import { ClientsService } from '../clients/clients.service'
 import { ConfigService } from '../config/config.service'
 import { BetterAuthTypeOrmAdapter } from '../db/adapters/better-auth-typeorm.adapter'
 import { DEFAULT_USER_ROLE } from '../users/user-role'
+import { AccountsRepository } from './accounts.repository'
 import { OtpDeliveryService } from './otp/otp-delivery.service'
+import type { SignInMethod } from './sign-in-method'
 
 function createBetterAuth({
   typeOrmAdapter,
@@ -22,6 +25,7 @@ function createBetterAuth({
   validatePhoneNumber,
   sendOTP,
   sendPasswordResetOTP,
+  resolveClientIdForNewUser,
 }: {
   typeOrmAdapter: BetterAuthTypeOrmAdapter
   secret: string
@@ -34,12 +38,17 @@ function createBetterAuth({
     phoneNumber: string
     code: string
   }) => Promise<void>
+  resolveClientIdForNewUser: (phoneNumber: unknown) => Promise<string>
 }) {
   return betterAuthFactory({
     basePath: '/auth',
     secret,
     baseURL,
     trustedOrigins: webUrl ? [webUrl] : undefined,
+    emailAndPassword: {
+      enabled: false,
+      revokeSessionsOnPasswordReset: true,
+    },
     plugins: [
       phoneNumber({
         phoneNumberValidator: validatePhoneNumber,
@@ -60,9 +69,21 @@ function createBetterAuth({
           input: false,
         },
         clientId: {
-          type: 'number',
+          type: 'string',
           required: false,
           input: false,
+        },
+      },
+    },
+    databaseHooks: {
+      user: {
+        create: {
+          before: async (user) => ({
+            data: {
+              ...user,
+              clientId: await resolveClientIdForNewUser(user.phoneNumber),
+            },
+          }),
         },
       },
     },
@@ -90,7 +111,9 @@ export class AuthenticationService {
   constructor(
     private readonly configService: ConfigService,
     private readonly betterAuthTypeOrmAdapter: BetterAuthTypeOrmAdapter,
-    private readonly otpDeliveryService: OtpDeliveryService
+    private readonly otpDeliveryService: OtpDeliveryService,
+    private readonly clientsService: ClientsService,
+    private readonly accountsRepository: AccountsRepository
   ) {
     this.betterAuth = createBetterAuth({
       typeOrmAdapter: this.betterAuthTypeOrmAdapter,
@@ -101,6 +124,8 @@ export class AuthenticationService {
       validatePhoneNumber: (input) => this.validatePhoneNumber(input),
       sendOTP: (data) => this.sendOTP(data),
       sendPasswordResetOTP: (data) => this.sendPasswordResetOTP(data),
+      resolveClientIdForNewUser: async (phoneNumber) =>
+        (await this.clientsService.resolveForNewUser(phoneNumber)).id,
     })
   }
 
@@ -110,6 +135,20 @@ export class AuthenticationService {
     return this.betterAuth.api.getSession({
       headers: fromNodeHeaders(headers),
     })
+  }
+
+  async getSignInMethod(input: string): Promise<SignInMethod> {
+    const phoneNumber = parsePhoneNumberFromString(input)
+
+    if (!phoneNumber?.isValid()) {
+      throw new BadRequestException('INVALID_PHONE_NUMBER')
+    }
+
+    const hasPassword = await this.accountsRepository.hasPasswordForPhoneNumber(
+      phoneNumber.number
+    )
+
+    return hasPassword ? 'password' : 'otp'
   }
 
   private validatePhoneNumber(input: string): boolean {

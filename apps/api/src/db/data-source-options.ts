@@ -6,6 +6,8 @@ import { User } from '../users/entities/user.entity'
 import { Account } from '../authentication/entities/account.entity'
 import { Session } from '../authentication/entities/session.entity'
 import { Verification } from '../authentication/entities/verification.entity'
+import { Client } from '../clients/entities/client.entity'
+import { ClientCodeAlias } from '../clients/entities/client-code-alias.entity'
 import { Parcel } from '../parcels/entities/parcel.entity'
 import { ParcelStatusHistory } from '../parcels/entities/parcel-status-history.entity'
 import { ParcelsImport } from '../parcels-imports/entities/parcels-import.entity'
@@ -17,6 +19,16 @@ import { AddParcelStatusHistory1778165216012 } from './migrations/1778165216012-
 import { AddUserRole1778267733853 } from './migrations/1778267733853-add-user-role'
 import { AddClientId1778411635666 } from './migrations/1778411635666-add-client-id'
 import { AddParcelsImportEntity1778745509438 } from './migrations/1778745509438-add-parcels-import-entity'
+import { AddAchievedAtToParcelStatusHistory1783196326251 } from './migrations/1783196326251-add-achieved-at-to-parcel-status-history'
+import { AddAchievedAtToParcelsImport1783197115439 } from './migrations/1783197115439-add-achieved-at-to-parcels-import'
+import { ConvertAchievedAtToDateOnly1783368829744 } from './migrations/1783368829744-convert-achieved-at-to-date-only'
+import { MakeParcelStatusHistoryUnique1786125107169 } from './migrations/1786125107169-make-parcel-status-history-unique'
+import { AddClientEntity1786808443379 } from './migrations/1786808443379-add-client-entity'
+import { RenameParcelNotesToComments1786999166153 } from './migrations/1786999166153-rename-parcel-notes-to-comments'
+import { AddClientDeletedAtToParcel1791713298338 } from './migrations/1791713298338-add-client-deleted-at-to-parcel'
+import { MakeParcelClientNullable1792252874197 } from './migrations/1792252874197-make-parcel-client-nullable'
+import { AddLegacyClientCodeAlias1792260357130 } from './migrations/1792260357130-add-legacy-client-code-alias'
+import { RenameClientCodeAlias1792852621834 } from './migrations/1792852621834-rename-client-code-alias'
 
 export function buildDataSourceOptions(
   db: EnvConfig['database']
@@ -39,6 +51,8 @@ export function buildDataSourceOptions(
       Account,
       Session,
       Verification,
+      Client,
+      ClientCodeAlias,
       Parcel,
       ParcelStatusHistory,
       ParcelsImport,
@@ -50,6 +64,16 @@ export function buildDataSourceOptions(
       AddUserRole1778267733853,
       AddClientId1778411635666,
       AddParcelsImportEntity1778745509438,
+      AddAchievedAtToParcelStatusHistory1783196326251,
+      AddAchievedAtToParcelsImport1783197115439,
+      ConvertAchievedAtToDateOnly1783368829744,
+      MakeParcelStatusHistoryUnique1786125107169,
+      AddClientEntity1786808443379,
+      RenameParcelNotesToComments1786999166153,
+      AddClientDeletedAtToParcel1791713298338,
+      MakeParcelClientNullable1792252874197,
+      AddLegacyClientCodeAlias1792260357130,
+      RenameClientCodeAlias1792852621834,
     ],
   }
 }

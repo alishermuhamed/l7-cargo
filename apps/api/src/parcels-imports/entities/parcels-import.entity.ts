@@ -3,20 +3,24 @@ import { Entity } from 'typeorm'
 import { BaseEntity } from '../../db/base.entity'
 import { BooleanColumn } from '../../db/columns/boolean-column'
 import { DateColumn } from '../../db/columns/date-column'
+import { DateTimeColumn } from '../../db/columns/date-time-column'
 import { JsonbColumn } from '../../db/columns/jsonb-column'
 import { TextColumn } from '../../db/columns/text-column'
 import type { ParcelStatus } from '../../parcels/parcel-status'
 
 export interface ParsedParcelsImportRow {
   rowNumber: number
-  clientId: number
+  clientCode?: number
   trackingNumber: string
   weightKg?: number
   deliveryFee?: number
-  notes?: string
+  comments?: string
 }
 
-export const PARSE_WARNING_CODES = ['PARCEL_OWNER_MISMATCH'] as const
+export const PARSE_WARNING_CODES = [
+  'PARCEL_CLIENT_MISMATCH',
+  'UNKNOWN_CLIENT',
+] as const
 
 export type ParseWarningCode = (typeof PARSE_WARNING_CODES)[number]
 
@@ -26,11 +30,12 @@ export interface ParsedParcelsImportWarning {
 }
 
 export const PARSE_ERROR_CODES = [
+  'CLIENT_CODE_REQUIRED',
   'INVALID_CLIENT_ID',
   'INVALID_TRACKING_CODE',
   'INVALID_WEIGHT_KG',
   'INVALID_DELIVERY_FEE',
-  'INVALID_NOTES',
+  'INVALID_COMMENTS',
   'UNKNOWN',
 ] as const
 
@@ -55,7 +60,10 @@ export class ParcelsImport extends BaseEntity {
   @TextColumn()
   parcelStatus!: ParcelStatus
 
-  @DateColumn({ nullable: true })
+  @DateColumn()
+  achievedAt!: string
+
+  @DateTimeColumn({ nullable: true })
   committedAt!: Date | null
 
   @JsonbColumn()

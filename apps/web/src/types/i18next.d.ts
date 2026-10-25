@@ -8,6 +8,7 @@ type Address = typeof import('../locales/en/address.json')
 type Parcels = typeof import('../locales/en/parcels.json')
 type Clients = typeof import('../locales/en/clients.json')
 type Profile = typeof import('../locales/en/profile.json')
+type Training = typeof import('../locales/en/training.json')
 type Errors = typeof import('../locales/en/errors.json')
 
 declare module 'i18next' {
@@ -23,6 +24,7 @@ declare module 'i18next' {
       parcels: Parcels
       clients: Clients
       profile: Profile
+      training: Training
       errors: Errors
     }
   }

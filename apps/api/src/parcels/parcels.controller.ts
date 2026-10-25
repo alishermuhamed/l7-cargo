@@ -7,10 +7,12 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Put,
   Query,
 } from '@nestjs/common'
 import { ILike } from 'typeorm'
 
+import { ClientsService } from '../clients/clients.service'
 import { SuccessResponseDto } from '../common/dtos/success-response.dto'
 import { ContextService } from '../context/context.service'
 import { CreateParcelRequestDto } from './dtos/create-parcel-request.dto'
@@ -18,6 +20,8 @@ import { CreateParcelResponseDto } from './dtos/create-parcel-response.dto'
 import { GetParcelResponseDto } from './dtos/get-parcel-response.dto'
 import { GetParcelStatusHistoryResponseDto } from './dtos/get-parcel-status-history-response.dto'
 import { GetParcelsQueryDto } from './dtos/get-parcels-query.dto'
+import { GetReadyForPickupBalanceResponseDto } from './dtos/get-ready-for-pickup-balance-response.dto'
+import { PutParcelStatusHistoryRequestDto } from './dtos/put-parcel-status-history-request.dto'
 import { UpdateParcelRequestDto } from './dtos/update-parcel-request.dto'
 import { ParcelStatusHistoryMapper } from './parcel-status-history.mapper'
 import { ParcelStatusHistoryService } from './parcel-status-history.service'
@@ -30,25 +34,51 @@ const PARCEL_ID_PARAM = 'parcelId'
 @Controller('parcels')
 export class ParcelsController {
   constructor(
-    private readonly parcelsPolicy: ParcelsPolicy,
     private readonly contextService: ContextService,
+    private readonly clientsService: ClientsService,
+    private readonly parcelsPolicy: ParcelsPolicy,
     private readonly parcelsService: ParcelsService,
     private readonly parcelStatusHistoryService: ParcelStatusHistoryService
   ) {}
 
   @Post()
   async createParcel(
-    @Body() { trackingNumber, source, description }: CreateParcelRequestDto
+    @Body() createParcelRequestDto: CreateParcelRequestDto
   ): Promise<CreateParcelResponseDto> {
-    this.parcelsPolicy.checkCanCreate()
+    this.parcelsPolicy.checkCanCreate(createParcelRequestDto)
 
-    const userId = this.contextService.getUserIdOrThrow()
+    const user = this.contextService.getUserOrThrow()
 
-    const id = await this.parcelsService.create({
-      userId,
+    const {
+      clientCode,
       trackingNumber,
       source,
       description,
+      weightKg,
+      deliveryFee,
+      comments,
+    } = createParcelRequestDto
+
+    let clientId: string | null
+
+    if (user.role === 'client') {
+      clientId = user.clientId
+    } else {
+      if (clientCode !== undefined) {
+        clientId = (await this.clientsService.findOrCreateByCode(clientCode)).id
+      } else {
+        clientId = null
+      }
+    }
+
+    const id = await this.parcelsService.create({
+      clientId,
+      trackingNumber,
+      source,
+      description,
+      weightKg,
+      deliveryFee,
+      comments,
     })
 
     return ParcelsMapper.toCreateParcelResponseDto(id)
@@ -56,11 +86,11 @@ export class ParcelsController {
 
   @Get()
   async getParcels(
-    @Query() { search, status, userId, limit, offset }: GetParcelsQueryDto
+    @Query() { search, status, clientId, limit, offset }: GetParcelsQueryDto
   ): Promise<GetParcelResponseDto[]> {
     const policyWhere = this.parcelsPolicy.getFindOptionsWhere()
 
-    const baseWhere = { status, userId, ...policyWhere }
+    const baseWhere = { status, clientId, ...policyWhere }
 
     const where = search
       ? [
@@ -83,6 +113,18 @@ export class ParcelsController {
     })
 
     return parcels.map((p) => ParcelsMapper.toGetParcelResponseDto(p))
+  }
+
+  @Get('ready-for-pickup-balance')
+  async getReadyForPickupBalance(): Promise<GetReadyForPickupBalanceResponseDto> {
+    this.parcelsPolicy.checkCanReadReadyForPickupBalance()
+
+    const user = this.contextService.getUserOrThrow()
+    const totalDeliveryFee = await this.parcelsService.getReadyForPickupBalance(
+      user.clientId
+    )
+
+    return { totalDeliveryFee }
   }
 
   @Get(`:${PARCEL_ID_PARAM}`)
@@ -114,6 +156,18 @@ export class ParcelsController {
     )
   }
 
+  @Put(`:${PARCEL_ID_PARAM}/status-history`)
+  async putParcelStatusHistory(
+    @Param(PARCEL_ID_PARAM, ParseUUIDPipe) parcelId: string,
+    @Body() { entries }: PutParcelStatusHistoryRequestDto
+  ): Promise<SuccessResponseDto> {
+    this.parcelsPolicy.checkCanManageStatusHistory()
+
+    await this.parcelStatusHistoryService.replace(parcelId, entries)
+
+    return new SuccessResponseDto()
+  }
+
   @Patch(`:${PARCEL_ID_PARAM}`)
   async updateParcel(
     @Param(PARCEL_ID_PARAM, ParseUUIDPipe) parcelId: string,
@@ -121,14 +175,16 @@ export class ParcelsController {
   ): Promise<SuccessResponseDto> {
     await this.parcelsPolicy.checkCanUpdate(parcelId, updateParcelRequestDto)
 
-    const { source, description, weightKg, deliveryFee } =
+    const { clientCode, source, description, weightKg, deliveryFee, comments } =
       updateParcelRequestDto
 
     await this.parcelsService.update(parcelId, {
+      clientCode,
       source,
       description,
       weightKg,
       deliveryFee,
+      comments,
     })
 
     return new SuccessResponseDto()
@@ -140,7 +196,13 @@ export class ParcelsController {
   ): Promise<SuccessResponseDto> {
     await this.parcelsPolicy.checkCanDelete(parcelId)
 
-    await this.parcelsService.delete(parcelId)
+    const user = this.contextService.getUserOrThrow()
+
+    if (user.role === 'admin') {
+      await this.parcelsService.delete(parcelId)
+    } else {
+      await this.parcelsService.hideFromClient(parcelId)
+    }
 
     return new SuccessResponseDto()
   }

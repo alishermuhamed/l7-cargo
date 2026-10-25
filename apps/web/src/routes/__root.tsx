@@ -14,7 +14,7 @@ function RootLayout() {
   return (
     <>
       <Outlet />
-      <TanStackRouterDevtools position="top-right" />
+      <TanStackRouterDevtools position="bottom-left" />
     </>
   )
 }

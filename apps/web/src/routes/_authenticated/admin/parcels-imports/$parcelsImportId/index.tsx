@@ -26,7 +26,7 @@ import {
   deleteParcelsImport as deleteParcelsImportRequest,
 } from '../../../../../lib/api/api.gen'
 import { getParcelsImportQueryOptions } from '../../../../../lib/api/queries'
-import { formatDateTime } from '../../../../../lib/date-time'
+import { formatDate, formatDateTime } from '../../../../../lib/date-time'
 import i18n from '../../../../../lib/i18n'
 import { formatMoneyAmount } from '../../../../../lib/money'
 
@@ -99,6 +99,13 @@ function AdminParcelsImportDetailsPage() {
               <DataList.Label>{i18n.t('parcels:parcelStatus')}</DataList.Label>
               <DataList.Value>
                 <ParcelStatusBadge status={parcelsImport.parcelStatus} />
+              </DataList.Value>
+            </DataList.Item>
+
+            <DataList.Item>
+              <DataList.Label>{i18n.t('parcels:achievedAt')}</DataList.Label>
+              <DataList.Value>
+                {formatDate(parcelsImport.achievedAt)}
               </DataList.Value>
             </DataList.Item>
 
@@ -199,10 +206,10 @@ function AdminParcelsImportDetailsPage() {
                     {i18n.t('parcels:rowNumber')}
                   </Table.ColumnHeaderCell>
                   <Table.ColumnHeaderCell>
-                    {i18n.t('parcels:clientId')}
+                    {i18n.t('parcels:trackingNumber')}
                   </Table.ColumnHeaderCell>
                   <Table.ColumnHeaderCell>
-                    {i18n.t('parcels:trackingNumber')}
+                    {i18n.t('parcels:clientCode')}
                   </Table.ColumnHeaderCell>
                   <Table.ColumnHeaderCell>
                     {i18n.t('parcels:weight')}
@@ -211,7 +218,7 @@ function AdminParcelsImportDetailsPage() {
                     {i18n.t('parcels:deliveryFee')}
                   </Table.ColumnHeaderCell>
                   <Table.ColumnHeaderCell>
-                    {i18n.t('parcels:notes')}
+                    {i18n.t('parcels:comments')}
                   </Table.ColumnHeaderCell>
                 </Table.Row>
               </Table.Header>
@@ -221,9 +228,9 @@ function AdminParcelsImportDetailsPage() {
                   <Table.Row key={row.rowNumber}>
                     <Table.RowHeaderCell>{row.rowNumber}</Table.RowHeaderCell>
 
-                    <Table.Cell>{row.clientId}</Table.Cell>
-
                     <Table.Cell>{row.trackingNumber}</Table.Cell>
+
+                    <Table.Cell>{row.clientCode ?? '-'}</Table.Cell>
 
                     <Table.Cell>
                       {row.weightKg ? formatWeightKg(row.weightKg) : '-'}
@@ -235,42 +242,42 @@ function AdminParcelsImportDetailsPage() {
                         : '-'}
                     </Table.Cell>
 
-                    <Table.Cell>{row.notes ?? '-'}</Table.Cell>
+                    <Table.Cell>{row.comments ?? '-'}</Table.Cell>
                   </Table.Row>
                 ))}
               </Table.Body>
             </Table.Root>
           </Box>
         </Flex>
+
+        {!parcelsImport.isCommitted && (
+          <Flex
+            direction={{ initial: 'column-reverse', xs: 'row' }}
+            align={{ initial: 'stretch', xs: 'center' }}
+            justify="end"
+            gap="3"
+          >
+            <Button
+              type="button"
+              variant="soft"
+              color="red"
+              onClick={() => setIsDeleteDialogOpen(true)}
+            >
+              <TrashIcon />
+              {i18n.t('parcels:deleteParcelsImportAction')}
+            </Button>
+
+            <Button
+              type="button"
+              loading={commitParcelsImportMutation.isPending}
+              onClick={() => setIsCommitDialogOpen(true)}
+            >
+              <MagicWandIcon />
+              {i18n.t('parcels:commitParcelsImportAction')}
+            </Button>
+          </Flex>
+        )}
       </Flex>
-
-      {!parcelsImport.isCommitted && (
-        <Flex
-          direction={{ initial: 'column-reverse', xs: 'row' }}
-          align={{ initial: 'stretch', xs: 'center' }}
-          justify="end"
-          gap="3"
-        >
-          <Button
-            type="button"
-            variant="soft"
-            color="red"
-            onClick={() => setIsDeleteDialogOpen(true)}
-          >
-            <TrashIcon />
-            {i18n.t('parcels:deleteParcelsImportAction')}
-          </Button>
-
-          <Button
-            type="button"
-            loading={commitParcelsImportMutation.isPending}
-            onClick={() => setIsCommitDialogOpen(true)}
-          >
-            <MagicWandIcon />
-            {i18n.t('parcels:commitParcelsImportAction')}
-          </Button>
-        </Flex>
-      )}
 
       {!parcelsImport.isCommitted && (
         <>

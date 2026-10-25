@@ -1,5 +1,7 @@
 {
   "title": "Address",
+  "addressHelpCallout": "If you are unsure whether the address is correct or have any questions, please contact an L7 Cargo manager:",
+  "whatsappLinkLabel": "WhatsApp",
   "copyFullAddress": "Copy full address",
   "exampleScreenshotsTitle": "Example of a correctly entered address on {{marketplace}}:",
   "exampleScreenshotAlt": "{{marketplace}} example screenshot {{index}}",

@@ -1,5 +1,13 @@
 import { Pencil1Icon, TrashIcon } from '@radix-ui/react-icons'
-import { Card, Container, DataList, Flex, Text } from '@radix-ui/themes'
+import {
+  Card,
+  Container,
+  DataList,
+  Flex,
+  Heading,
+  Skeleton,
+  Text,
+} from '@radix-ui/themes'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import {
   createFileRoute,
@@ -11,14 +19,19 @@ import { useState } from 'react'
 import { AlertDialog } from '../../../../../components/alert-dialog'
 import { Button } from '../../../../../components/button'
 import { CopyButton } from '../../../../../components/copy-button'
-import { ParcelStatusHistory } from '../../../../../features/parcels/components/parcel-status-history/parcel-status-history'
-import { formatWeightKg } from '../../../../../features/parcels/lib/format-weight'
-import { deleteParcel } from '../../../../../lib/api/api.gen'
 import {
+  ParcelStatusHistory,
+  ParcelStatusHistoryItem,
+} from '../../../../../features/parcels/components/parcel-status-history/parcel-status-history'
+import { formatWeightKg } from '../../../../../features/parcels/lib/format-weight'
+import { PARCEL_STATUS_LABELS } from '../../../../../features/parcels/lib/parcel-status-labels'
+import { deleteParcel, ParcelStatus } from '../../../../../lib/api/api.gen'
+import {
+  getClientQueryOptions,
   getParcelQueryOptions,
   getParcelStatusHistoryQueryOptions,
-  getUserQueryOptions,
 } from '../../../../../lib/api/queries'
+import { formatDate } from '../../../../../lib/date-time'
 import i18n from '../../../../../lib/i18n'
 import { formatMoneyAmount } from '../../../../../lib/money'
 
@@ -49,9 +62,9 @@ function AdminParcelPage() {
     ...getParcelQueryOptions(initialParcel.id),
     initialData: initialParcel,
   })
-  const { data: owner } = useQuery({
-    ...getUserQueryOptions(parcel.userId ?? ''),
-    enabled: parcel.userId !== null,
+  const { data: client, isPending: isClientPending } = useQuery({
+    ...getClientQueryOptions(parcel.clientId ?? ''),
+    enabled: parcel.clientId !== null,
   })
   const { data: statusHistory } = useQuery({
     ...getParcelStatusHistoryQueryOptions(initialParcel.id),
@@ -92,15 +105,17 @@ function AdminParcelPage() {
             </DataList.Item>
 
             <DataList.Item>
-              <DataList.Label>{i18n.t('parcels:owner')}</DataList.Label>
+              <DataList.Label>{i18n.t('parcels:clientCode')}</DataList.Label>
               <DataList.Value>
-                {owner ? (
+                {parcel.clientId !== null && isClientPending ? (
+                  <Skeleton width="140px" />
+                ) : client ? (
                   <Text asChild weight="medium">
                     <RouterLink
                       to="/admin/clients/$clientId"
-                      params={{ clientId: owner.id }}
+                      params={{ clientId: client.id }}
                     >
-                      {owner.name} ({i18n.t('clients:id')}: {owner.clientId})
+                      {client.code}
                     </RouterLink>
                   </Text>
                 ) : (
@@ -127,16 +142,46 @@ function AdminParcelPage() {
               </DataList.Value>
             </DataList.Item>
 
-            {parcel.notes && (
+            {parcel.comments && (
               <DataList.Item>
-                <DataList.Label>{i18n.t('parcels:notes')}</DataList.Label>
-                <DataList.Value>{parcel.notes}</DataList.Value>
+                <DataList.Label>{i18n.t('parcels:comments')}</DataList.Label>
+                <DataList.Value>{parcel.comments}</DataList.Value>
               </DataList.Item>
             )}
           </DataList.Root>
         </Card>
 
-        <ParcelStatusHistory history={statusHistory} />
+        <Heading size="4">{i18n.t('parcels:statusHistory')}</Heading>
+
+        <ParcelStatusHistory>
+          {Object.values(ParcelStatus).map((status) => {
+            const existingEntry = statusHistory.find(
+              (item) => item.status === status
+            )
+
+            const isAchieved = !!existingEntry?.achievedAt
+
+            return (
+              <ParcelStatusHistoryItem key={status} isAchieved={isAchieved}>
+                <Flex mt="-1" mb="4" direction="column">
+                  <Text
+                    as="p"
+                    weight={isAchieved ? 'medium' : 'regular'}
+                    color={isAchieved ? undefined : 'gray'}
+                  >
+                    {PARCEL_STATUS_LABELS[status]}
+                  </Text>
+
+                  <Text as="p" color="gray" size="2">
+                    {isAchieved
+                      ? formatDate(existingEntry.achievedAt)
+                      : i18n.t('parcels:pendingStatus')}
+                  </Text>
+                </Flex>
+              </ParcelStatusHistoryItem>
+            )
+          })}
+        </ParcelStatusHistory>
 
         <Flex
           direction={{ initial: 'column', xs: 'row' }}

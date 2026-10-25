@@ -1,6 +1,5 @@
-.parcel-status-history__timeline {
+.parcel-status-history {
   list-style: none;
-  padding: 0;
 }
 
 .parcel-status-history__marker {
@@ -8,7 +7,7 @@
   border: 2px solid var(--gray-6);
 }
 
-.parcel-status-history__marker--done {
+.parcel-status-history__item--achieved .parcel-status-history__marker {
   border: 2px solid var(--accent-6);
   background-color: var(--accent-9);
 }
@@ -17,6 +16,11 @@
   background-color: var(--gray-6);
 }
 
-.parcel-status-history__line--done {
+.parcel-status-history__item:has(+ .parcel-status-history__item--achieved)
+  .parcel-status-history__line {
   background-color: var(--accent-6);
+}
+
+.parcel-status-history__item:last-child .parcel-status-history__line {
+  display: none;
 }

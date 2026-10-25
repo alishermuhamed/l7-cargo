@@ -7,6 +7,7 @@ import {
   Flex,
   Grid,
   Heading,
+  Link,
   Text,
 } from '@radix-ui/themes'
 import { createFileRoute, redirect } from '@tanstack/react-router'
@@ -14,11 +15,13 @@ import toast from 'react-hot-toast'
 
 import { Button } from '../../../../components/button'
 import { CopyButton } from '../../../../components/copy-button'
+import { useClientContext } from '../../../../hooks/use-client-context'
 import { useSessionContext } from '../../../../hooks/use-session-context'
 import {
   isMarketplaceSlug,
   MARKETPLACES_BY_SLUGS,
 } from '../../../../lib/address-marketplaces'
+import { MANAGER_WHATSAPP_URL } from '../../../../lib/contact'
 import i18n from '../../../../lib/i18n'
 
 export const Route = createFileRoute(
@@ -40,6 +43,7 @@ export const Route = createFileRoute(
 
 function MarketplaceAddressPage() {
   const { marketplace } = Route.useRouteContext()
+  const client = useClientContext()
 
   const {
     session: { user },
@@ -53,8 +57,8 @@ function MarketplaceAddressPage() {
       : null
 
   const addressLines = marketplaceConfig.formatAddress({
-    clientId: user.clientId,
-    clientName: user.name,
+    clientCode: client.code,
+    userName: user.name,
     phoneNumber: user.phoneNumber,
   })
 
@@ -70,6 +74,19 @@ function MarketplaceAddressPage() {
   return (
     <Container p="4">
       <Flex direction="column" gap="4">
+        <Callout.Root color="blue">
+          <Callout.Icon>
+            <InfoCircledIcon />
+          </Callout.Icon>
+
+          <Callout.Text>
+            {i18n.t('address:addressHelpCallout')}{' '}
+            <Link href={MANAGER_WHATSAPP_URL} rel="noreferrer" target="_blank">
+              {i18n.t('address:whatsappLinkLabel')}
+            </Link>
+          </Callout.Text>
+        </Callout.Root>
+
         <Flex align="center" gap="2">
           <Box asChild flexShrink="0" width="36px" height="36px">
             <img

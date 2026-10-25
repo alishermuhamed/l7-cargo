@@ -14,15 +14,20 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
 import { Route as AuthSignInRouteImport } from './routes/auth/sign-in'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
+import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedCodeResolutionRouteImport } from './routes/_authenticated/code-resolution'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedClientRouteRouteImport } from './routes/_authenticated/_client/route'
 import { Route as AuthenticatedAdminParcelsIndexRouteImport } from './routes/_authenticated/admin/parcels/index'
 import { Route as AuthenticatedAdminParcelsImportsIndexRouteImport } from './routes/_authenticated/admin/parcels-imports/index'
 import { Route as AuthenticatedAdminClientsIndexRouteImport } from './routes/_authenticated/admin/clients/index'
+import { Route as AuthenticatedClientTrainingIndexRouteImport } from './routes/_authenticated/_client/training/index'
 import { Route as AuthenticatedClientProfileIndexRouteImport } from './routes/_authenticated/_client/profile/index'
 import { Route as AuthenticatedClientParcelsIndexRouteImport } from './routes/_authenticated/_client/parcels/index'
 import { Route as AuthenticatedClientAddressIndexRouteImport } from './routes/_authenticated/_client/address/index'
+import { Route as AuthenticatedAdminParcelsAddRouteImport } from './routes/_authenticated/admin/parcels/add'
 import { Route as AuthenticatedAdminParcelsImportsAddRouteImport } from './routes/_authenticated/admin/parcels-imports/add'
 import { Route as AuthenticatedClientProfileEditRouteImport } from './routes/_authenticated/_client/profile/edit'
 import { Route as AuthenticatedClientParcelsAddRouteImport } from './routes/_authenticated/_client/parcels/add'
@@ -58,11 +63,27 @@ const AuthSignInRoute = AuthSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCodeResolutionRoute =
+  AuthenticatedCodeResolutionRouteImport.update({
+    id: '/code-resolution',
+    path: '/code-resolution',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -91,6 +112,12 @@ const AuthenticatedAdminClientsIndexRoute =
     path: '/clients/',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedClientTrainingIndexRoute =
+  AuthenticatedClientTrainingIndexRouteImport.update({
+    id: '/training/',
+    path: '/training/',
+    getParentRoute: () => AuthenticatedClientRouteRoute,
+  } as any)
 const AuthenticatedClientProfileIndexRoute =
   AuthenticatedClientProfileIndexRouteImport.update({
     id: '/profile/',
@@ -108,6 +135,12 @@ const AuthenticatedClientAddressIndexRoute =
     id: '/address/',
     path: '/address/',
     getParentRoute: () => AuthenticatedClientRouteRoute,
+  } as any)
+const AuthenticatedAdminParcelsAddRoute =
+  AuthenticatedAdminParcelsAddRouteImport.update({
+    id: '/parcels/add',
+    path: '/parcels/add',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminParcelsImportsAddRoute =
   AuthenticatedAdminParcelsImportsAddRouteImport.update({
@@ -174,16 +207,21 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/code-resolution': typeof AuthenticatedCodeResolutionRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/address/$marketplace': typeof AuthenticatedClientAddressMarketplaceRoute
   '/parcels/add': typeof AuthenticatedClientParcelsAddRoute
   '/profile/edit': typeof AuthenticatedClientProfileEditRoute
   '/admin/parcels-imports/add': typeof AuthenticatedAdminParcelsImportsAddRoute
+  '/admin/parcels/add': typeof AuthenticatedAdminParcelsAddRoute
   '/address/': typeof AuthenticatedClientAddressIndexRoute
   '/parcels/': typeof AuthenticatedClientParcelsIndexRoute
   '/profile/': typeof AuthenticatedClientProfileIndexRoute
+  '/training/': typeof AuthenticatedClientTrainingIndexRoute
   '/admin/clients/': typeof AuthenticatedAdminClientsIndexRoute
   '/admin/parcels-imports/': typeof AuthenticatedAdminParcelsImportsIndexRoute
   '/admin/parcels/': typeof AuthenticatedAdminParcelsIndexRoute
@@ -198,16 +236,21 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/code-resolution': typeof AuthenticatedCodeResolutionRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/address/$marketplace': typeof AuthenticatedClientAddressMarketplaceRoute
   '/parcels/add': typeof AuthenticatedClientParcelsAddRoute
   '/profile/edit': typeof AuthenticatedClientProfileEditRoute
   '/admin/parcels-imports/add': typeof AuthenticatedAdminParcelsImportsAddRoute
+  '/admin/parcels/add': typeof AuthenticatedAdminParcelsAddRoute
   '/address': typeof AuthenticatedClientAddressIndexRoute
   '/parcels': typeof AuthenticatedClientParcelsIndexRoute
   '/profile': typeof AuthenticatedClientProfileIndexRoute
+  '/training': typeof AuthenticatedClientTrainingIndexRoute
   '/admin/clients': typeof AuthenticatedAdminClientsIndexRoute
   '/admin/parcels-imports': typeof AuthenticatedAdminParcelsImportsIndexRoute
   '/admin/parcels': typeof AuthenticatedAdminParcelsIndexRoute
@@ -225,16 +268,21 @@ export interface FileRoutesById {
   '/auth': typeof AuthRouteRouteWithChildren
   '/_authenticated/_client': typeof AuthenticatedClientRouteRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/_authenticated/code-resolution': typeof AuthenticatedCodeResolutionRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/_authenticated/_client/address/$marketplace': typeof AuthenticatedClientAddressMarketplaceRoute
   '/_authenticated/_client/parcels/add': typeof AuthenticatedClientParcelsAddRoute
   '/_authenticated/_client/profile/edit': typeof AuthenticatedClientProfileEditRoute
   '/_authenticated/admin/parcels-imports/add': typeof AuthenticatedAdminParcelsImportsAddRoute
+  '/_authenticated/admin/parcels/add': typeof AuthenticatedAdminParcelsAddRoute
   '/_authenticated/_client/address/': typeof AuthenticatedClientAddressIndexRoute
   '/_authenticated/_client/parcels/': typeof AuthenticatedClientParcelsIndexRoute
   '/_authenticated/_client/profile/': typeof AuthenticatedClientProfileIndexRoute
+  '/_authenticated/_client/training/': typeof AuthenticatedClientTrainingIndexRoute
   '/_authenticated/admin/clients/': typeof AuthenticatedAdminClientsIndexRoute
   '/_authenticated/admin/parcels-imports/': typeof AuthenticatedAdminParcelsImportsIndexRoute
   '/_authenticated/admin/parcels/': typeof AuthenticatedAdminParcelsIndexRoute
@@ -251,16 +299,21 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
+    | '/code-resolution'
     | '/onboarding'
+    | '/auth/forgot-password'
+    | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/verify'
     | '/address/$marketplace'
     | '/parcels/add'
     | '/profile/edit'
     | '/admin/parcels-imports/add'
+    | '/admin/parcels/add'
     | '/address/'
     | '/parcels/'
     | '/profile/'
+    | '/training/'
     | '/admin/clients/'
     | '/admin/parcels-imports/'
     | '/admin/parcels/'
@@ -275,16 +328,21 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
+    | '/code-resolution'
     | '/onboarding'
+    | '/auth/forgot-password'
+    | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/verify'
     | '/address/$marketplace'
     | '/parcels/add'
     | '/profile/edit'
     | '/admin/parcels-imports/add'
+    | '/admin/parcels/add'
     | '/address'
     | '/parcels'
     | '/profile'
+    | '/training'
     | '/admin/clients'
     | '/admin/parcels-imports'
     | '/admin/parcels'
@@ -301,16 +359,21 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/_client'
     | '/_authenticated/admin'
+    | '/_authenticated/code-resolution'
     | '/_authenticated/onboarding'
+    | '/auth/forgot-password'
+    | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/verify'
     | '/_authenticated/_client/address/$marketplace'
     | '/_authenticated/_client/parcels/add'
     | '/_authenticated/_client/profile/edit'
     | '/_authenticated/admin/parcels-imports/add'
+    | '/_authenticated/admin/parcels/add'
     | '/_authenticated/_client/address/'
     | '/_authenticated/_client/parcels/'
     | '/_authenticated/_client/profile/'
+    | '/_authenticated/_client/training/'
     | '/_authenticated/admin/clients/'
     | '/_authenticated/admin/parcels-imports/'
     | '/_authenticated/admin/parcels/'
@@ -365,11 +428,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignInRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/forgot-password': {
+      id: '/auth/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
     '/_authenticated/onboarding': {
       id: '/_authenticated/onboarding'
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/code-resolution': {
+      id: '/_authenticated/code-resolution'
+      path: '/code-resolution'
+      fullPath: '/code-resolution'
+      preLoaderRoute: typeof AuthenticatedCodeResolutionRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin': {
@@ -407,6 +491,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminClientsIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/_client/training/': {
+      id: '/_authenticated/_client/training/'
+      path: '/training'
+      fullPath: '/training/'
+      preLoaderRoute: typeof AuthenticatedClientTrainingIndexRouteImport
+      parentRoute: typeof AuthenticatedClientRouteRoute
+    }
     '/_authenticated/_client/profile/': {
       id: '/_authenticated/_client/profile/'
       path: '/profile'
@@ -427,6 +518,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/address/'
       preLoaderRoute: typeof AuthenticatedClientAddressIndexRouteImport
       parentRoute: typeof AuthenticatedClientRouteRoute
+    }
+    '/_authenticated/admin/parcels/add': {
+      id: '/_authenticated/admin/parcels/add'
+      path: '/parcels/add'
+      fullPath: '/admin/parcels/add'
+      preLoaderRoute: typeof AuthenticatedAdminParcelsAddRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/parcels-imports/add': {
       id: '/_authenticated/admin/parcels-imports/add'
@@ -508,6 +606,7 @@ interface AuthenticatedClientRouteRouteChildren {
   AuthenticatedClientAddressIndexRoute: typeof AuthenticatedClientAddressIndexRoute
   AuthenticatedClientParcelsIndexRoute: typeof AuthenticatedClientParcelsIndexRoute
   AuthenticatedClientProfileIndexRoute: typeof AuthenticatedClientProfileIndexRoute
+  AuthenticatedClientTrainingIndexRoute: typeof AuthenticatedClientTrainingIndexRoute
   AuthenticatedClientParcelsParcelIdEditRoute: typeof AuthenticatedClientParcelsParcelIdEditRoute
   AuthenticatedClientParcelsParcelIdIndexRoute: typeof AuthenticatedClientParcelsParcelIdIndexRoute
 }
@@ -521,6 +620,8 @@ const AuthenticatedClientRouteRouteChildren: AuthenticatedClientRouteRouteChildr
     AuthenticatedClientAddressIndexRoute: AuthenticatedClientAddressIndexRoute,
     AuthenticatedClientParcelsIndexRoute: AuthenticatedClientParcelsIndexRoute,
     AuthenticatedClientProfileIndexRoute: AuthenticatedClientProfileIndexRoute,
+    AuthenticatedClientTrainingIndexRoute:
+      AuthenticatedClientTrainingIndexRoute,
     AuthenticatedClientParcelsParcelIdEditRoute:
       AuthenticatedClientParcelsParcelIdEditRoute,
     AuthenticatedClientParcelsParcelIdIndexRoute:
@@ -534,6 +635,7 @@ const AuthenticatedClientRouteRouteWithChildren =
 
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminParcelsImportsAddRoute: typeof AuthenticatedAdminParcelsImportsAddRoute
+  AuthenticatedAdminParcelsAddRoute: typeof AuthenticatedAdminParcelsAddRoute
   AuthenticatedAdminClientsIndexRoute: typeof AuthenticatedAdminClientsIndexRoute
   AuthenticatedAdminParcelsImportsIndexRoute: typeof AuthenticatedAdminParcelsImportsIndexRoute
   AuthenticatedAdminParcelsIndexRoute: typeof AuthenticatedAdminParcelsIndexRoute
@@ -547,6 +649,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
   {
     AuthenticatedAdminParcelsImportsAddRoute:
       AuthenticatedAdminParcelsImportsAddRoute,
+    AuthenticatedAdminParcelsAddRoute: AuthenticatedAdminParcelsAddRoute,
     AuthenticatedAdminClientsIndexRoute: AuthenticatedAdminClientsIndexRoute,
     AuthenticatedAdminParcelsImportsIndexRoute:
       AuthenticatedAdminParcelsImportsIndexRoute,
@@ -569,12 +672,14 @@ const AuthenticatedAdminRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedClientRouteRoute: typeof AuthenticatedClientRouteRouteWithChildren
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedCodeResolutionRoute: typeof AuthenticatedCodeResolutionRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClientRouteRoute: AuthenticatedClientRouteRouteWithChildren,
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
+  AuthenticatedCodeResolutionRoute: AuthenticatedCodeResolutionRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
 }
 
@@ -582,11 +687,15 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface AuthRouteRouteChildren {
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSignInRoute: typeof AuthSignInRoute
   AuthVerifyRoute: typeof AuthVerifyRoute
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignInRoute: AuthSignInRoute,
   AuthVerifyRoute: AuthVerifyRoute,
 }

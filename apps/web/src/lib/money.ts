@@ -1,15 +1,16 @@
 import BigNumber from 'bignumber.js'
 
+import { normalizeDecimalSeparator } from './decimal'
 import i18n from './i18n'
 
-export const MONEY_AMOUNT_PATTERN = /^(?:0|[1-9]\d{0,9})(?:\.\d{1,4})?$/
+export const MONEY_AMOUNT_PATTERN = /^(?:0|[1-9]\d{0,9})(?:[.,]\d{1,4})?$/
 
 export function isValidMoneyAmount(amount: string): boolean {
   return MONEY_AMOUNT_PATTERN.test(amount.trim())
 }
 
 export function normalizeMoneyAmount(amount: string): string {
-  return new BigNumber(amount.trim()).toFixed()
+  return new BigNumber(normalizeDecimalSeparator(amount.trim())).toFixed()
 }
 
 export function addMoneyAmounts(amounts: string[]): string {

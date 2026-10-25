@@ -1,7 +1,7 @@
 import { Entity } from 'typeorm'
 
 import { BaseEntity } from '../../db/base.entity'
-import { DateColumn } from '../../db/columns/date-column'
+import { DateTimeColumn } from '../../db/columns/date-time-column'
 import { TextColumn } from '../../db/columns/text-column'
 
 @Entity()
@@ -12,6 +12,6 @@ export class Verification extends BaseEntity {
   @TextColumn()
   value!: string
 
-  @DateColumn()
+  @DateTimeColumn()
   expiresAt!: Date
 }

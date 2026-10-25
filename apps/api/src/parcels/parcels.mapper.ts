@@ -13,13 +13,13 @@ export class ParcelsMapper {
       createdAt: parcel.createdAt.toISOString(),
       updatedAt: parcel.updatedAt.toISOString(),
       trackingNumber: parcel.trackingNumber,
-      userId: parcel.userId,
+      clientId: parcel.clientId,
       status: parcel.status,
       source: parcel.source,
       description: parcel.description,
       weightKg: parcel.weightKg,
       deliveryFee: parcel.deliveryFee,
-      notes: parcel.notes,
+      comments: parcel.comments,
     }
   }
 }

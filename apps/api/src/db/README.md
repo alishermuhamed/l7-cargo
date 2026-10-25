@@ -25,3 +25,10 @@ Example (package.json script):
 ```
 typeorm-ts-node-commonjs -d apps/api/src/db/data-source.ts migration:run
 ```
+
+## Schema object names
+
+Do not assign explicit names to indexes, relations, foreign keys, or other
+schema objects in entity decorators. Let TypeORM generate names consistently,
+and preserve those generated names in migrations unless compatibility with an
+existing external schema requires otherwise.

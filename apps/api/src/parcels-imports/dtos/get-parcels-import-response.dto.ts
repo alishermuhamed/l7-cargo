@@ -8,11 +8,11 @@ import {
 
 class ParsedParcelsImportRowDto {
   rowNumber!: number
-  clientId!: number
+  clientCode?: number
   trackingNumber!: string
   weightKg?: number
   deliveryFee?: number
-  notes?: string
+  comments?: string
 }
 
 class ParsedParcelsImportWarningDto {
@@ -50,6 +50,7 @@ export class GetParcelsImportResponseDto {
     enumName: 'ParcelStatus',
   })
   parcelStatus!: ParcelStatus
+  achievedAt!: string
   committedAt!: string | null
   parsedData!: ParsedParcelsImportDataDto
 }

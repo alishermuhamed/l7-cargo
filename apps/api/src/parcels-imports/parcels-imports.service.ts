@@ -13,11 +13,11 @@ import {
 } from 'typeorm'
 import * as XLSX from 'xlsx'
 
+import { ClientsService } from '../clients/clients.service'
 import { WithRelations } from '../db/db.types'
 import { type ParcelStatus } from '../parcels/parcel-status'
 import { ParcelStatusHistoryService } from '../parcels/parcel-status-history.service'
 import { ParcelsService } from '../parcels/parcels.service'
-import { UsersService } from '../users/users.service'
 import {
   ParcelsImport,
   PARSE_ERROR_CODES,
@@ -35,7 +35,7 @@ export class ParcelsImportsService {
 
   constructor(
     private readonly parcelsImportsRepository: ParcelsImportsRepository,
-    private readonly usersService: UsersService,
+    private readonly clientsService: ClientsService,
     private readonly parcelsService: ParcelsService,
     private readonly parcelStatusHistoryService: ParcelStatusHistoryService
   ) {}
@@ -45,16 +45,19 @@ export class ParcelsImportsService {
     file,
     withHeader,
     parcelStatus,
+    achievedAt,
   }: {
     file: Express.Multer.File
     withHeader: boolean
     parcelStatus: ParcelStatus
+    achievedAt: string
   }): Promise<ParcelsImport['id']> {
     const parsedData = await this.buildParsedData(file, withHeader)
 
     const parcelsImport = this.parcelsImportsRepository.create({
       isCommitted: false,
       parcelStatus,
+      achievedAt,
       parsedData,
     })
 
@@ -75,7 +78,8 @@ export class ParcelsImportsService {
 
     await this.commitParsedRows(
       parcelsImport.parsedData.rows,
-      parcelsImport.parcelStatus
+      parcelsImport.parcelStatus,
+      parcelsImport.achievedAt
     )
 
     await this.parcelsImportsRepository.update(
@@ -119,10 +123,16 @@ export class ParcelsImportsService {
     file: Express.Multer.File,
     withHeader: boolean
   ): Promise<ParsedParcelsImportData> {
-    const { rows, errors } = this.parseFile(file, withHeader)
-    const warnings = await this.buildWarnings(rows)
+    const { rows, errors: parseErrors } = this.parseFile(file, withHeader)
+    const { warnings, errors: validationErrors } = await this.buildIssues(rows)
 
-    return { rows, warnings, errors }
+    return {
+      rows,
+      warnings,
+      errors: [...parseErrors, ...validationErrors].sort(
+        (a, b) => a.rowNumber - b.rowNumber
+      ),
+    }
   }
 
   private parseFile(
@@ -157,19 +167,19 @@ export class ParcelsImportsService {
         }
 
         try {
-          const clientId = this.parseClientId(row[1])
-          const trackingNumber = this.parseTrackingNumber(row[2])
-          const weightKg = this.parseWeightKg(row[3])
-          const deliveryFee = this.parseDeliveryFee(row[4])
-          const notes = this.parseNotes(row[5])
+          const trackingNumber = this.parseTrackingNumber(row[0])
+          const clientCode = this.parseClientCode(row[1])
+          const weightKg = this.parseWeightKg(row[2])
+          const deliveryFee = this.parseDeliveryFee(row[3])
+          const comments = this.parseComments(row[4])
 
           rows.push({
             rowNumber,
-            clientId,
+            clientCode,
             trackingNumber,
             weightKg,
             deliveryFee,
-            notes,
+            comments,
           })
         } catch (e: unknown) {
           const errorMessage = e instanceof Error ? e.message : String(e)
@@ -194,23 +204,37 @@ export class ParcelsImportsService {
     }
   }
 
-  private parseClientId(cell: unknown): number {
-    if (typeof cell !== 'number' || !Number.isInteger(cell)) {
-      throw new Error('INVALID_CLIENT_ID' satisfies ParseErrorCode)
-    }
-
-    return cell
-  }
-
   private parseTrackingNumber(cell: unknown): string {
-    if (
-      (typeof cell !== 'number' || !Number.isInteger(cell)) &&
-      (typeof cell !== 'string' || cell === '')
-    ) {
+    const isValidNumber = typeof cell === 'number' && Number.isInteger(cell)
+    const isValidString = typeof cell === 'string' && cell.trim() !== ''
+
+    if (!isValidNumber && !isValidString) {
       throw new Error('INVALID_TRACKING_CODE' satisfies ParseErrorCode)
     }
 
     return cell.toString().trim()
+  }
+
+  private parseClientCode(cell: unknown): number | undefined {
+    if (
+      cell === undefined ||
+      cell === '' ||
+      (typeof cell === 'string' && cell.trim() === '')
+    ) {
+      return undefined
+    }
+
+    const clientCode = typeof cell === 'string' ? Number(cell.trim()) : cell
+
+    if (
+      typeof clientCode !== 'number' ||
+      !Number.isInteger(clientCode) ||
+      clientCode < 1
+    ) {
+      throw new Error('INVALID_CLIENT_ID' satisfies ParseErrorCode)
+    }
+
+    return clientCode
   }
 
   private parseWeightKg(cell: unknown): number | undefined {
@@ -218,70 +242,109 @@ export class ParcelsImportsService {
       return undefined
     }
 
-    if (typeof cell !== 'number' || Number.isNaN(cell)) {
+    let weightKg: number
+
+    if (typeof cell === 'number') {
+      weightKg = cell
+    } else if (typeof cell === 'string') {
+      weightKg = Number(cell.trim().replace(',', '.'))
+    } else {
       throw new Error('INVALID_WEIGHT_KG' satisfies ParseErrorCode)
     }
 
-    return Math.round(cell * 1000) / 1000
+    if (!Number.isFinite(weightKg)) {
+      throw new Error('INVALID_WEIGHT_KG' satisfies ParseErrorCode)
+    }
+
+    return Math.round(weightKg * 1000) / 1000
   }
 
   private parseDeliveryFee(cell: unknown): number | undefined {
-    if (cell === undefined || cell === '') {
+    if (
+      cell === undefined ||
+      cell === '' ||
+      (typeof cell === 'string' && cell.trim() === '')
+    ) {
       return undefined
     }
 
-    if (typeof cell !== 'number' || Number.isNaN(cell)) {
+    const deliveryFee = typeof cell === 'string' ? Number(cell.trim()) : cell
+
+    if (typeof deliveryFee !== 'number' || !Number.isFinite(deliveryFee)) {
       throw new Error('INVALID_DELIVERY_FEE' satisfies ParseErrorCode)
     }
 
-    return cell
+    return deliveryFee
   }
 
-  private parseNotes(cell: unknown): string | undefined {
+  private parseComments(cell: unknown): string | undefined {
     if (cell === undefined || cell === '') {
       return undefined
     }
 
     if (typeof cell !== 'string') {
-      throw new Error('INVALID_NOTES' satisfies ParseErrorCode)
+      throw new Error('INVALID_COMMENTS' satisfies ParseErrorCode)
     }
 
     return cell.trim()
   }
 
-  private async buildWarnings(
-    rows: ParsedParcelsImportRow[]
-  ): Promise<ParsedParcelsImportWarning[]> {
-    const { existingUsersByIds, existingParcelsByTrackingNumbers } =
+  private async buildIssues(rows: ParsedParcelsImportRow[]): Promise<{
+    warnings: ParsedParcelsImportWarning[]
+    errors: ParsedParcelsImportError[]
+  }> {
+    const { existingClientsByCodes, existingParcelsByTrackingNumbers } =
       await this.loadExistingData(rows)
 
     const warnings: ParsedParcelsImportWarning[] = []
+    const errors: ParsedParcelsImportError[] = []
 
     rows.forEach((row) => {
       const existingParcel = existingParcelsByTrackingNumbers.get(
         row.trackingNumber
       )
 
-      if (existingParcel?.userId) {
-        const existingUser = existingUsersByIds.get(existingParcel.userId)
-
-        if (existingUser && existingUser.clientId !== row.clientId) {
-          warnings.push({
+      if (row.clientCode === undefined) {
+        if (!existingParcel) {
+          errors.push({
             rowNumber: row.rowNumber,
-            code: 'PARCEL_OWNER_MISMATCH',
+            code: 'CLIENT_CODE_REQUIRED',
           })
         }
+
+        return
+      }
+
+      const matchingClient = existingClientsByCodes.get(row.clientCode)
+
+      if (!matchingClient) {
+        warnings.push({
+          rowNumber: row.rowNumber,
+          code: 'UNKNOWN_CLIENT',
+        })
+      }
+
+      if (
+        existingParcel?.clientId &&
+        matchingClient &&
+        existingParcel.clientId !== matchingClient.id
+      ) {
+        warnings.push({
+          rowNumber: row.rowNumber,
+          code: 'PARCEL_CLIENT_MISMATCH',
+        })
       }
     })
 
-    return warnings
+    return { warnings, errors }
   }
 
   private async commitParsedRows(
     rows: ParsedParcelsImportRow[],
-    parcelStatus: ParcelStatus
+    parcelStatus: ParcelStatus,
+    achievedAt: string
   ): Promise<void> {
-    const { existingUsersByClientIds, existingParcelsByTrackingNumbers } =
+    const { existingClientsByCodes, existingParcelsByTrackingNumbers } =
       await this.loadExistingData(rows)
 
     for (const row of rows) {
@@ -289,76 +352,84 @@ export class ParcelsImportsService {
         row.trackingNumber
       )
 
-      const matchingUser = existingUsersByClientIds.get(row.clientId) ?? null
-
       if (existingParcel) {
-        const userId = existingParcel.userId ?? matchingUser?.id ?? null
-
         await this.parcelsService.update(existingParcel.id, {
-          userId,
-          status: parcelStatus,
           weightKg: row.weightKg?.toFixed(3),
           deliveryFee: row.deliveryFee?.toFixed(),
-          notes: row.notes,
+          comments: row.comments,
         })
 
-        await this.parcelStatusHistoryService.create({
+        await this.parcelStatusHistoryService.upsert({
           parcelId: existingParcel.id,
           status: parcelStatus,
-        })
-      } else {
-        const createdParcelId = await this.parcelsService.create({
-          trackingNumber: row.trackingNumber,
-          userId: matchingUser?.id ?? null,
-          status: parcelStatus,
-          weightKg: row.weightKg?.toFixed(3),
-          deliveryFee: row.deliveryFee?.toFixed(),
-          notes: row.notes,
+          achievedAt,
         })
 
-        await this.parcelStatusHistoryService.create({
-          parcelId: createdParcelId,
-          status: parcelStatus,
-        })
+        continue
       }
+
+      if (row.clientCode === undefined) {
+        continue
+      }
+
+      let matchingClient = existingClientsByCodes.get(row.clientCode)
+
+      if (!matchingClient) {
+        matchingClient = await this.clientsService.findOrCreateByCode(
+          row.clientCode
+        )
+
+        existingClientsByCodes.set(row.clientCode, matchingClient)
+      }
+
+      const parcelId = await this.parcelsService.create({
+        trackingNumber: row.trackingNumber,
+        clientId: matchingClient.id,
+        weightKg: row.weightKg?.toFixed(3),
+        deliveryFee: row.deliveryFee?.toFixed(),
+        comments: row.comments,
+      })
+
+      await this.parcelStatusHistoryService.upsert({
+        parcelId,
+        status: parcelStatus,
+        achievedAt,
+      })
     }
   }
 
   private async loadExistingData(rows: ParsedParcelsImportRow[]): Promise<{
-    existingUsersByIds: Map<string, { id: string; clientId: number }>
-    existingUsersByClientIds: Map<number, { id: string; clientId: number }>
+    existingClientsByCodes: Map<number, { id: string; code: number }>
     existingParcelsByTrackingNumbers: Map<
       string,
-      { id: string; userId: string | null }
+      { id: string; clientId: string | null }
     >
   }> {
-    const clientIdsSet = new Set<number>()
+    const clientCodesSet = new Set<number>()
     const trackingNumbersSet = new Set<string>()
 
     rows.forEach((row) => {
-      clientIdsSet.add(row.clientId)
+      if (row.clientCode !== undefined) {
+        clientCodesSet.add(row.clientCode)
+      }
+
       trackingNumbersSet.add(row.trackingNumber)
     })
 
-    const clientIds = [...clientIdsSet]
+    const clientCodes = [...clientCodesSet]
     const trackingNumbers = [...trackingNumbersSet]
 
-    const [existingParcels, users] = await Promise.all([
+    const [existingParcels, existingClientsByCodes] = await Promise.all([
       trackingNumbers.length
         ? this.parcelsService.find({
             where: { trackingNumber: In(trackingNumbers) },
           })
         : Promise.resolve([]),
-      clientIds.length
-        ? this.usersService.find({ where: { clientId: In(clientIds) } })
-        : Promise.resolve([]),
+      this.clientsService.findByCodes(clientCodes),
     ])
 
     return {
-      existingUsersByIds: new Map(users.map((user) => [user.id, user])),
-      existingUsersByClientIds: new Map(
-        users.map((user) => [user.clientId, user])
-      ),
+      existingClientsByCodes,
       existingParcelsByTrackingNumbers: new Map(
         existingParcels.map((parcel) => [parcel.trackingNumber, parcel])
       ),

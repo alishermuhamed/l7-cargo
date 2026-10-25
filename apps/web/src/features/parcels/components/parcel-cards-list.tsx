@@ -14,14 +14,14 @@ const PARCELS_PAGE_SIZE = 10
 interface ParcelCardsListProps {
   search: string
   status?: ParcelStatus
-  userId?: string
+  clientId?: string
   isAdminPage?: boolean
 }
 
 export function ParcelCardsList({
   search,
   status,
-  userId,
+  clientId,
   isAdminPage = false,
 }: ParcelCardsListProps) {
   const debouncedSearch = useDebounce(search, 500)
@@ -30,7 +30,7 @@ export function ParcelCardsList({
     limit: PARCELS_PAGE_SIZE,
     search: debouncedSearch.length === 0 ? undefined : debouncedSearch,
     status,
-    userId,
+    clientId,
   }
 
   const {

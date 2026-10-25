@@ -11,7 +11,7 @@ export class GetParcelsQueryDto extends PaginationParamsDto {
 
   @IsOptional()
   @IsUUID()
-  userId?: string
+  clientId?: string
 
   @ApiPropertyOptional({ enum: PARCEL_STATUSES, enumName: 'ParcelStatus' })
   @IsOptional()

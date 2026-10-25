@@ -2,5 +2,6 @@
   "profile": "Profile",
   "editProfile": "Edit profile",
   "name": "Name",
+  "clientCode": "Client code",
   "unableToUpdateProfile": "Unable to update profile"
 }

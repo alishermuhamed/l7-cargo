@@ -1,7 +1,7 @@
 import { Entity, Index, ManyToOne } from 'typeorm'
 
 import { BaseEntity } from '../../db/base.entity'
-import { DateColumn } from '../../db/columns/date-column'
+import { DateTimeColumn } from '../../db/columns/date-time-column'
 import { TextColumn } from '../../db/columns/text-column'
 import { UUIDColumn } from '../../db/columns/uuid-column'
 import { User } from '../../users/entities/user.entity'
@@ -12,7 +12,7 @@ export class Session extends BaseEntity {
   @TextColumn()
   token!: string
 
-  @DateColumn()
+  @DateTimeColumn()
   expiresAt!: Date
 
   @TextColumn({ nullable: true })

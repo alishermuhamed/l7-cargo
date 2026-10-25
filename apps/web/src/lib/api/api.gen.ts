@@ -10,6 +10,29 @@ export interface UpdateUserDto {
   image?: string | null
 }
 
+export interface SetPasswordDto {
+  /**
+   * @minLength 8
+   * @maxLength 128
+   */
+  newPassword: string
+}
+
+export interface SuccessResponseDto {
+  success: boolean
+}
+
+export type SignInMethod = (typeof SignInMethod)[keyof typeof SignInMethod]
+
+export const SignInMethod = {
+  password: 'password',
+  otp: 'otp',
+} as const
+
+export interface GetSignInMethodResponseDto {
+  method: SignInMethod
+}
+
 export interface PhoneSignInDto {
   phoneNumber: string
   password: string
@@ -40,27 +63,64 @@ export interface PhoneResetPasswordDto {
   newPassword: string
 }
 
-export type UserRole = (typeof UserRole)[keyof typeof UserRole]
-
-export const UserRole = {
-  admin: 'admin',
-  client: 'client',
-} as const
-
-export interface GetUserResponseDto {
-  role: UserRole
+export interface LinkedUserDto {
   id: string
-  clientId: number
   name: string
   /** @nullable */
   phoneNumber: string | null
 }
 
+/**
+ * @nullable
+ */
+export type GetClientResponseDtoUser = LinkedUserDto | null
+
+export interface GetClientResponseDto {
+  id: string
+  code: number
+  aliases: number[]
+  /** @nullable */
+  legacyPhoneRaw: string | null
+  /** @nullable */
+  legacyPhoneNormalized: string | null
+  /** @nullable */
+  user: GetClientResponseDtoUser
+}
+
+export interface UpdateClientCodeRequestDto {
+  /**
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  code: number
+  /**
+   * @minimum -2147483648
+   * @maximum 2147483647
+   */
+  expectedCode: number
+}
+
+export interface AddClientAliasRequestDto {
+  /**
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  code: number
+}
+
 export interface CreateParcelRequestDto {
-  /** @minLength 1 */
+  /** @minimum 1 */
+  clientCode?: number
+  /**
+   * @minLength 1
+   * @pattern \S
+   */
   trackingNumber: string
   source?: string
   description?: string
+  weightKg?: string
+  deliveryFee?: string
+  comments?: string
 }
 
 export interface CreateParcelResponseDto {
@@ -89,7 +149,7 @@ export interface GetParcelResponseDto {
   updatedAt: string
   trackingNumber: string
   /** @nullable */
-  userId: string | null
+  clientId: string | null
   /** @nullable */
   source: string | null
   /** @nullable */
@@ -99,7 +159,11 @@ export interface GetParcelResponseDto {
   /** @nullable */
   deliveryFee: string | null
   /** @nullable */
-  notes: string | null
+  comments: string | null
+}
+
+export interface GetReadyForPickupBalanceResponseDto {
+  totalDeliveryFee: string
 }
 
 export interface GetParcelStatusHistoryResponseDto {
@@ -107,9 +171,24 @@ export interface GetParcelStatusHistoryResponseDto {
   id: string
   parcelId: string
   createdAt: string
+  achievedAt: string
+}
+
+export interface PutParcelStatusHistoryEntryRequestDto {
+  status: ParcelStatus
+  achievedAt: string
+}
+
+export interface PutParcelStatusHistoryRequestDto {
+  entries: PutParcelStatusHistoryEntryRequestDto[]
 }
 
 export interface UpdateParcelRequestDto {
+  /**
+   * @minimum 1
+   * @nullable
+   */
+  clientCode?: number | null
   /** @nullable */
   source?: string | null
   /** @nullable */
@@ -118,15 +197,14 @@ export interface UpdateParcelRequestDto {
   weightKg?: string | null
   /** @nullable */
   deliveryFee?: string | null
-}
-
-export interface SuccessResponseDto {
-  success: boolean
+  /** @nullable */
+  comments?: string | null
 }
 
 export interface CreateParcelsImportRequestDto {
   file: Blob
   parcelStatus: ParcelStatus
+  achievedAt: string
   withHeader: string
 }
 
@@ -138,6 +216,7 @@ export interface GetParcelsImportSummaryResponseDto {
   parcelStatus: ParcelStatus
   id: string
   createdAt: string
+  achievedAt: string
   isCommitted: boolean
   /** @nullable */
   committedAt: string | null
@@ -145,18 +224,19 @@ export interface GetParcelsImportSummaryResponseDto {
 
 export interface ParsedParcelsImportRowDto {
   rowNumber: number
-  clientId: number
+  clientCode?: number
   trackingNumber: string
   weightKg?: number
   deliveryFee?: number
-  notes?: string
+  comments?: string
 }
 
 export type ParcelsImportWarningCode =
   (typeof ParcelsImportWarningCode)[keyof typeof ParcelsImportWarningCode]
 
 export const ParcelsImportWarningCode = {
-  PARCEL_OWNER_MISMATCH: 'PARCEL_OWNER_MISMATCH',
+  PARCEL_CLIENT_MISMATCH: 'PARCEL_CLIENT_MISMATCH',
+  UNKNOWN_CLIENT: 'UNKNOWN_CLIENT',
 } as const
 
 export interface ParsedParcelsImportWarningDto {
@@ -168,11 +248,12 @@ export type ParcelsImportErrorCode =
   (typeof ParcelsImportErrorCode)[keyof typeof ParcelsImportErrorCode]
 
 export const ParcelsImportErrorCode = {
+  CLIENT_CODE_REQUIRED: 'CLIENT_CODE_REQUIRED',
   INVALID_CLIENT_ID: 'INVALID_CLIENT_ID',
   INVALID_TRACKING_CODE: 'INVALID_TRACKING_CODE',
   INVALID_WEIGHT_KG: 'INVALID_WEIGHT_KG',
   INVALID_DELIVERY_FEE: 'INVALID_DELIVERY_FEE',
-  INVALID_NOTES: 'INVALID_NOTES',
+  INVALID_COMMENTS: 'INVALID_COMMENTS',
   UNKNOWN: 'UNKNOWN',
 } as const
 
@@ -191,12 +272,34 @@ export interface GetParcelsImportResponseDto {
   parcelStatus: ParcelStatus
   id: string
   isCommitted: boolean
+  achievedAt: string
   /** @nullable */
   committedAt: string | null
   parsedData: ParsedParcelsImportDataDto
 }
 
-export type GetUsersParams = {
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
+export const UserRole = {
+  admin: 'admin',
+  client: 'client',
+} as const
+
+export interface GetUserResponseDto {
+  role: UserRole
+  id: string
+  clientId: string
+  requiresCodeResolution: boolean
+  name: string
+  /** @nullable */
+  phoneNumber: string | null
+}
+
+export type GetSignInMethodParams = {
+  phoneNumber: string
+}
+
+export type GetClientsParams = {
   /**
    * @minimum 0
    */
@@ -205,7 +308,6 @@ export type GetUsersParams = {
    * @minimum 0
    */
   offset?: number
-  role?: UserRole
   search?: string
 }
 
@@ -220,7 +322,7 @@ export type GetParcelsParams = {
   offset?: number
   status?: ParcelStatus
   search?: string
-  userId?: string
+  clientId?: string
 }
 
 export type GetParcelsImportsParams = {
@@ -232,6 +334,19 @@ export type GetParcelsImportsParams = {
    * @minimum 0
    */
   offset?: number
+}
+
+export type GetUsersParams = {
+  /**
+   * @minimum 0
+   */
+  limit?: number
+  /**
+   * @minimum 0
+   */
+  offset?: number
+  role?: UserRole
+  search?: string
 }
 
 export const getGetHealthUrl = () => {
@@ -270,6 +385,51 @@ export const updateUser = async (
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(updateUserDto),
   })
+}
+
+export const getSetPasswordUrl = () => {
+  return `/auth/set-password`
+}
+
+export const setPassword = async (
+  setPasswordDto: SetPasswordDto,
+  options?: RequestInit
+): Promise<SuccessResponseDto> => {
+  return customFetch<SuccessResponseDto>(getSetPasswordUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(setPasswordDto),
+  })
+}
+
+export const getGetSignInMethodUrl = (params: GetSignInMethodParams) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0
+    ? `/auth/get-sign-in-method?${stringifiedParams}`
+    : `/auth/get-sign-in-method`
+}
+
+export const getSignInMethod = async (
+  params: GetSignInMethodParams,
+  options?: RequestInit
+): Promise<GetSignInMethodResponseDto> => {
+  return customFetch<GetSignInMethodResponseDto>(
+    getGetSignInMethodUrl(params),
+    {
+      ...options,
+      method: 'GET',
+    }
+  )
 }
 
 export const getSignInPhoneNumberUrl = () => {
@@ -363,21 +523,7 @@ export const signOut = async (options?: RequestInit): Promise<void> => {
   })
 }
 
-export const getGetUserUrl = (userId: string) => {
-  return `/users/${userId}`
-}
-
-export const getUser = async (
-  userId: string,
-  options?: RequestInit
-): Promise<GetUserResponseDto> => {
-  return customFetch<GetUserResponseDto>(getGetUserUrl(userId), {
-    ...options,
-    method: 'GET',
-  })
-}
-
-export const getGetUsersUrl = (params?: GetUsersParams) => {
+export const getGetClientsUrl = (params?: GetClientsParams) => {
   const normalizedParams = new URLSearchParams()
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -388,14 +534,82 @@ export const getGetUsersUrl = (params?: GetUsersParams) => {
 
   const stringifiedParams = normalizedParams.toString()
 
-  return stringifiedParams.length > 0 ? `/users?${stringifiedParams}` : `/users`
+  return stringifiedParams.length > 0
+    ? `/clients?${stringifiedParams}`
+    : `/clients`
 }
 
-export const getUsers = async (
-  params?: GetUsersParams,
+export const getClients = async (
+  params?: GetClientsParams,
   options?: RequestInit
-): Promise<GetUserResponseDto[]> => {
-  return customFetch<GetUserResponseDto[]>(getGetUsersUrl(params), {
+): Promise<GetClientResponseDto[]> => {
+  return customFetch<GetClientResponseDto[]>(getGetClientsUrl(params), {
+    ...options,
+    method: 'GET',
+  })
+}
+
+export const getUpdateClientCodeUrl = (clientId: string) => {
+  return `/clients/${clientId}/code`
+}
+
+export const updateClientCode = async (
+  clientId: string,
+  updateClientCodeRequestDto: UpdateClientCodeRequestDto,
+  options?: RequestInit
+): Promise<SuccessResponseDto> => {
+  return customFetch<SuccessResponseDto>(getUpdateClientCodeUrl(clientId), {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateClientCodeRequestDto),
+  })
+}
+
+export const getAddClientAliasUrl = (clientId: string) => {
+  return `/clients/${clientId}/aliases`
+}
+
+export const addClientAlias = async (
+  clientId: string,
+  addClientAliasRequestDto: AddClientAliasRequestDto,
+  options?: RequestInit
+): Promise<SuccessResponseDto> => {
+  return customFetch<SuccessResponseDto>(getAddClientAliasUrl(clientId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(addClientAliasRequestDto),
+  })
+}
+
+export const getRemoveClientAliasUrl = (clientId: string, code: number) => {
+  return `/clients/${clientId}/aliases/${code}`
+}
+
+export const removeClientAlias = async (
+  clientId: string,
+  code: number,
+  options?: RequestInit
+): Promise<SuccessResponseDto> => {
+  return customFetch<SuccessResponseDto>(
+    getRemoveClientAliasUrl(clientId, code),
+    {
+      ...options,
+      method: 'DELETE',
+    }
+  )
+}
+
+export const getGetClientUrl = (clientId: string) => {
+  return `/clients/${clientId}`
+}
+
+export const getClient = async (
+  clientId: string,
+  options?: RequestInit
+): Promise<GetClientResponseDto> => {
+  return customFetch<GetClientResponseDto>(getGetClientUrl(clientId), {
     ...options,
     method: 'GET',
   })
@@ -441,6 +655,22 @@ export const getParcels = async (
     ...options,
     method: 'GET',
   })
+}
+
+export const getGetReadyForPickupBalanceUrl = () => {
+  return `/parcels/ready-for-pickup-balance`
+}
+
+export const getReadyForPickupBalance = async (
+  options?: RequestInit
+): Promise<GetReadyForPickupBalanceResponseDto> => {
+  return customFetch<GetReadyForPickupBalanceResponseDto>(
+    getGetReadyForPickupBalanceUrl(),
+    {
+      ...options,
+      method: 'GET',
+    }
+  )
 }
 
 export const getGetParcelUrl = (parcelId: string) => {
@@ -505,6 +735,26 @@ export const getParcelStatusHistory = async (
   )
 }
 
+export const getPutParcelStatusHistoryUrl = (parcelId: string) => {
+  return `/parcels/${parcelId}/status-history`
+}
+
+export const putParcelStatusHistory = async (
+  parcelId: string,
+  putParcelStatusHistoryRequestDto: PutParcelStatusHistoryRequestDto,
+  options?: RequestInit
+): Promise<SuccessResponseDto> => {
+  return customFetch<SuccessResponseDto>(
+    getPutParcelStatusHistoryUrl(parcelId),
+    {
+      ...options,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(putParcelStatusHistoryRequestDto),
+    }
+  )
+}
+
 export const getCreateParcelsImportUrl = () => {
   return `/parcels-imports`
 }
@@ -516,6 +766,7 @@ export const createParcelsImport = async (
   const formData = new FormData()
   formData.append(`file`, createParcelsImportRequestDto.file)
   formData.append(`parcelStatus`, createParcelsImportRequestDto.parcelStatus)
+  formData.append(`achievedAt`, createParcelsImportRequestDto.achievedAt)
   formData.append(`withHeader`, createParcelsImportRequestDto.withHeader)
 
   return customFetch<CreateParcelsImportResponseDto>(
@@ -574,6 +825,23 @@ export const commitParcelsImport = async (
   )
 }
 
+export const getGetParcelsImportUrl = (parcelsImportId: string) => {
+  return `/parcels-imports/${parcelsImportId}`
+}
+
+export const getParcelsImport = async (
+  parcelsImportId: string,
+  options?: RequestInit
+): Promise<GetParcelsImportResponseDto> => {
+  return customFetch<GetParcelsImportResponseDto>(
+    getGetParcelsImportUrl(parcelsImportId),
+    {
+      ...options,
+      method: 'GET',
+    }
+  )
+}
+
 export const getDeleteParcelsImportUrl = (parcelsImportId: string) => {
   return `/parcels-imports/${parcelsImportId}`
 }
@@ -591,19 +859,40 @@ export const deleteParcelsImport = async (
   )
 }
 
-export const getGetParcelsImportUrl = (parcelsImportId: string) => {
-  return `/parcels-imports/${parcelsImportId}`
+export const getGetUserUrl = (userId: string) => {
+  return `/users/${userId}`
 }
 
-export const getParcelsImport = async (
-  parcelsImportId: string,
+export const getUser = async (
+  userId: string,
   options?: RequestInit
-): Promise<GetParcelsImportResponseDto> => {
-  return customFetch<GetParcelsImportResponseDto>(
-    getGetParcelsImportUrl(parcelsImportId),
-    {
-      ...options,
-      method: 'GET',
+): Promise<GetUserResponseDto> => {
+  return customFetch<GetUserResponseDto>(getGetUserUrl(userId), {
+    ...options,
+    method: 'GET',
+  })
+}
+
+export const getGetUsersUrl = (params?: GetUsersParams) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
-  )
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0 ? `/users?${stringifiedParams}` : `/users`
+}
+
+export const getUsers = async (
+  params?: GetUsersParams,
+  options?: RequestInit
+): Promise<GetUserResponseDto[]> => {
+  return customFetch<GetUserResponseDto[]>(getGetUsersUrl(params), {
+    ...options,
+    method: 'GET',
+  })
 }

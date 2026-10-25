@@ -1,19 +1,35 @@
 import { Pencil1Icon, TrashIcon } from '@radix-ui/react-icons'
-import { Card, Container, DataList, Flex, Text } from '@radix-ui/themes'
+import {
+  Card,
+  Container,
+  DataList,
+  Flex,
+  Heading,
+  Text,
+} from '@radix-ui/themes'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { createFileRoute, Link as RouterLink } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  Link as RouterLink,
+  useNavigate,
+} from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { AlertDialog } from '../../../../../components/alert-dialog'
 import { Button } from '../../../../../components/button'
 import { CopyButton } from '../../../../../components/copy-button'
-import { ParcelStatusHistory } from '../../../../../features/parcels/components/parcel-status-history/parcel-status-history'
+import {
+  ParcelStatusHistory,
+  ParcelStatusHistoryItem,
+} from '../../../../../features/parcels/components/parcel-status-history/parcel-status-history'
 import { formatWeightKg } from '../../../../../features/parcels/lib/format-weight'
-import { deleteParcel } from '../../../../../lib/api/api.gen'
+import { PARCEL_STATUS_LABELS } from '../../../../../features/parcels/lib/parcel-status-labels'
+import { deleteParcel, ParcelStatus } from '../../../../../lib/api/api.gen'
 import {
   getParcelQueryOptions,
   getParcelStatusHistoryQueryOptions,
 } from '../../../../../lib/api/queries'
+import { formatDate } from '../../../../../lib/date-time'
 import i18n from '../../../../../lib/i18n'
 import { formatMoneyAmount } from '../../../../../lib/money'
 
@@ -36,6 +52,7 @@ export const Route = createFileRoute(
 })
 
 function ParcelPage() {
+  const navigate = useNavigate()
   const { initialParcel, initialStatusHistory } = Route.useLoaderData()
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
@@ -51,6 +68,9 @@ function ParcelPage() {
 
   const deleteParcelMutation = useMutation({
     mutationFn: () => deleteParcel(initialParcel.id),
+    onSuccess: async () => {
+      await navigate({ to: '/parcels', replace: true })
+    },
   })
 
   return (
@@ -93,16 +113,46 @@ function ParcelPage() {
               </DataList.Value>
             </DataList.Item>
 
-            {parcel.notes && (
+            {parcel.comments && (
               <DataList.Item>
-                <DataList.Label>{i18n.t('parcels:notes')}</DataList.Label>
-                <DataList.Value>{parcel.notes}</DataList.Value>
+                <DataList.Label>{i18n.t('parcels:comments')}</DataList.Label>
+                <DataList.Value>{parcel.comments}</DataList.Value>
               </DataList.Item>
             )}
           </DataList.Root>
         </Card>
 
-        <ParcelStatusHistory history={statusHistory} />
+        <Heading size="4">{i18n.t('parcels:statusHistory')}</Heading>
+
+        <ParcelStatusHistory>
+          {Object.values(ParcelStatus).map((status) => {
+            const existingEntry = statusHistory.find(
+              (item) => item.status === status
+            )
+
+            const isAchieved = !!existingEntry?.achievedAt
+
+            return (
+              <ParcelStatusHistoryItem key={status} isAchieved={isAchieved}>
+                <Flex mt="-1" mb="4" direction="column">
+                  <Text
+                    as="p"
+                    weight={isAchieved ? 'medium' : 'regular'}
+                    color={isAchieved ? undefined : 'gray'}
+                  >
+                    {PARCEL_STATUS_LABELS[status]}
+                  </Text>
+
+                  <Text as="p" color="gray" size="2">
+                    {isAchieved
+                      ? formatDate(existingEntry.achievedAt)
+                      : i18n.t('parcels:pendingStatus')}
+                  </Text>
+                </Flex>
+              </ParcelStatusHistoryItem>
+            )
+          })}
+        </ParcelStatusHistory>
 
         <Flex
           direction={{ initial: 'column', xs: 'row' }}

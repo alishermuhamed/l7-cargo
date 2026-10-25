@@ -1,15 +1,27 @@
-import { Box, Card, Container, DataList, Flex, Heading } from '@radix-ui/themes'
+import { Pencil1Icon } from '@radix-ui/react-icons'
+import {
+  Box,
+  Card,
+  Container,
+  DataList,
+  Flex,
+  Heading,
+  IconButton,
+  Text,
+} from '@radix-ui/themes'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { SearchField } from '../../../../../components/search-field/search-field'
 import { Select } from '../../../../../components/select/select'
+import { ChangeCodeDialog } from '../../../../../features/clients/components/change-code-dialog'
+import { ManageAlternativeCodesDialog } from '../../../../../features/clients/components/manage-alternative-codes-dialog'
 import { ParcelCardsList } from '../../../../../features/parcels/components/parcel-cards-list'
 import { ParcelsTable } from '../../../../../features/parcels/components/parcels-table'
 import { PARCEL_STATUS_LABELS } from '../../../../../features/parcels/lib/parcel-status-labels'
 import { ParcelStatus } from '../../../../../lib/api/api.gen'
-import { getUserQueryOptions } from '../../../../../lib/api/queries'
+import { getClientQueryOptions } from '../../../../../lib/api/queries'
 import i18n from '../../../../../lib/i18n'
 import { formatPhoneNumber } from '../../../../../lib/phone-number'
 
@@ -22,7 +34,7 @@ export const Route = createFileRoute(
   },
   loader: async ({ params: { clientId }, context: { queryClient } }) => {
     const initialClient = await queryClient.ensureQueryData(
-      getUserQueryOptions(clientId)
+      getClientQueryOptions(clientId)
     )
 
     return { initialClient }
@@ -33,13 +45,17 @@ export const Route = createFileRoute(
 function AdminClientDetailsPage() {
   const { initialClient } = Route.useLoaderData()
 
+  const [changeCodeOpen, setChangeCodeOpen] = useState(false)
+  const [manageAlternativeCodesOpen, setManageAlternativeCodesOpen] =
+    useState(false)
+
   const [parcelsSearch, setParcelsSearch] = useState('')
   const [parcelsStatus, setParcelsStatus] = useState<ParcelStatus | 'all'>(
     'all'
   )
 
   const { data: client } = useQuery({
-    ...getUserQueryOptions(initialClient.id),
+    ...getClientQueryOptions(initialClient.id),
     initialData: initialClient,
   })
 
@@ -49,19 +65,54 @@ function AdminClientDetailsPage() {
         <Card size="3">
           <DataList.Root>
             <DataList.Item>
-              <DataList.Label>{i18n.t('clients:id')}</DataList.Label>
-              <DataList.Value>{client.clientId}</DataList.Value>
+              <DataList.Label>{i18n.t('clients:code')}</DataList.Label>
+              <DataList.Value>
+                <Flex align="center" gap="3">
+                  <Text>{client.code}</Text>
+                  <IconButton
+                    variant="ghost"
+                    size="1"
+                    aria-label={i18n.t('clients:codes.change')}
+                    title={i18n.t('clients:codes.change')}
+                    onClick={() => setChangeCodeOpen(true)}
+                  >
+                    <Pencil1Icon />
+                  </IconButton>
+                </Flex>
+              </DataList.Value>
+            </DataList.Item>
+            <DataList.Item>
+              <DataList.Label>{i18n.t('clients:aliases')}</DataList.Label>
+              <DataList.Value>
+                <Flex align="center" gap="3">
+                  <Text>{client.aliases.join(', ') || '-'}</Text>
+                  <IconButton
+                    variant="ghost"
+                    size="1"
+                    aria-label={i18n.t('clients:codes.manageAlternatives')}
+                    title={i18n.t('clients:codes.manageAlternatives')}
+                    onClick={() => setManageAlternativeCodesOpen(true)}
+                  >
+                    <Pencil1Icon />
+                  </IconButton>
+                </Flex>
+              </DataList.Value>
             </DataList.Item>
 
             <DataList.Item>
               <DataList.Label>{i18n.t('profile:name')}</DataList.Label>
-              <DataList.Value>{client.name}</DataList.Value>
+              <DataList.Value>{client.user?.name ?? '-'}</DataList.Value>
             </DataList.Item>
 
             <DataList.Item>
               <DataList.Label>{i18n.t('auth:phoneNumber')}</DataList.Label>
               <DataList.Value>
-                {formatPhoneNumber(client.phoneNumber ?? '')}
+                {formatPhoneNumber(
+                  client.user?.phoneNumber ??
+                    client.legacyPhoneNormalized ??
+                    client.legacyPhoneRaw ??
+                    ''
+                ) ?? '-'}
               </DataList.Value>
             </DataList.Item>
           </DataList.Root>
@@ -98,7 +149,7 @@ function AdminClientDetailsPage() {
             <ParcelCardsList
               search={parcelsSearch}
               status={parcelsStatus === 'all' ? undefined : parcelsStatus}
-              userId={client.id}
+              clientId={client.id}
               isAdminPage
             />
           </Box>
@@ -107,12 +158,24 @@ function AdminClientDetailsPage() {
             <ParcelsTable
               search={parcelsSearch}
               status={parcelsStatus === 'all' ? undefined : parcelsStatus}
-              userId={client.id}
+              clientId={client.id}
               isAdminPage
             />
           </Box>
         </Flex>
       </Flex>
+      {changeCodeOpen && (
+        <ChangeCodeDialog
+          client={client}
+          onClose={() => setChangeCodeOpen(false)}
+        />
+      )}
+      {manageAlternativeCodesOpen && (
+        <ManageAlternativeCodesDialog
+          client={client}
+          onClose={() => setManageAlternativeCodesOpen(false)}
+        />
+      )}
     </Container>
   )
 }

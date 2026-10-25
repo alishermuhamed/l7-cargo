@@ -1,5 +1,10 @@
 {
+  "unableToSignIn": "Кіру мүмкін болмады",
+  "invalidPhoneNumberOrPassword": "Телефон нөмірі немесе құпия сөз қате",
   "unableToSendVerificationCode": "Растау кодын жіберу мүмкін болмады",
   "invalidOrExpiredCode": "Код қате немесе мерзімі өтіп кеткен",
-  "unableToSaveYourName": "Атыңызды сақтау мүмкін болмады"
+  "unableToRequestPasswordReset": "Құпия сөзді қалпына келтіру кодын жіберу мүмкін болмады",
+  "unableToResetPassword": "Құпия сөзді қалпына келтіру мүмкін болмады",
+  "tooManyResetAttempts": "Қате код тым көп енгізілді. Жаңа код сұраңыз.",
+  "unableToCompleteOnboarding": "Аккаунтты баптауды аяқтау мүмкін болмады"
 }

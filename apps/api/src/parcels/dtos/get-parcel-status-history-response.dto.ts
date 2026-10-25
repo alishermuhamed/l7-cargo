@@ -6,6 +6,7 @@ export class GetParcelStatusHistoryResponseDto {
   id!: string
   parcelId!: string
   createdAt!: string
+  achievedAt!: string
 
   @ApiProperty({
     enum: PARCEL_STATUSES,

@@ -7,7 +7,9 @@ import { useState } from 'react'
 import { ClientNavBar } from '../../../components/client-nav-bar/client-nav-bar'
 import { Drawer } from '../../../components/drawer/drawer'
 import { Header } from '../../../components/header/header'
+import { ClientContext } from '../../../contexts/client'
 import { UserRole } from '../../../lib/api/api.gen'
+import { getClientQueryOptions } from '../../../lib/api/queries'
 import { SCROLL_CONTAINER_CLASS } from '../../../lib/constants'
 import i18n from '../../../lib/i18n'
 
@@ -15,22 +17,29 @@ export const Route = createFileRoute('/_authenticated/_client')({
   staticData: {
     title: 'L7 Cargo',
   },
-  beforeLoad: async ({ context: { session } }) => {
+  beforeLoad: async ({ context: { queryClient, session } }) => {
     if (session.user.role === UserRole.admin) {
       throw redirect({
         to: '/admin/parcels',
         replace: true,
       })
     }
+
+    const client = await queryClient.ensureQueryData(
+      getClientQueryOptions(session.user.clientId)
+    )
+
+    return { client }
   },
   component: ClientLayout,
 })
 
 function ClientLayout() {
+  const { client } = Route.useRouteContext()
   const [isNavBarOpen, setIsNavBarOpen] = useState(false)
 
   return (
-    <>
+    <ClientContext.Provider value={client}>
       <Flex height="100vh" overflow="hidden">
         <Box
           className="client-nav-bar-container"
@@ -63,6 +72,6 @@ function ClientLayout() {
       >
         <ClientNavBar onNavigate={() => setIsNavBarOpen(false)} />
       </Drawer>
-    </>
+    </ClientContext.Provider>
   )
 }

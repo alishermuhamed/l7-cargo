@@ -17,6 +17,7 @@ export class ParcelsImportsMapper {
       id: parcelsImport.id,
       isCommitted: parcelsImport.isCommitted,
       parcelStatus: parcelsImport.parcelStatus,
+      achievedAt: parcelsImport.achievedAt,
       committedAt: parcelsImport.committedAt?.toISOString() ?? null,
       parsedData: parcelsImport.parsedData,
     }
@@ -29,6 +30,7 @@ export class ParcelsImportsMapper {
       id: parcelsImport.id,
       createdAt: parcelsImport.createdAt.toISOString(),
       parcelStatus: parcelsImport.parcelStatus,
+      achievedAt: parcelsImport.achievedAt,
       isCommitted: parcelsImport.isCommitted,
       committedAt: parcelsImport.committedAt?.toISOString() ?? null,
     }

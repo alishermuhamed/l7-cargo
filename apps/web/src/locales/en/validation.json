@@ -2,11 +2,19 @@
   "phoneNumber": {
     "required": "Phone number is required"
   },
+  "password": {
+    "required": "Password is required",
+    "tooShort": "Password must be at least 8 characters",
+    "tooLong": "Password must be 128 characters or fewer"
+  },
   "otpCode": {
-    "required": "Verification code is required"
+    "required": "Verification code is required",
+    "invalid": "Verification code must be 6 digits"
   },
   "trackingNumber": {
-    "required": "Tracking number is required"
+    "required": "Tracking number is required",
+    "duplicate": "A parcel with this tracking number already exists",
+    "suspicious": "This does not look like a tracking number. Tracking numbers usually start with YT, JT, SF, 78, 98, 43, 777, or DPK."
   },
   "file": {
     "required": "File is required",
@@ -17,6 +25,13 @@
   },
   "deliveryFee": {
     "invalid": "Enter a valid delivery fee"
+  },
+  "status": {
+    "required": "Select a status"
+  },
+  "statusDate": {
+    "future": "Status date cannot be in the future",
+    "order": "Date must follow the parcel status order"
   },
   "name": {
     "required": "Name is required",

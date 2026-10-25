@@ -4,6 +4,7 @@ import { Box, Flex, Heading, Link, Text } from '@radix-ui/themes'
 import { Link as RouterLink } from '@tanstack/react-router'
 import type { PropsWithChildren } from 'react'
 
+import { useClientContext } from '../../hooks/use-client-context'
 import i18n from '../../lib/i18n'
 
 interface ClientNavBarProps {
@@ -11,10 +12,18 @@ interface ClientNavBarProps {
 }
 
 export function ClientNavBar({ onNavigate }: ClientNavBarProps) {
+  const client = useClientContext()
+
   return (
     <Flex direction="column" justify="between" p="3" height="100%">
       <Flex direction="column" gap="5">
-        <Heading>L7 Cargo</Heading>
+        <Flex direction="column" gap="1">
+          <Heading>L7 Cargo</Heading>
+
+          <Text size="2" color="gray">
+            {i18n.t('profile:clientCode')}: {client.code}
+          </Text>
+        </Flex>
 
         <Flex
           aria-label={i18n.t('common:navigation')}
@@ -30,6 +39,12 @@ export function ClientNavBar({ onNavigate }: ClientNavBarProps) {
           <RouterLinkWrapper>
             <RouterLink onClick={onNavigate} to="/address">
               <Text size="3">{i18n.t('nav:address')}</Text>
+            </RouterLink>
+          </RouterLinkWrapper>
+
+          <RouterLinkWrapper>
+            <RouterLink onClick={onNavigate} to="/training">
+              <Text size="3">{i18n.t('nav:training')}</Text>
             </RouterLink>
           </RouterLinkWrapper>
         </Flex>

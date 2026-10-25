@@ -25,6 +25,8 @@ export class UsersPolicy extends EntityPolicy<User> {
       can('read', User)
       return
     }
+
+    can('read', User, { id: user.id })
   }
 
   checkCanList(): void {

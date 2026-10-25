@@ -1,10 +1,15 @@
-import { IsOptional, IsString, Matches } from 'class-validator'
+import { IsInt, IsOptional, IsString, Matches, Min } from 'class-validator'
 
 import { IsMoneyString } from '../../common/money'
 
 const WEIGHT_KG_PATTERN = /^(?:0|[1-9]\d{0,3})(?:\.\d{1,3})?$/
 
 export class UpdateParcelRequestDto {
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  clientCode?: number | null
+
   @IsOptional()
   @IsString()
   source?: string | null
@@ -21,4 +26,8 @@ export class UpdateParcelRequestDto {
   @IsOptional()
   @IsMoneyString()
   deliveryFee?: string | null
+
+  @IsOptional()
+  @IsString()
+  comments?: string | null
 }

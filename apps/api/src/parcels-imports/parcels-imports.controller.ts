@@ -55,7 +55,7 @@ export class ParcelsImportsController {
     )
     file: Express.Multer.File,
     @Body()
-    { withHeader, parcelStatus }: CreateParcelsImportRequestDto
+    { withHeader, parcelStatus, achievedAt }: CreateParcelsImportRequestDto
   ): Promise<CreateParcelsImportResponseDto> {
     this.parcelsImportsPolicy.checkCanCreate()
 
@@ -67,6 +67,7 @@ export class ParcelsImportsController {
       file,
       withHeader: withHeader === 'true',
       parcelStatus,
+      achievedAt,
     })
 
     return ParcelsImportsMapper.toCreateParcelsImportResponseDto(id)

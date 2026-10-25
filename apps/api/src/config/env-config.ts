@@ -22,6 +22,10 @@ export function envConfig() {
       cookiesDomain: process.env.BETTER_AUTH_COOKIES_DOMAIN,
     },
     otp: {
+      autocall: {
+        apiToken: process.env.AUTOCALL_API_TOKEN,
+        channel: process.env.AUTOCALL_OTP_CHANNEL,
+      },
       telegramGateway: {
         accessToken: process.env.TELEGRAM_GATEWAY_ACCESS_TOKEN,
       },
@@ -36,7 +40,7 @@ export function envConfig() {
       },
       telegramFallback: {
         botToken: process.env.TELEGRAM_FALLBACK_BOT_TOKEN,
-        chatId: process.env.TELEGRAM_FALLBACK_CHAT_ID,
+        chatIds: process.env.TELEGRAM_FALLBACK_CHAT_IDS,
       },
     },
     defaultAdmin: {

@@ -11,6 +11,7 @@ const NAMESPACES = [
   'parcels',
   'clients',
   'profile',
+  'training',
   'errors',
 ] as const
 
