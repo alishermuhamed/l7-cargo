@@ -189,6 +189,14 @@ export class ParcelsImportsService {
           errors.push({
             rowNumber,
             code,
+            rawRow: Array.from({ length: 5 }, (_, columnIndex): string => {
+              const cell: unknown = row[columnIndex]
+              return typeof cell === 'string' ||
+                typeof cell === 'number' ||
+                typeof cell === 'boolean'
+                ? String(cell)
+                : ''
+            }),
           })
         }
       })
