@@ -260,6 +260,7 @@ export const ParcelsImportErrorCode = {
 export interface ParsedParcelsImportErrorDto {
   code: ParcelsImportErrorCode
   rowNumber: number
+  rawRow?: string[]
 }
 
 export interface ParsedParcelsImportDataDto {

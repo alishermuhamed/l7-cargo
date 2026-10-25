@@ -23,11 +23,13 @@ import { PARCEL_STATUS_LABELS } from '../../../../../features/parcels/lib/parcel
 import { ParcelStatus } from '../../../../../lib/api/api.gen'
 import { getClientQueryOptions } from '../../../../../lib/api/queries'
 import i18n from '../../../../../lib/i18n'
+import { parcelsSearchSchema } from '../../../../../lib/list-search'
 import { formatPhoneNumber } from '../../../../../lib/phone-number'
 
 export const Route = createFileRoute(
   '/_authenticated/admin/clients/$clientId/'
 )({
+  validateSearch: parcelsSearchSchema,
   staticData: {
     title: i18n.t('clients:clientDetails'),
     fallbackTo: '/admin/clients',
@@ -49,10 +51,43 @@ function AdminClientDetailsPage() {
   const [manageAlternativeCodesOpen, setManageAlternativeCodesOpen] =
     useState(false)
 
-  const [parcelsSearch, setParcelsSearch] = useState('')
-  const [parcelsStatus, setParcelsStatus] = useState<ParcelStatus | 'all'>(
-    'all'
-  )
+  const { search = '', page = 1, status = 'all' } = Route.useSearch()
+  const navigate = Route.useNavigate()
+
+  const setSearch = (value: string) => {
+    void navigate({
+      search: (previous) => ({
+        ...previous,
+        search: value || undefined,
+        page: undefined,
+      }),
+      replace: true,
+      resetScroll: false,
+    })
+  }
+
+  const setStatus = (value: ParcelStatus | 'all') => {
+    void navigate({
+      search: (previous) => ({
+        ...previous,
+        status: value === 'all' ? undefined : value,
+        page: undefined,
+      }),
+      replace: true,
+      resetScroll: false,
+    })
+  }
+
+  const setPage = (value: number) => {
+    void navigate({
+      search: (previous) => ({
+        ...previous,
+        page: value === 0 ? undefined : value + 1,
+      }),
+      replace: true,
+      resetScroll: false,
+    })
+  }
 
   const { data: client } = useQuery({
     ...getClientQueryOptions(initialClient.id),
@@ -123,7 +158,7 @@ function AdminClientDetailsPage() {
 
           <Flex align="center" gap="3">
             <Box maxWidth="250px">
-              <SearchField value={parcelsSearch} onChange={setParcelsSearch} />
+              <SearchField value={search} onChange={setSearch} />
             </Box>
 
             <Box
@@ -132,8 +167,8 @@ function AdminClientDetailsPage() {
               flexShrink="0"
             >
               <Select
-                value={parcelsStatus}
-                onValueChange={setParcelsStatus}
+                value={status}
+                onValueChange={setStatus}
                 items={[
                   { label: i18n.t('parcels:all'), value: 'all' },
                   ...Object.values(ParcelStatus).map((status) => ({
@@ -147,8 +182,8 @@ function AdminClientDetailsPage() {
 
           <Box display={{ initial: 'block', xs: 'none' }}>
             <ParcelCardsList
-              search={parcelsSearch}
-              status={parcelsStatus === 'all' ? undefined : parcelsStatus}
+              search={search}
+              status={status === 'all' ? undefined : status}
               clientId={client.id}
               isAdminPage
             />
@@ -156,8 +191,10 @@ function AdminClientDetailsPage() {
 
           <Box display={{ initial: 'none', xs: 'block' }}>
             <ParcelsTable
-              search={parcelsSearch}
-              status={parcelsStatus === 'all' ? undefined : parcelsStatus}
+              page={page - 1}
+              onPageChange={setPage}
+              search={search}
+              status={status === 'all' ? undefined : status}
               clientId={client.id}
               isAdminPage
             />

@@ -44,6 +44,7 @@ export type ParseErrorCode = (typeof PARSE_ERROR_CODES)[number]
 export interface ParsedParcelsImportError {
   rowNumber: number
   code: ParseErrorCode
+  rawRow?: string[]
 }
 
 export interface ParsedParcelsImportData {

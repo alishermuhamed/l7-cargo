@@ -1,13 +1,14 @@
 import { Box, Container, Flex } from '@radix-ui/themes'
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
 
 import { SearchField } from '../../../../components/search-field/search-field'
 import { ClientCardsList } from '../../../../features/clients/components/client-cards-list'
 import { ClientsTable } from '../../../../features/clients/components/clients-table'
 import i18n from '../../../../lib/i18n'
+import { listSearchSchema } from '../../../../lib/list-search'
 
 export const Route = createFileRoute('/_authenticated/admin/clients/')({
+  validateSearch: listSearchSchema,
   staticData: {
     title: i18n.t('nav:clients'),
   },
@@ -15,7 +16,31 @@ export const Route = createFileRoute('/_authenticated/admin/clients/')({
 })
 
 function AdminClientsPage() {
-  const [search, setSearch] = useState('')
+  const { search = '', page = 1 } = Route.useSearch()
+  const navigate = Route.useNavigate()
+
+  const setSearch = (value: string) => {
+    void navigate({
+      search: (previous) => ({
+        ...previous,
+        search: value || undefined,
+        page: undefined,
+      }),
+      replace: true,
+      resetScroll: false,
+    })
+  }
+
+  const setPage = (value: number) => {
+    void navigate({
+      search: (previous) => ({
+        ...previous,
+        page: value === 0 ? undefined : value + 1,
+      }),
+      replace: true,
+      resetScroll: false,
+    })
+  }
 
   return (
     <Container p="4">
@@ -29,7 +54,11 @@ function AdminClientsPage() {
         </Box>
 
         <Box display={{ initial: 'none', xs: 'block' }}>
-          <ClientsTable search={search} />
+          <ClientsTable
+            search={search}
+            page={page - 1}
+            onPageChange={setPage}
+          />
         </Box>
       </Flex>
     </Container>

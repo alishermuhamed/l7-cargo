@@ -17,6 +17,7 @@ import { AlertDialog } from '../../../../../components/alert-dialog'
 import { Button } from '../../../../../components/button'
 import { ParcelStatusBadge } from '../../../../../features/parcels/components/parcel-status-badge'
 import { formatWeightKg } from '../../../../../features/parcels/lib/format-weight'
+import { ParcelsImportIssuesTable } from '../../../../../features/parcels-imports/components/parcels-import-issues-table'
 import {
   PARSE_ERROR_LABELS,
   PARSE_WARNING_LABELS,
@@ -89,6 +90,9 @@ function AdminParcelsImportDetailsPage() {
   }
 
   const parsedData = parcelsImport.parsedData
+  const rowsByNumber = new Map(
+    parsedData.rows.map((row) => [row.rowNumber, row])
+  )
 
   return (
     <Container p="4">
@@ -133,31 +137,15 @@ function AdminParcelsImportDetailsPage() {
           <Flex direction="column" gap="3">
             <Heading size="4">{i18n.t('parcels:importErrors')}</Heading>
 
-            <Box overflowX="auto">
-              <Table.Root size={{ initial: '3', xs: '2' }}>
-                <Table.Header>
-                  <Table.Row>
-                    <Table.ColumnHeaderCell>
-                      {i18n.t('parcels:rowNumber')}
-                    </Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell>
-                      {i18n.t('parcels:issue')}
-                    </Table.ColumnHeaderCell>
-                  </Table.Row>
-                </Table.Header>
-
-                <Table.Body>
-                  {parsedData.errors.map((error) => (
-                    <Table.Row key={`${error.rowNumber}-${error.code}`}>
-                      <Table.RowHeaderCell>
-                        {error.rowNumber}
-                      </Table.RowHeaderCell>
-                      <Table.Cell>{PARSE_ERROR_LABELS[error.code]}</Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table.Root>
-            </Box>
+            <ParcelsImportIssuesTable
+              issues={parsedData.errors.map((issue) => ({
+                rowNumber: issue.rowNumber,
+                code: issue.code,
+                label: PARSE_ERROR_LABELS[issue.code],
+                row: rowsByNumber.get(issue.rowNumber),
+                rawRow: issue.rawRow,
+              }))}
+            />
           </Flex>
         )}
 
@@ -165,33 +153,14 @@ function AdminParcelsImportDetailsPage() {
           <Flex direction="column" gap="3">
             <Heading size="4">{i18n.t('parcels:importWarnings')}</Heading>
 
-            <Box overflowX="auto">
-              <Table.Root size={{ initial: '3', xs: '2' }}>
-                <Table.Header>
-                  <Table.Row>
-                    <Table.ColumnHeaderCell>
-                      {i18n.t('parcels:rowNumber')}
-                    </Table.ColumnHeaderCell>
-                    <Table.ColumnHeaderCell>
-                      {i18n.t('parcels:issue')}
-                    </Table.ColumnHeaderCell>
-                  </Table.Row>
-                </Table.Header>
-
-                <Table.Body>
-                  {parsedData.warnings.map((warning) => (
-                    <Table.Row key={`${warning.rowNumber}-${warning.code}`}>
-                      <Table.RowHeaderCell>
-                        {warning.rowNumber}
-                      </Table.RowHeaderCell>
-                      <Table.Cell>
-                        {PARSE_WARNING_LABELS[warning.code]}
-                      </Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table.Root>
-            </Box>
+            <ParcelsImportIssuesTable
+              issues={parsedData.warnings.map((issue) => ({
+                rowNumber: issue.rowNumber,
+                code: issue.code,
+                label: PARSE_WARNING_LABELS[issue.code],
+                row: rowsByNumber.get(issue.rowNumber),
+              }))}
+            />
           </Flex>
         )}
 

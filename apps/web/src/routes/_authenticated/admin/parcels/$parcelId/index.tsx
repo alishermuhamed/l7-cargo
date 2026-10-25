@@ -31,7 +31,7 @@ import {
   getParcelQueryOptions,
   getParcelStatusHistoryQueryOptions,
 } from '../../../../../lib/api/queries'
-import { formatDate } from '../../../../../lib/date-time'
+import { formatDate, formatDateTime } from '../../../../../lib/date-time'
 import i18n from '../../../../../lib/i18n'
 import { formatMoneyAmount } from '../../../../../lib/money'
 
@@ -87,6 +87,13 @@ function AdminParcelPage() {
       <Flex direction="column" gap="4">
         <Card size="3">
           <DataList.Root>
+            <DataList.Item>
+              <DataList.Label>{i18n.t('parcels:createdAt')}</DataList.Label>
+              <DataList.Value>
+                {formatDateTime(parcel.createdAt)}
+              </DataList.Value>
+            </DataList.Item>
+
             <DataList.Item>
               <DataList.Label>
                 {i18n.t('parcels:trackingNumber')}

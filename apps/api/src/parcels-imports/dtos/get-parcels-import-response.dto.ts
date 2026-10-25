@@ -27,6 +27,7 @@ class ParsedParcelsImportWarningDto {
 
 class ParsedParcelsImportErrorDto {
   rowNumber!: number
+  rawRow?: string[]
 
   @ApiProperty({
     enum: PARSE_ERROR_CODES,
