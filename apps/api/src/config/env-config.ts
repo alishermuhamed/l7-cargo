@@ -24,7 +24,6 @@ export function envConfig() {
     otp: {
       autocall: {
         apiToken: process.env.AUTOCALL_API_TOKEN,
-        channel: process.env.AUTOCALL_OTP_CHANNEL,
       },
       telegramGateway: {
         accessToken: process.env.TELEGRAM_GATEWAY_ACCESS_TOKEN,

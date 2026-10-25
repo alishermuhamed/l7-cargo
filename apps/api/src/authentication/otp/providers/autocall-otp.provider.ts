@@ -5,7 +5,7 @@ import { BadGatewayException, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '../../../config/config.service'
 import { OtpProvider } from './otp.provider'
 
-const CHANNELS = ['whatsapp', 'telegram', 'sms'] as const
+const CHANNELS = ['telegram', 'whatsapp', 'sms'] as const
 const STATUSES = [
   'pending',
   'sent',
@@ -41,14 +41,12 @@ export class AutocallOtpProvider extends OtpProvider {
   private readonly logger = new Logger(AutocallOtpProvider.name)
   private readonly apiBaseUrl = 'https://autocall.kz/api/v1'
   private readonly apiToken: string | undefined
-  private readonly channel: string
   private readonly channelTimeoutMs = 10_000
   private readonly pollIntervalMs = 1_000
 
   constructor(configService: ConfigService) {
     super()
     this.apiToken = configService.get('otp.autocall.apiToken')
-    this.channel = configService.get('otp.autocall.channel') || 'whatsapp'
   }
 
   get isConfigured(): boolean {
@@ -69,7 +67,7 @@ export class AutocallOtpProvider extends OtpProvider {
     const number = this.formatPhoneNumber(phoneNumber)
     const expiresAt = Date.now() + 300_000
 
-    for (const channel of this.getChannels()) {
+    for (const channel of CHANNELS) {
       const deadline = Date.now() + this.channelTimeoutMs
 
       try {
@@ -133,16 +131,6 @@ export class AutocallOtpProvider extends OtpProvider {
     }
 
     throw new BadGatewayException('Failed to send OTP')
-  }
-
-  private getChannels(): AutocallChannel[] {
-    const channel = CHANNELS.find((value): boolean => value === this.channel)
-    if (!channel) {
-      throw new BadGatewayException('Invalid Autocall OTP channel')
-    }
-
-    // Keep the configured starting channel and only fall forward, never repeat it.
-    return CHANNELS.slice(CHANNELS.indexOf(channel))
   }
 
   private async request({
