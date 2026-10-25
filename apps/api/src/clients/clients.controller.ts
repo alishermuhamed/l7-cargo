@@ -67,7 +67,7 @@ export class ClientsController {
     const clients = await this.clientsService.find({
       where,
       relations: { user: true },
-      order: { code: 'ASC' },
+      order: { createdAt: 'DESC', id: 'DESC' },
       take: limit,
       skip: offset,
     })

@@ -22,6 +22,7 @@ import { UnsavedChangesBlocker } from '../../../../components/unsaved-changes-bl
 import {
   createParcel,
   type CreateParcelRequestDto,
+  updateParcel,
 } from '../../../../lib/api/api.gen'
 import { ApiError } from '../../../../lib/api/custom-fetch'
 import { MANAGER_WHATSAPP_URL } from '../../../../lib/contact'
@@ -71,6 +72,11 @@ function AddParcelPage() {
     mutationFn: (dto: CreateParcelRequestDto) => createParcel(dto),
   })
 
+  const updateParcelDescriptionMutation = useMutation({
+    mutationFn: (data: { parcelId: string; description: string }) =>
+      updateParcel(data.parcelId, { description: data.description }),
+  })
+
   const navigateToParcels = (params?: {
     ignoreBlocker?: boolean
     replace?: boolean
@@ -118,6 +124,18 @@ function AddParcelPage() {
               : null
 
           if (typeof parcelId === 'string') {
+            if (description) {
+              try {
+                await updateParcelDescriptionMutation.mutateAsync({
+                  parcelId,
+                  description,
+                })
+              } catch {
+                toast.error(i18n.t('parcels:unableToEditParcel'))
+                return
+              }
+            }
+
             await navigate({
               to: '/parcels/$parcelId',
               params: { parcelId },
