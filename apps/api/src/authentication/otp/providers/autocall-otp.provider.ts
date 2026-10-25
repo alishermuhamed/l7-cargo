@@ -1,9 +1,38 @@
+import { setTimeout } from 'node:timers/promises'
+
 import { BadGatewayException, Injectable, Logger } from '@nestjs/common'
 
 import { ConfigService } from '../../../config/config.service'
 import { OtpProvider } from './otp.provider'
 
-type AutocallChannel = 'whatsapp' | 'sms'
+const CHANNELS = ['whatsapp', 'telegram', 'sms'] as const
+const STATUSES = [
+  'pending',
+  'sent',
+  'delivered',
+  'read',
+  'verified',
+  'expired',
+  'failed',
+] as const
+
+type AutocallChannel = (typeof CHANNELS)[number]
+type AutocallStatus = (typeof STATUSES)[number]
+
+interface AutocallOtp {
+  id: number
+  channel: AutocallChannel
+  number: string
+  code: string
+  status: AutocallStatus
+  reason?: string | null
+}
+
+class AutocallRequestError extends BadGatewayException {
+  constructor(readonly retryable: boolean) {
+    super('Failed to send OTP')
+  }
+}
 
 @Injectable()
 export class AutocallOtpProvider extends OtpProvider {
@@ -13,6 +42,8 @@ export class AutocallOtpProvider extends OtpProvider {
   private readonly apiBaseUrl = 'https://autocall.kz/api/v1'
   private readonly apiToken: string | undefined
   private readonly channel: string
+  private readonly channelTimeoutMs = 10_000
+  private readonly pollIntervalMs = 1_000
 
   constructor(configService: ConfigService) {
     super()
@@ -35,81 +66,165 @@ export class AutocallOtpProvider extends OtpProvider {
       throw new BadGatewayException('Autocall is not configured')
     }
 
-    const channel = this.getChannel()
     const number = this.formatPhoneNumber(phoneNumber)
+    const expiresAt = Date.now() + 300_000
 
-    try {
-      const response = await this.post({
-        abortAfterMs: 10_000,
-        url: `${this.apiBaseUrl}/otp/${channel}`,
-        headers: {
-          Authorization: `Bearer ${this.apiToken}`,
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+    for (const channel of this.getChannels()) {
+      const deadline = Date.now() + this.channelTimeoutMs
+
+      try {
+        let otp = await this.request({
+          path: `/otp/${channel}`,
+          channel,
           number,
           code,
-          ttl: 300,
-          language: 'ru',
-        }),
-      })
+          deadline,
+          ttl: Math.floor((expiresAt - Date.now()) / 1_000),
+        })
 
-      const body: unknown = await response.json()
+        while (true) {
+          if (['delivered', 'read', 'verified'].includes(otp.status)) {
+            return
+          }
 
-      if (
-        response.status !== 201 ||
-        !AutocallOtpProvider.isAcceptedResponse(body, channel, number, code)
-      ) {
+          // A newer request or explicit revocation must not revive this code.
+          if (otp.reason === 'replaced' || otp.reason === 'revoked') {
+            return
+          }
+
+          if (
+            otp.reason === 'invalid_number' ||
+            otp.reason === 'too_many_attempts'
+          ) {
+            throw new AutocallRequestError(false)
+          }
+
+          if (otp.status === 'failed' || otp.status === 'expired') {
+            break
+          }
+
+          const remainingMs = deadline - Date.now()
+          if (remainingMs <= this.pollIntervalMs) {
+            break
+          }
+
+          await setTimeout(this.pollIntervalMs)
+          otp = await this.request({
+            path: `/otp/${otp.id}`,
+            channel,
+            number,
+            code,
+            deadline,
+            id: otp.id,
+          })
+        }
+
         this.logger.warn(
-          `Autocall ${channel} rejected OTP for ${number} with HTTP ${response.status}`
+          `Autocall ${channel} did not confirm OTP delivery (status: ${otp.status})`
         )
-        throw new BadGatewayException('Failed to send OTP')
-      }
-    } catch (error: unknown) {
-      if (error instanceof BadGatewayException) {
-        throw error
-      }
+      } catch (error: unknown) {
+        if (error instanceof AutocallRequestError && !error.retryable) {
+          throw error
+        }
 
-      this.logger.error(
-        `Autocall ${channel} request failed for ${number}`,
-        error instanceof Error ? error.stack : String(error)
-      )
-
-      throw new BadGatewayException('Failed to send OTP')
+        // Do not log response bodies: they contain the verification code.
+        this.logger.warn(`Autocall ${channel} OTP delivery failed`)
+      }
     }
+
+    throw new BadGatewayException('Failed to send OTP')
   }
 
-  private getChannel(): AutocallChannel {
-    const channel = this.channel
-
-    if (channel !== 'whatsapp' && channel !== 'sms') {
+  private getChannels(): AutocallChannel[] {
+    const channel = CHANNELS.find((value): boolean => value === this.channel)
+    if (!channel) {
       throw new BadGatewayException('Invalid Autocall OTP channel')
     }
 
-    return channel
+    // Keep the configured starting channel and only fall forward, never repeat it.
+    return CHANNELS.slice(CHANNELS.indexOf(channel))
   }
 
-  private static isAcceptedResponse(
-    value: unknown,
-    channel: AutocallChannel,
-    number: string,
+  private async request({
+    path,
+    channel,
+    number,
+    code,
+    deadline,
+    ttl,
+    id,
+  }: {
+    path: string
+    channel: AutocallChannel
+    number: string
     code: string
-  ): boolean {
+    deadline: number
+    ttl?: number
+    id?: number
+  }): Promise<AutocallOtp> {
+    const remainingMs = deadline - Date.now()
+    if (remainingMs <= 0) {
+      throw new AutocallRequestError(true)
+    }
+
+    // The timeout covers response headers AND reading the JSON body.
+    const response = await fetch(`${this.apiBaseUrl}${path}`, {
+      method: ttl === undefined ? 'GET' : 'POST',
+      headers: {
+        Authorization: `Bearer ${this.apiToken}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      signal: AbortSignal.timeout(remainingMs),
+      body:
+        ttl === undefined
+          ? undefined
+          : JSON.stringify({ number, code, ttl, language: 'ru' }),
+    })
+
+    if (response.status !== (ttl === undefined ? 200 : 201)) {
+      this.logger.warn(
+        `Autocall ${channel} OTP request returned HTTP ${response.status}`
+      )
+      // Changing channels cannot fix credentials, balance or a shared rate limit.
+      throw new AutocallRequestError(
+        ![401, 402, 403, 429].includes(response.status)
+      )
+    }
+
+    const body: unknown = await response.json()
+    if (
+      !AutocallOtpProvider.isOtp(body) ||
+      body.channel !== channel ||
+      body.number !== number ||
+      body.code !== code ||
+      (id !== undefined && body.id !== id)
+    ) {
+      throw new AutocallRequestError(true)
+    }
+
+    return body
+  }
+
+  private static isOtp(value: unknown): value is AutocallOtp {
     return (
       typeof value === 'object' &&
       value !== null &&
       'id' in value &&
-      Number.isInteger(value.id) &&
+      typeof value.id === 'number' &&
+      Number.isSafeInteger(value.id) &&
+      value.id > 0 &&
       'channel' in value &&
-      value.channel === channel &&
+      CHANNELS.some((channel): boolean => channel === value.channel) &&
       'number' in value &&
-      value.number === number &&
+      typeof value.number === 'string' &&
       'code' in value &&
-      value.code === code &&
+      typeof value.code === 'string' &&
       'status' in value &&
-      typeof value.status === 'string' &&
-      ['pending', 'sent', 'delivered', 'read'].includes(value.status)
+      STATUSES.some((status): boolean => status === value.status) &&
+      (!('reason' in value) ||
+        value.reason === null ||
+        typeof value.reason === 'string')
     )
   }
 }
