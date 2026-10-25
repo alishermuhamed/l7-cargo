@@ -14,6 +14,7 @@ import { BetterAuthTypeOrmAdapter } from '../db/adapters/better-auth-typeorm.ada
 import { DEFAULT_USER_ROLE } from '../users/user-role'
 import { AccountsRepository } from './accounts.repository'
 import { OtpDeliveryService } from './otp/otp-delivery.service'
+import { RegistrationNotificationService } from './registration-notification.service'
 import type { SignInMethod } from './sign-in-method'
 
 function createBetterAuth({
@@ -26,6 +27,7 @@ function createBetterAuth({
   sendOTP,
   sendPasswordResetOTP,
   resolveClientIdForNewUser,
+  notifyRegistration,
 }: {
   typeOrmAdapter: BetterAuthTypeOrmAdapter
   secret: string
@@ -39,6 +41,11 @@ function createBetterAuth({
     code: string
   }) => Promise<void>
   resolveClientIdForNewUser: (phoneNumber: unknown) => Promise<string>
+  notifyRegistration: (user: {
+    id: string
+    name: string
+    phoneNumber?: unknown
+  }) => Promise<void>
 }) {
   return betterAuthFactory({
     basePath: '/auth',
@@ -84,6 +91,7 @@ function createBetterAuth({
               clientId: await resolveClientIdForNewUser(user.phoneNumber),
             },
           }),
+          after: notifyRegistration,
         },
       },
     },
@@ -113,6 +121,7 @@ export class AuthenticationService {
     private readonly betterAuthTypeOrmAdapter: BetterAuthTypeOrmAdapter,
     private readonly otpDeliveryService: OtpDeliveryService,
     private readonly clientsService: ClientsService,
+    private readonly registrationNotificationService: RegistrationNotificationService,
     private readonly accountsRepository: AccountsRepository
   ) {
     this.betterAuth = createBetterAuth({
@@ -126,6 +135,8 @@ export class AuthenticationService {
       sendPasswordResetOTP: (data) => this.sendPasswordResetOTP(data),
       resolveClientIdForNewUser: async (phoneNumber) =>
         (await this.clientsService.resolveForNewUser(phoneNumber)).id,
+      notifyRegistration: (user): Promise<void> =>
+        this.registrationNotificationService.send(user),
     })
   }
 

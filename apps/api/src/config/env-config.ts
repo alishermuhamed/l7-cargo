@@ -43,6 +43,10 @@ export function envConfig() {
         chatIds: process.env.TELEGRAM_FALLBACK_CHAT_IDS,
       },
     },
+    registrationNotifications: {
+      botToken: process.env.TELEGRAM_REGISTRATION_BOT_TOKEN,
+      chatId: process.env.TELEGRAM_REGISTRATION_CHAT_ID,
+    },
     defaultAdmin: {
       email: process.env.DEFAULT_ADMIN_EMAIL,
       password: process.env.DEFAULT_ADMIN_PASSWORD,
