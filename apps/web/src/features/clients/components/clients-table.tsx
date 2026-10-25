@@ -6,6 +6,7 @@ import { Link } from '@tanstack/react-router'
 import { Button } from '../../../components/button'
 import { IconButton } from '../../../components/icon-button'
 import { getClientsQueryOptions } from '../../../lib/api/queries'
+import { formatClientCode } from '../../../lib/client-code'
 import i18n from '../../../lib/i18n'
 import { formatPhoneNumber } from '../../../lib/phone-number'
 
@@ -56,7 +57,7 @@ export function ClientsTable({
           {clients.length > 0 &&
             clients.map((client) => (
               <Table.Row key={client.id}>
-                <Table.Cell>{client.code}</Table.Cell>
+                <Table.Cell>{formatClientCode(client.code)}</Table.Cell>
 
                 <Table.RowHeaderCell>
                   {client.user?.name ?? '-'}

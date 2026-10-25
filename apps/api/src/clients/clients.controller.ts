@@ -23,6 +23,11 @@ import { UpdateClientCodeRequestDto } from './dtos/update-client-code-request.dt
 
 const CLIENT_ID_PARAM = 'clientId'
 
+function formattedClientCodeSql(column: string): string {
+  const digits = `CAST(ABS(CAST(${column} AS bigint)) AS text)`
+  return `(CASE WHEN ${column} < 0 THEN '-' ELSE '' END || LPAD(${digits}, GREATEST(3, LENGTH(${digits})), '0'))`
+}
+
 @Controller('clients')
 export class ClientsController {
   constructor(
@@ -39,14 +44,17 @@ export class ClientsController {
     const where = search
       ? [
           {
-            code: Raw((alias) => `CAST(${alias} AS text) ILIKE :search`, {
-              search: `%${search}%`,
-            }),
+            code: Raw(
+              (alias) => `${formattedClientCodeSql(alias)} ILIKE :search`,
+              {
+                search: `%${search}%`,
+              }
+            ),
           },
           {
             id: Raw(
               (alias) =>
-                `EXISTS (SELECT 1 FROM "client_code_alias" "codeAlias" WHERE "codeAlias"."clientId" = ${alias} AND CAST("codeAlias"."code" AS text) ILIKE :search)`,
+                `EXISTS (SELECT 1 FROM "client_code_alias" "codeAlias" WHERE "codeAlias"."clientId" = ${alias} AND ${formattedClientCodeSql('"codeAlias"."code"')} ILIKE :search)`,
               { search: `%${search}%` }
             ),
           },

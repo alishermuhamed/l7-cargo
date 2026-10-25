@@ -5,6 +5,7 @@ import { Link as RouterLink } from '@tanstack/react-router'
 import type { PropsWithChildren } from 'react'
 
 import { useClientContext } from '../../hooks/use-client-context'
+import { formatClientCode } from '../../lib/client-code'
 import i18n from '../../lib/i18n'
 
 interface ClientNavBarProps {
@@ -21,7 +22,7 @@ export function ClientNavBar({ onNavigate }: ClientNavBarProps) {
           <Heading>L7 Cargo</Heading>
 
           <Text size="2" color="gray">
-            {i18n.t('profile:clientCode')}: {client.code}
+            {i18n.t('profile:clientCode')}: {formatClientCode(client.code)}
           </Text>
         </Flex>
 

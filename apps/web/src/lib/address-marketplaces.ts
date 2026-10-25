@@ -1,5 +1,7 @@
 import parsePhoneNumber from 'libphonenumber-js'
 
+import { formatClientCode } from './client-code'
+
 export const MARKETPLACE_SLUGS = [
   'pinduoduo',
   'taobao',
@@ -142,11 +144,11 @@ function formatPinduoduoAddress({
   const latinUserName = cyrillicToLatin(userName)
 
   const recipientLine = clientPhoneNumber
-    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName} ${clientPhoneNumber}`
-    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName}`
+    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${formatClientCode(clientCode)} ${latinUserName} ${clientPhoneNumber}`
+    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${formatClientCode(clientCode)} ${latinUserName}`
 
   return [
-    `JL7182-${clientCode}`,
+    `JL7182-${formatClientCode(clientCode)}`,
     '13661225513',
     '',
     '广东省',
@@ -166,8 +168,8 @@ function formatTaobaoAddress({
   const latinUserName = cyrillicToLatin(userName)
 
   const recipientLine = clientPhoneNumber
-    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName} ${clientPhoneNumber}`
-    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName}`
+    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${formatClientCode(clientCode)} ${latinUserName} ${clientPhoneNumber}`
+    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${formatClientCode(clientCode)} ${latinUserName}`
 
   return [
     '广东省',
@@ -177,7 +179,7 @@ function formatTaobaoAddress({
     '',
     recipientLine,
     '',
-    `JL7182-${clientCode}`,
+    `JL7182-${formatClientCode(clientCode)}`,
     '13661225513',
   ]
 }
@@ -191,11 +193,11 @@ function formatPoizonAddress({
   const latinUserName = cyrillicToLatin(userName)
 
   const recipientLine = clientPhoneNumber
-    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName} ${clientPhoneNumber}`
-    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName}`
+    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${formatClientCode(clientCode)} ${latinUserName} ${clientPhoneNumber}`
+    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${formatClientCode(clientCode)} ${latinUserName}`
 
   return [
-    `JL7182-${clientCode}`,
+    `JL7182-${formatClientCode(clientCode)}`,
     '13661225513',
     '',
     '广东省',
@@ -216,11 +218,11 @@ function format1688Address({
   const latinUserName = cyrillicToLatin(userName)
 
   const recipientLine = clientPhoneNumber
-    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName} ${clientPhoneNumber}`
-    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName}`
+    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${formatClientCode(clientCode)} ${latinUserName} ${clientPhoneNumber}`
+    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${formatClientCode(clientCode)} ${latinUserName}`
 
   return [
-    `JL7182-${clientCode}`,
+    `JL7182-${formatClientCode(clientCode)}`,
     '13661225513',
     '',
     '广东省',
@@ -241,11 +243,11 @@ function formatWeChatAddress({
   const latinUserName = cyrillicToLatin(userName)
 
   const recipientLine = clientPhoneNumber
-    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName} ${clientPhoneNumber}`
-    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${clientCode} ${latinUserName}`
+    ? `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${formatClientCode(clientCode)} ${latinUserName} ${clientPhoneNumber}`
+    : `里水镇沙涌社区上沙村松元路2号F栋 158库JL7182-${formatClientCode(clientCode)} ${latinUserName}`
 
   return [
-    `JL7182-${clientCode}`,
+    `JL7182-${formatClientCode(clientCode)}`,
     '13661225513',
     '',
     '广东省',

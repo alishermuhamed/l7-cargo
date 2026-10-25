@@ -4,6 +4,7 @@ import { createFileRoute, Link as RouterLink } from '@tanstack/react-router'
 
 import { Button } from '../../../../components/button'
 import { useClientContext } from '../../../../hooks/use-client-context'
+import { formatClientCode } from '../../../../lib/client-code'
 import i18n from '../../../../lib/i18n'
 import { formatPhoneNumber } from '../../../../lib/phone-number'
 
@@ -27,7 +28,7 @@ function ProfilePage() {
           <DataList.Root>
             <DataList.Item>
               <DataList.Label>{i18n.t('profile:clientCode')}</DataList.Label>
-              <DataList.Value>{client.code}</DataList.Value>
+              <DataList.Value>{formatClientCode(client.code)}</DataList.Value>
             </DataList.Item>
 
             <DataList.Item>

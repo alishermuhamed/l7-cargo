@@ -1,6 +1,7 @@
 import { Box, Table } from '@radix-ui/themes'
 
 import type { ParsedParcelsImportRowDto } from '../../../lib/api/api.gen'
+import { formatClientCode } from '../../../lib/client-code'
 import i18n from '../../../lib/i18n'
 import { formatMoneyAmount } from '../../../lib/money'
 import { formatWeightKg } from '../../parcels/lib/format-weight'
@@ -50,7 +51,9 @@ export function ParcelsImportIssuesTable({
           {issues.map(({ rowNumber, code, label, row, rawRow }) => {
             const cells = rawRow ?? [
               row?.trackingNumber,
-              row?.clientCode,
+              row?.clientCode === undefined
+                ? undefined
+                : formatClientCode(row.clientCode),
               row?.weightKg === undefined
                 ? undefined
                 : formatWeightKg(row.weightKg),
@@ -66,7 +69,11 @@ export function ParcelsImportIssuesTable({
                 <Table.Cell>{label}</Table.Cell>
                 {Array.from({ length: 5 }, (_, index) => (
                   <Table.Cell key={index}>
-                    {cells[index] === '' ? '-' : (cells[index] ?? '-')}
+                    {index === 1 && rawRow && /^\d+$/.test(rawRow[index] ?? '')
+                      ? rawRow[index]?.padStart(3, '0')
+                      : cells[index] === ''
+                        ? '-'
+                        : (cells[index] ?? '-')}
                   </Table.Cell>
                 ))}
               </Table.Row>

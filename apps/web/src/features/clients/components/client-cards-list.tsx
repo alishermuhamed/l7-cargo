@@ -4,6 +4,7 @@ import { Link } from '@tanstack/react-router'
 
 import { useIntersectionObserver } from '../../../hooks/use-intersection-observer'
 import { getClientsInfiniteQueryOptions } from '../../../lib/api/queries'
+import { formatClientCode } from '../../../lib/client-code'
 import i18n from '../../../lib/i18n'
 import { formatPhoneNumber } from '../../../lib/phone-number'
 
@@ -55,7 +56,7 @@ export function ClientCardsList({ search }: ClientCardsListProps) {
                   </Text>
 
                   <Text as="p" color="gray" size="2" truncate>
-                    {i18n.t('clients:code')}: {client.code}
+                    {i18n.t('clients:code')}: {formatClientCode(client.code)}
                   </Text>
 
                   <Text as="p" color="gray" size="2" truncate>
