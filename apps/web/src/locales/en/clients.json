@@ -16,7 +16,7 @@
     "remove": "Remove",
     "newCode": "New code",
     "empty": "No alternative codes",
-    "changeDescription": "Current primary code: {{code}}. The old code will not be saved automatically. Add it as an alternative after the change if needed.",
+    "changeDescription": "Current primary code: {{code}}. The previous primary code will automatically be saved as an alternative. Temporary codes are not saved.",
     "addDescription": "Enter an additional code that can be used to find this client.",
     "removeDescription": "Remove alternative code {{code}}? Existing parcels will remain with this client.",
     "conflict": "This code is already assigned to another client",

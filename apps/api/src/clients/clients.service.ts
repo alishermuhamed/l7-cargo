@@ -109,6 +109,9 @@ export class ClientsService {
     await this.assertCodeAvailable(clientId, code)
     await this.clientCodeAliasRepository.delete({ clientId, code })
     await this.clientsRepository.update({ id: clientId }, { code })
+    if (client.code > 0) {
+      await this.insertAlias(clientId, client.code)
+    }
   }
 
   @Transactional()
