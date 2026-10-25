@@ -2,7 +2,6 @@ import { Box, Card, Flex, Skeleton, Text } from '@radix-ui/themes'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 
-import { useDebounce } from '../../../hooks/use-debounce'
 import { useIntersectionObserver } from '../../../hooks/use-intersection-observer'
 import { type GetParcelsParams, ParcelStatus } from '../../../lib/api/api.gen'
 import { getParcelsInfiniteQueryOptions } from '../../../lib/api/queries'
@@ -24,11 +23,9 @@ export function ParcelCardsList({
   clientId,
   isAdminPage = false,
 }: ParcelCardsListProps) {
-  const debouncedSearch = useDebounce(search, 500)
-
   const params: GetParcelsParams = {
     limit: PARCELS_PAGE_SIZE,
-    search: debouncedSearch.length === 0 ? undefined : debouncedSearch,
+    search: search.length === 0 ? undefined : search,
     status,
     clientId,
   }

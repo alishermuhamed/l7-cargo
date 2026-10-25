@@ -2,9 +2,9 @@ import { Box, Card, Flex, Skeleton, Text } from '@radix-ui/themes'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 
-import { useDebounce } from '../../../hooks/use-debounce'
 import { useIntersectionObserver } from '../../../hooks/use-intersection-observer'
 import { getClientsInfiniteQueryOptions } from '../../../lib/api/queries'
+import { formatClientCode } from '../../../lib/client-code'
 import i18n from '../../../lib/i18n'
 import { formatPhoneNumber } from '../../../lib/phone-number'
 
@@ -15,11 +15,9 @@ interface ClientCardsListProps {
 }
 
 export function ClientCardsList({ search }: ClientCardsListProps) {
-  const debouncedSearch = useDebounce(search, 500)
-
   const params = {
     limit: CLIENTS_PAGE_SIZE,
-    search: debouncedSearch.length === 0 ? undefined : debouncedSearch,
+    search: search.length === 0 ? undefined : search,
   }
 
   const {
@@ -58,7 +56,7 @@ export function ClientCardsList({ search }: ClientCardsListProps) {
                   </Text>
 
                   <Text as="p" color="gray" size="2" truncate>
-                    {i18n.t('clients:code')}: {client.code}
+                    {i18n.t('clients:code')}: {formatClientCode(client.code)}
                   </Text>
 
                   <Text as="p" color="gray" size="2" truncate>

@@ -43,6 +43,7 @@ import {
   getParcelQueryOptions,
   getParcelStatusHistoryQueryOptions,
 } from '../../../../../lib/api/queries'
+import { formatClientCode } from '../../../../../lib/client-code'
 import { normalizeDecimalSeparator } from '../../../../../lib/decimal'
 import i18n from '../../../../../lib/i18n'
 import {
@@ -120,7 +121,7 @@ function EditAdminParcelPage() {
   const form = useForm<EditAdminParcelFormValues>({
     resolver: zodResolver(editAdminParcelSchema),
     defaultValues: {
-      clientCode: initialClient ? String(initialClient.code) : '',
+      clientCode: initialClient ? formatClientCode(initialClient.code) : '',
       weightKg: initialParcel.weightKg ?? '',
       deliveryFee: initialParcel.deliveryFee ?? '',
       comments: initialParcel.comments ?? '',

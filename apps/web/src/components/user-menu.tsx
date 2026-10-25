@@ -16,6 +16,7 @@ import { useSessionContext } from '../hooks/use-session-context'
 import { useThemeContext } from '../hooks/use-theme-context'
 import { UserRole } from '../lib/api/api.gen'
 import { authClient } from '../lib/auth-client'
+import { formatClientCode } from '../lib/client-code'
 import i18n, {
   type Language,
   LANGUAGE_LABELS,
@@ -132,7 +133,7 @@ function ClientCode() {
 
   return (
     <Text size="1" color="gray">
-      {i18n.t('profile:clientCode')}: {client.code}
+      {i18n.t('profile:clientCode')}: {formatClientCode(client.code)}
     </Text>
   )
 }

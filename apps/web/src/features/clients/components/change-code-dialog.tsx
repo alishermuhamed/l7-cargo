@@ -16,6 +16,7 @@ import {
 } from '../../../components/form'
 import { type GetClientResponseDto } from '../../../lib/api/api.gen'
 import { ApiError } from '../../../lib/api/custom-fetch'
+import { formatClientCode } from '../../../lib/client-code'
 import i18n from '../../../lib/i18n'
 import { useUpdateClientCode } from '../hooks/use-update-client-code'
 
@@ -93,7 +94,9 @@ export function ChangeCodeDialog({
       >
         <Dialog.Title>{i18n.t('clients:codes.change')}</Dialog.Title>
         <Dialog.Description size="2" mb="4">
-          {i18n.t('clients:codes.changeDescription', { code: expectedCode })}
+          {i18n.t('clients:codes.changeDescription', {
+            code: formatClientCode(expectedCode),
+          })}
         </Dialog.Description>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>

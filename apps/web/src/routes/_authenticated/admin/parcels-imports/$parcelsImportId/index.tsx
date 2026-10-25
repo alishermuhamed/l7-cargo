@@ -27,6 +27,7 @@ import {
   deleteParcelsImport as deleteParcelsImportRequest,
 } from '../../../../../lib/api/api.gen'
 import { getParcelsImportQueryOptions } from '../../../../../lib/api/queries'
+import { formatClientCode } from '../../../../../lib/client-code'
 import { formatDate, formatDateTime } from '../../../../../lib/date-time'
 import i18n from '../../../../../lib/i18n'
 import { formatMoneyAmount } from '../../../../../lib/money'
@@ -199,7 +200,11 @@ function AdminParcelsImportDetailsPage() {
 
                     <Table.Cell>{row.trackingNumber}</Table.Cell>
 
-                    <Table.Cell>{row.clientCode ?? '-'}</Table.Cell>
+                    <Table.Cell>
+                      {row.clientCode === undefined
+                        ? '-'
+                        : formatClientCode(row.clientCode)}
+                    </Table.Cell>
 
                     <Table.Cell>
                       {row.weightKg ? formatWeightKg(row.weightKg) : '-'}

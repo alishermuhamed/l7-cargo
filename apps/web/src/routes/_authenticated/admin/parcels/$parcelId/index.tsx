@@ -31,6 +31,7 @@ import {
   getParcelQueryOptions,
   getParcelStatusHistoryQueryOptions,
 } from '../../../../../lib/api/queries'
+import { formatClientCode } from '../../../../../lib/client-code'
 import { formatDate, formatDateTime } from '../../../../../lib/date-time'
 import i18n from '../../../../../lib/i18n'
 import { formatMoneyAmount } from '../../../../../lib/money'
@@ -122,7 +123,7 @@ function AdminParcelPage() {
                       to="/admin/clients/$clientId"
                       params={{ clientId: client.id }}
                     >
-                      {client.code}
+                      {formatClientCode(client.code)}
                     </RouterLink>
                   </Text>
                 ) : (

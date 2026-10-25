@@ -5,6 +5,7 @@ import toast from 'react-hot-toast'
 import { AlertDialog } from '../../../components/alert-dialog'
 import { type GetClientResponseDto } from '../../../lib/api/api.gen'
 import { ApiError } from '../../../lib/api/custom-fetch'
+import { formatClientCode } from '../../../lib/client-code'
 import i18n from '../../../lib/i18n'
 import { useRemoveAliasMutation } from '../hooks/use-remove-alias-mutation'
 import { useUpdateClientCode } from '../hooks/use-update-client-code'
@@ -70,7 +71,7 @@ export function ManageAlternativeCodesDialog({
               justify="between"
               gap="2"
             >
-              <Text weight="medium">{code}</Text>
+              <Text weight="medium">{formatClientCode(code)}</Text>
               <Flex gap="2" wrap="wrap">
                 <Button
                   variant="soft"
@@ -122,7 +123,7 @@ export function ManageAlternativeCodesDialog({
               if (!open) setPromoteAlias(null)
             }}
             title={i18n.t('clients:codes.promote')}
-            description={`${promoteAlias.code}. ${i18n.t('clients:codes.changeDescription', { code: promoteAlias.expectedCode })}`}
+            description={`${formatClientCode(promoteAlias.code)}. ${i18n.t('clients:codes.changeDescription', { code: formatClientCode(promoteAlias.expectedCode) })}`}
             actionLabel={i18n.t('clients:codes.promote')}
             onAction={() =>
               updateCodeMutation.mutate(promoteAlias, mutationOptions)
@@ -138,7 +139,7 @@ export function ManageAlternativeCodesDialog({
             }}
             title={i18n.t('clients:codes.remove')}
             description={i18n.t('clients:codes.removeDescription', {
-              code: removeAlias,
+              code: formatClientCode(removeAlias),
             })}
             actionLabel={i18n.t('clients:codes.remove')}
             actionColor="red"

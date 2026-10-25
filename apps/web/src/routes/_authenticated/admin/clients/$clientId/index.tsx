@@ -22,6 +22,7 @@ import { ParcelsTable } from '../../../../../features/parcels/components/parcels
 import { PARCEL_STATUS_LABELS } from '../../../../../features/parcels/lib/parcel-status-labels'
 import { ParcelStatus } from '../../../../../lib/api/api.gen'
 import { getClientQueryOptions } from '../../../../../lib/api/queries'
+import { formatClientCode } from '../../../../../lib/client-code'
 import i18n from '../../../../../lib/i18n'
 import { parcelsSearchSchema } from '../../../../../lib/list-search'
 import { formatPhoneNumber } from '../../../../../lib/phone-number'
@@ -103,7 +104,7 @@ function AdminClientDetailsPage() {
               <DataList.Label>{i18n.t('clients:code')}</DataList.Label>
               <DataList.Value>
                 <Flex align="center" gap="3">
-                  <Text>{client.code}</Text>
+                  <Text>{formatClientCode(client.code)}</Text>
                   <IconButton
                     variant="ghost"
                     size="1"
@@ -120,7 +121,9 @@ function AdminClientDetailsPage() {
               <DataList.Label>{i18n.t('clients:aliases')}</DataList.Label>
               <DataList.Value>
                 <Flex align="center" gap="3">
-                  <Text>{client.aliases.join(', ') || '-'}</Text>
+                  <Text>
+                    {client.aliases.map(formatClientCode).join(', ') || '-'}
+                  </Text>
                   <IconButton
                     variant="ghost"
                     size="1"
