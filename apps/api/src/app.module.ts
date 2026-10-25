@@ -5,6 +5,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { AppController } from './app.controller'
 import { AuthenticationModule } from './authentication/authentication.module'
 import { AuthorizationModule } from './authorization/authorization.module'
+import { ClientMergesModule } from './client-merges/client-merges.module'
 import { ClientsModule } from './clients/clients.module'
 import { AuthenticationGuard } from './common/guards/authentication.guard'
 import { ClientAccessGuard } from './common/guards/client-access.guard'
@@ -29,6 +30,7 @@ import { UsersModule } from './users/users.module'
     AuthenticationModule,
     AuthorizationModule,
     ClientsModule,
+    ClientMergesModule,
     UsersModule,
     ParcelsModule,
     ParcelsImportsModule,

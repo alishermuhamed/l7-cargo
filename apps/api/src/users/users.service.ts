@@ -9,6 +9,13 @@ import { UsersRepository } from './users.repository'
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
+  async transferClient(sourceId: string, targetId: string): Promise<void> {
+    await this.usersRepository.update(
+      { clientId: sourceId },
+      { clientId: targetId }
+    )
+  }
+
   async find<R extends FindOptionsRelations<User>>(
     options?: Omit<FindManyOptions<User>, 'relations'> & {
       relations?: R

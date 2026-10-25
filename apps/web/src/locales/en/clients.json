@@ -34,5 +34,23 @@
     "contactManager": "Contact manager",
     "reload": "Reload page",
     "signOutFailed": "Could not sign out. Please try again."
+  },
+  "merge": {
+    "title": "Merge clients",
+    "selected": "Selected client",
+    "change": "Change",
+    "after": "After merging:",
+    "search": "Merge with",
+    "placeholder": "Primary or alternative code",
+    "loading": "Loading…",
+    "results": "Matching clients",
+    "submit": "Merge",
+    "saved": "Clients merged",
+    "reviewRequired": "These clients require manual review before merging.",
+    "changed": "Client data has changed. Review the updated result and confirm again.",
+    "notFound": "One of the clients is no longer available. Select a client again.",
+    "failed": "Could not merge clients. Please try again.",
+    "searchFailed": "Could not find the client. Please try again.",
+    "invalidCode": "Enter a nonzero integer code from -2147483648 to 2147483647."
   }
 }
