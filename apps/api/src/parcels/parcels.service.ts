@@ -19,6 +19,21 @@ export class ParcelsService {
     private readonly clientsService: ClientsService
   ) {}
 
+  async lockForClientMerge(clientIds: string[]): Promise<void> {
+    await this.parcelsRepository.lockForClientMerge(clientIds)
+  }
+
+  async countByClient(clientId: string): Promise<number> {
+    return this.parcelsRepository.countByClient(clientId)
+  }
+
+  async transferClient(sourceId: string, targetId: string): Promise<void> {
+    await this.parcelsRepository.update(
+      { clientId: sourceId },
+      { clientId: targetId }
+    )
+  }
+
   async create({
     clientId,
     trackingNumber,

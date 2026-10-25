@@ -63,6 +63,34 @@ export interface PhoneResetPasswordDto {
   newPassword: string
 }
 
+export interface MergeCandidateResponseDto {
+  id: string
+  code: number
+  aliases: number[]
+  /** @nullable */
+  name: string | null
+  /** @nullable */
+  phone: string | null
+  parcelCount: number
+}
+
+export interface ClientMergePreviewResponseDto {
+  /** @nullable */
+  name: string | null
+  /** @nullable */
+  phone: string | null
+  code: number
+  aliases: number[]
+  parcelCount: number
+  version: string
+}
+
+export interface MergeClientsRequestDto {
+  sourceId: string
+  /** @pattern ^[a-f0-9]{64}$ */
+  version: string
+}
+
 export interface LinkedUserDto {
   id: string
   name: string
@@ -300,6 +328,18 @@ export type GetSignInMethodParams = {
   phoneNumber: string
 }
 
+export type FindMergeCandidatesParams = {
+  /**
+   * @minimum -2147483648
+   * @maximum 2147483647
+   */
+  code: number
+}
+
+export type PreviewClientMergeParams = {
+  sourceId: string
+}
+
 export type GetClientsParams = {
   /**
    * @minimum 0
@@ -521,6 +561,89 @@ export const signOut = async (options?: RequestInit): Promise<void> => {
   return customFetch<void>(getSignOutUrl(), {
     ...options,
     method: 'POST',
+  })
+}
+
+export const getFindMergeCandidatesUrl = (
+  clientId: string,
+  params: FindMergeCandidatesParams
+) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0
+    ? `/clients/${clientId}/merge/candidates?${stringifiedParams}`
+    : `/clients/${clientId}/merge/candidates`
+}
+
+export const findMergeCandidates = async (
+  clientId: string,
+  params: FindMergeCandidatesParams,
+  options?: RequestInit
+): Promise<MergeCandidateResponseDto[]> => {
+  return customFetch<MergeCandidateResponseDto[]>(
+    getFindMergeCandidatesUrl(clientId, params),
+    {
+      ...options,
+      method: 'GET',
+    }
+  )
+}
+
+export const getPreviewClientMergeUrl = (
+  clientId: string,
+  params: PreviewClientMergeParams
+) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0
+    ? `/clients/${clientId}/merge/preview?${stringifiedParams}`
+    : `/clients/${clientId}/merge/preview`
+}
+
+export const previewClientMerge = async (
+  clientId: string,
+  params: PreviewClientMergeParams,
+  options?: RequestInit
+): Promise<ClientMergePreviewResponseDto> => {
+  return customFetch<ClientMergePreviewResponseDto>(
+    getPreviewClientMergeUrl(clientId, params),
+    {
+      ...options,
+      method: 'GET',
+    }
+  )
+}
+
+export const getMergeClientsUrl = (clientId: string) => {
+  return `/clients/${clientId}/merge`
+}
+
+export const mergeClients = async (
+  clientId: string,
+  mergeClientsRequestDto: MergeClientsRequestDto,
+  options?: RequestInit
+): Promise<SuccessResponseDto> => {
+  return customFetch<SuccessResponseDto>(getMergeClientsUrl(clientId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(mergeClientsRequestDto),
   })
 }
 

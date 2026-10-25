@@ -13,10 +13,12 @@ import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 
+import { Button } from '../../../../../components/button'
 import { SearchField } from '../../../../../components/search-field/search-field'
 import { Select } from '../../../../../components/select/select'
 import { ChangeCodeDialog } from '../../../../../features/clients/components/change-code-dialog'
 import { ManageAlternativeCodesDialog } from '../../../../../features/clients/components/manage-alternative-codes-dialog'
+import { MergeClientsDialog } from '../../../../../features/clients/components/merge-clients-dialog'
 import { ParcelCardsList } from '../../../../../features/parcels/components/parcel-cards-list'
 import { ParcelsTable } from '../../../../../features/parcels/components/parcels-table'
 import { PARCEL_STATUS_LABELS } from '../../../../../features/parcels/lib/parcel-status-labels'
@@ -48,6 +50,7 @@ export const Route = createFileRoute(
 function AdminClientDetailsPage() {
   const { initialClient } = Route.useLoaderData()
 
+  const [mergeOpen, setMergeOpen] = useState(false)
   const [changeCodeOpen, setChangeCodeOpen] = useState(false)
   const [manageAlternativeCodesOpen, setManageAlternativeCodesOpen] =
     useState(false)
@@ -154,6 +157,11 @@ function AdminClientDetailsPage() {
               </DataList.Value>
             </DataList.Item>
           </DataList.Root>
+          <Flex mt="4" justify="end">
+            <Button variant="soft" onClick={() => setMergeOpen(true)}>
+              {i18n.t('clients:merge.title')}
+            </Button>
+          </Flex>
         </Card>
 
         <Flex direction="column" gap="3">
@@ -204,6 +212,12 @@ function AdminClientDetailsPage() {
           </Box>
         </Flex>
       </Flex>
+      {mergeOpen && (
+        <MergeClientsDialog
+          client={client}
+          onClose={() => setMergeOpen(false)}
+        />
+      )}
       {changeCodeOpen && (
         <ChangeCodeDialog
           client={client}

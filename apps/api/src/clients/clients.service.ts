@@ -26,6 +26,27 @@ export class ClientsService {
     private readonly clientCodeAliasRepository: ClientCodeAliasRepository
   ) {}
 
+  async lockForMerge(ids: string[]): Promise<void> {
+    await this.clientsRepository.lockCodeAllocation()
+    for (const id of [...ids].sort()) {
+      await this.clientsRepository.findOneOrThrow({
+        where: { id },
+        lock: { mode: 'pessimistic_write' },
+      })
+    }
+  }
+
+  async absorbClient(target: Client, source: Client): Promise<void> {
+    await this.clientCodeAliasRepository.update(
+      { clientId: source.id },
+      { clientId: target.id }
+    )
+    await this.clientsRepository.delete({ id: source.id })
+    if (source.code > 0) {
+      await this.insertAlias(target.id, source.code)
+    }
+  }
+
   @Transactional()
   async createWithGeneratedCode(): Promise<Client> {
     await this.clientsRepository.lockCodeAllocation()
