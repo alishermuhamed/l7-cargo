@@ -1,9 +1,7 @@
 import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common'
 import { ILike } from 'typeorm'
 
-import { AuthenticationService } from '../authentication/authentication.service'
 import { AllowUnresolvedClient } from '../clients/decorators/allow-unresolved-client.decorator'
-import { GetUserDetailsResponseDto } from './dtos/get-user-details-response.dto'
 import { GetUserResponseDto } from './dtos/get-user-response.dto'
 import { GetUsersQueryDto } from './dtos/get-users-query.dto'
 import { UsersMapper } from './users.mapper'
@@ -14,15 +12,14 @@ import { UsersService } from './users.service'
 export class UsersController {
   constructor(
     private readonly usersPolicy: UsersPolicy,
-    private readonly usersService: UsersService,
-    private readonly authenticationService: AuthenticationService
+    private readonly usersService: UsersService
   ) {}
 
   @AllowUnresolvedClient()
   @Get(':userId')
   async getUser(
     @Param('userId', ParseUUIDPipe) userId: string
-  ): Promise<GetUserDetailsResponseDto> {
+  ): Promise<GetUserResponseDto> {
     await this.usersPolicy.checkCanRead(userId)
 
     const user = await this.usersService.findOneOrThrow({
@@ -30,11 +27,7 @@ export class UsersController {
       relations: { client: true },
     })
 
-    return {
-      ...UsersMapper.toGetUserResponseDto(user),
-      hasPassword:
-        await this.authenticationService.hasPasswordForUserId(userId),
-    }
+    return UsersMapper.toGetUserResponseDto(user)
   }
 
   @Get()

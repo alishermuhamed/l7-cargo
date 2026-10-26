@@ -16,12 +16,6 @@ export class AccountsRepository extends BaseRepository<Account> {
     super(txHost, contextService, Account)
   }
 
-  async hasPasswordForUserId(userId: string): Promise<boolean> {
-    return this.repository.exists({
-      where: { userId, providerId: 'credential', password: Not(IsNull()) },
-    })
-  }
-
   async hasPasswordForPhoneNumber(phoneNumber: string): Promise<boolean> {
     return this.repository.exists({
       where: {
