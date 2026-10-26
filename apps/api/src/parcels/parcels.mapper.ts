@@ -14,6 +14,7 @@ export class ParcelsMapper {
       updatedAt: parcel.updatedAt.toISOString(),
       trackingNumber: parcel.trackingNumber,
       clientId: parcel.clientId,
+      isHiddenByClient: parcel.clientDeletedAt !== null,
       status: parcel.status,
       source: parcel.source,
       description: parcel.description,

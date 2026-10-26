@@ -178,6 +178,7 @@ export interface GetParcelResponseDto {
   trackingNumber: string
   /** @nullable */
   clientId: string | null
+  isHiddenByClient: boolean
   /** @nullable */
   source: string | null
   /** @nullable */

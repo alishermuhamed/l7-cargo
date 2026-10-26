@@ -7,6 +7,7 @@ import { Button } from '../../../components/button'
 import { IconButton } from '../../../components/icon-button'
 import { type GetParcelsParams, ParcelStatus } from '../../../lib/api/api.gen'
 import { getParcelsQueryOptions } from '../../../lib/api/queries'
+import { formatDateTime } from '../../../lib/date-time'
 import i18n from '../../../lib/i18n'
 import { ParcelStatusBadge } from './parcel-status-badge'
 
@@ -19,6 +20,7 @@ interface ParcelsTableProps {
   status?: ParcelStatus
   clientId?: string
   isAdminPage?: boolean
+  showClientDetails?: boolean
 }
 
 export function ParcelsTable({
@@ -28,6 +30,7 @@ export function ParcelsTable({
   status,
   clientId,
   isAdminPage = false,
+  showClientDetails = false,
 }: ParcelsTableProps) {
   const params: GetParcelsParams = {
     limit: PARCELS_PAGE_SIZE,
@@ -48,6 +51,11 @@ export function ParcelsTable({
       <Table.Root size={{ initial: '3', xs: '2' }}>
         <Table.Header>
           <Table.Row>
+            {showClientDetails && (
+              <Table.ColumnHeaderCell>
+                {i18n.t('parcels:createdAtColumn')}
+              </Table.ColumnHeaderCell>
+            )}
             <Table.ColumnHeaderCell>
               {i18n.t('parcels:trackingNumber')}
             </Table.ColumnHeaderCell>
@@ -58,6 +66,11 @@ export function ParcelsTable({
               {i18n.t('parcels:status')}
             </Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell />
+            {showClientDetails && (
+              <Table.ColumnHeaderCell>
+                {i18n.t('parcels:hiddenByClient')}
+              </Table.ColumnHeaderCell>
+            )}
           </Table.Row>
         </Table.Header>
 
@@ -65,6 +78,9 @@ export function ParcelsTable({
           {parcels.length > 0 &&
             parcels.map((parcel) => (
               <Table.Row key={parcel.id}>
+                {showClientDetails && (
+                  <Table.Cell>{formatDateTime(parcel.createdAt)}</Table.Cell>
+                )}
                 <Table.RowHeaderCell>
                   {parcel.trackingNumber}
                 </Table.RowHeaderCell>
@@ -91,11 +107,23 @@ export function ParcelsTable({
                     </Link>
                   </Button>
                 </Table.Cell>
+                {showClientDetails && (
+                  <Table.Cell>
+                    {i18n.t(
+                      parcel.isHiddenByClient ? 'common:yes' : 'common:no'
+                    )}
+                  </Table.Cell>
+                )}
               </Table.Row>
             ))}
 
           {isPageLoading && (
             <Table.Row>
+              {showClientDetails && (
+                <Table.Cell>
+                  <Skeleton />
+                </Table.Cell>
+              )}
               <Table.RowHeaderCell>
                 <Skeleton />
               </Table.RowHeaderCell>
@@ -111,12 +139,17 @@ export function ParcelsTable({
               <Table.Cell>
                 <Skeleton />
               </Table.Cell>
+              {showClientDetails && (
+                <Table.Cell>
+                  <Skeleton />
+                </Table.Cell>
+              )}
             </Table.Row>
           )}
 
           {!isPageLoading && parcels.length === 0 && (
             <Table.Row>
-              <Table.Cell align="center" colSpan={4}>
+              <Table.Cell align="center" colSpan={showClientDetails ? 6 : 4}>
                 {i18n.t('parcels:noParcelsFound')}
               </Table.Cell>
             </Table.Row>

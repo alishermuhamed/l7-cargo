@@ -8,6 +8,7 @@ export class GetParcelResponseDto {
   updatedAt!: string
   trackingNumber!: string
   clientId!: string | null
+  declare isHiddenByClient: boolean
 
   @ApiProperty({
     enum: PARCEL_STATUSES,

@@ -202,6 +202,7 @@ function AdminClientDetailsPage() {
 
           <Box display={{ initial: 'none', xs: 'block' }}>
             <ParcelsTable
+              showClientDetails
               page={page - 1}
               onPageChange={setPage}
               search={search}

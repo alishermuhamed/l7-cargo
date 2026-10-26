@@ -11,6 +11,8 @@
   "all": "Барлығы",
   "status": "Статус",
   "createdAt": "Жасалған уақыты",
+  "createdAtColumn": "Жасалған уақыты",
+  "hiddenByClient": "Клиент жасырған",
   "trackingNumber": "Трек-нөмір",
   "weight": "Салмақ",
   "weightValue": "{{weight}} кг",
