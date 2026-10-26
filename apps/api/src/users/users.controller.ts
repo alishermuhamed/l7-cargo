@@ -1,7 +1,6 @@
 import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common'
 import { ILike } from 'typeorm'
 
-import { AllowUnresolvedClient } from '../clients/decorators/allow-unresolved-client.decorator'
 import { GetUserResponseDto } from './dtos/get-user-response.dto'
 import { GetUsersQueryDto } from './dtos/get-users-query.dto'
 import { UsersMapper } from './users.mapper'
@@ -15,7 +14,6 @@ export class UsersController {
     private readonly usersService: UsersService
   ) {}
 
-  @AllowUnresolvedClient()
   @Get(':userId')
   async getUser(
     @Param('userId', ParseUUIDPipe) userId: string

@@ -14,7 +14,6 @@ import { APIError } from 'better-auth/api'
 import { fromNodeHeaders, toNodeHandler } from 'better-auth/node'
 import type { Request, Response } from 'express'
 
-import { AllowUnresolvedClient } from '../clients/decorators/allow-unresolved-client.decorator'
 import { SuccessResponseDto } from '../common/dtos/success-response.dto'
 import { AuthenticationService } from './authentication.service'
 import { Public } from './decorators/public.decorator'
@@ -28,7 +27,6 @@ import { PhoneVerifyDto } from './dtos/phone-verify.dto'
 import { SetPasswordDto } from './dtos/set-password.dto'
 import { UpdateUserDto } from './dtos/update-user.dto'
 
-@AllowUnresolvedClient()
 @Public()
 @Controller('auth')
 export class AuthenticationController {
