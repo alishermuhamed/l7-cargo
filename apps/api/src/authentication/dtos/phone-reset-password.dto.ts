@@ -1,4 +1,4 @@
-import { IsPhoneNumber, IsString, Length, MinLength } from 'class-validator'
+import { IsPhoneNumber, IsString, Length } from 'class-validator'
 
 export class PhoneResetPasswordDto {
   @IsString()
@@ -9,6 +9,6 @@ export class PhoneResetPasswordDto {
   phoneNumber!: string
 
   @IsString()
-  @MinLength(8)
+  @Length(8, 128)
   newPassword!: string
 }
