@@ -69,7 +69,6 @@ export class AuthenticationController {
     }
   }
 
-  @Throttle({ default: { limit: 5, ttl: 60000 * 60 * 24 } })
   @Get('/get-sign-in-method')
   async getSignInMethod(
     @Query() { phoneNumber }: GetSignInMethodQueryDto
