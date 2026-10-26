@@ -1,6 +1,7 @@
 export function envConfig() {
   return {
     env: {
+      isRender: process.env.RENDER === 'true',
       nodeEnv: process.env.NODE_ENV,
       name: process.env.ENV_NAME,
       port: process.env.PORT ? parseInt(process.env.PORT, 10) : undefined,
