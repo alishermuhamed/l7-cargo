@@ -150,6 +150,10 @@ function VerifyPage() {
                     </RouterLink>
                   </Button>
                 </Flex>
+
+                <Text as="p" size="2" color="gray">
+                  {i18n.t('auth:codeDeliveryHint')}
+                </Text>
               </Flex>
 
               <FormField
