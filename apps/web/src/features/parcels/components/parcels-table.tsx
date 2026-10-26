@@ -65,12 +65,12 @@ export function ParcelsTable({
             <Table.ColumnHeaderCell>
               {i18n.t('parcels:status')}
             </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell />
             {showClientDetails && (
               <Table.ColumnHeaderCell>
                 {i18n.t('parcels:hiddenByClient')}
               </Table.ColumnHeaderCell>
             )}
+            <Table.ColumnHeaderCell />
           </Table.Row>
         </Table.Header>
 
@@ -93,6 +93,14 @@ export function ParcelsTable({
                   <ParcelStatusBadge status={parcel.status} />
                 </Table.Cell>
 
+                {showClientDetails && (
+                  <Table.Cell>
+                    {i18n.t(
+                      parcel.isHiddenByClient ? 'common:yes' : 'common:no'
+                    )}
+                  </Table.Cell>
+                )}
+
                 <Table.Cell align="right">
                   <Button asChild variant="ghost">
                     <Link
@@ -107,13 +115,6 @@ export function ParcelsTable({
                     </Link>
                   </Button>
                 </Table.Cell>
-                {showClientDetails && (
-                  <Table.Cell>
-                    {i18n.t(
-                      parcel.isHiddenByClient ? 'common:yes' : 'common:no'
-                    )}
-                  </Table.Cell>
-                )}
               </Table.Row>
             ))}
 
@@ -136,14 +137,14 @@ export function ParcelsTable({
                 <Skeleton />
               </Table.Cell>
 
-              <Table.Cell>
-                <Skeleton />
-              </Table.Cell>
               {showClientDetails && (
                 <Table.Cell>
                   <Skeleton />
                 </Table.Cell>
               )}
+              <Table.Cell>
+                <Skeleton />
+              </Table.Cell>
             </Table.Row>
           )}
 
