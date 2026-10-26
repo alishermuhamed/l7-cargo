@@ -1,20 +1,10 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpException,
-  InternalServerErrorException,
-  Post,
-  Query,
-  Req,
-  Res,
-} from '@nestjs/common'
+import { Body, Controller, Get, Post, Query, Req, Res } from '@nestjs/common'
 import { Throttle } from '@nestjs/throttler'
-import { APIError } from 'better-auth/api'
-import { fromNodeHeaders, toNodeHandler } from 'better-auth/node'
+import { toNodeHandler } from 'better-auth/node'
 import type { Request, Response } from 'express'
 
 import { SuccessResponseDto } from '../common/dtos/success-response.dto'
+import { AuthenticationMapper } from './authentication.mapper'
 import { AuthenticationService } from './authentication.service'
 import { Public } from './decorators/public.decorator'
 import { GetSignInMethodQueryDto } from './dtos/get-sign-in-method-query.dto'
@@ -51,29 +41,16 @@ export class AuthenticationController {
     @Req() req: Request,
     @Body() body: SetPasswordDto
   ): Promise<SuccessResponseDto> {
-    try {
-      await this.authenticationService.betterAuth.api.setPassword({
-        body,
-        headers: fromNodeHeaders(req.headers),
-      })
-
-      return new SuccessResponseDto()
-    } catch (error: unknown) {
-      if (error instanceof APIError) {
-        throw new HttpException(error.body ?? error.message, error.statusCode)
-      }
-
-      throw new InternalServerErrorException()
-    }
+    await this.authenticationService.setPassword(body.newPassword, req.headers)
+    return new SuccessResponseDto()
   }
 
   @Get('/get-sign-in-method')
   async getSignInMethod(
     @Query() { phoneNumber }: GetSignInMethodQueryDto
   ): Promise<GetSignInMethodResponseDto> {
-    return {
-      method: await this.authenticationService.getSignInMethod(phoneNumber),
-    }
+    const method = await this.authenticationService.getSignInMethod(phoneNumber)
+    return AuthenticationMapper.toGetSignInMethodResponseDto(method)
   }
 
   @Post('/sign-in/phone-number')

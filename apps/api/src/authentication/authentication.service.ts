@@ -1,8 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common'
 import {
   betterAuth as betterAuthFactory,
   type BetterAuthOptions,
 } from 'better-auth'
+import { APIError } from 'better-auth/api'
 import { fromNodeHeaders } from 'better-auth/node'
 import { phoneNumber } from 'better-auth/plugins'
 import type { IncomingHttpHeaders } from 'http'
@@ -146,6 +147,24 @@ export class AuthenticationService {
     return this.betterAuth.api.getSession({
       headers: fromNodeHeaders(headers),
     })
+  }
+
+  async setPassword(
+    newPassword: string,
+    headers: IncomingHttpHeaders
+  ): Promise<void> {
+    try {
+      await this.betterAuth.api.setPassword({
+        body: { newPassword },
+        headers: fromNodeHeaders(headers),
+      })
+    } catch (error: unknown) {
+      if (error instanceof APIError) {
+        throw new HttpException(error.body ?? error.message, error.statusCode)
+      }
+
+      throw error
+    }
   }
 
   async getSignInMethod(input: string): Promise<SignInMethod> {
