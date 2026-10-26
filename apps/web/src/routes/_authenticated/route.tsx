@@ -22,27 +22,28 @@ export const Route = createFileRoute('/_authenticated')({
 
     const { user } = session.data
 
+    const currentUser = await queryClient.fetchQuery({
+      ...getUserQueryOptions(user.id),
+      staleTime: 0,
+    })
     const requiresCodeResolution =
-      user.role !== UserRole.admin &&
-      (
-        await queryClient.fetchQuery({
-          ...getUserQueryOptions(user.id),
-          staleTime: 0,
-        })
-      ).requiresCodeResolution
+      user.role !== UserRole.admin && currentUser.requiresCodeResolution
 
     if (requiresCodeResolution) {
       if (location.pathname !== CODE_RESOLUTION_PATH) {
         throw redirect({ to: CODE_RESOLUTION_PATH, replace: true })
       }
-      return { session: session.data }
+      return { session: session.data, currentUser }
     }
 
     if (location.pathname === CODE_RESOLUTION_PATH) {
       throw redirect({ to: '/', replace: true })
     }
 
-    const needsOnboarding = user.name.trim() === user.phoneNumber?.trim()
+    const needsOnboarding =
+      !currentUser.name.trim() ||
+      currentUser.name.trim() === currentUser.phoneNumber?.trim() ||
+      !currentUser.hasPassword
 
     if (needsOnboarding && location.pathname !== ONBOARDING_PATH) {
       throw redirect({
@@ -51,7 +52,7 @@ export const Route = createFileRoute('/_authenticated')({
       })
     }
 
-    return { session: session.data }
+    return { session: session.data, currentUser }
   },
   component: AuthenticatedLayout,
 })

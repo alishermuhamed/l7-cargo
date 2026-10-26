@@ -148,6 +148,10 @@ export class AuthenticationService {
     })
   }
 
+  async hasPasswordForUserId(userId: string): Promise<boolean> {
+    return this.accountsRepository.hasPasswordForUserId(userId)
+  }
+
   async getSignInMethod(input: string): Promise<SignInMethod> {
     const phoneNumber = parsePhoneNumberFromString(input)
 

@@ -314,6 +314,17 @@ export const UserRole = {
   client: 'client',
 } as const
 
+export interface GetUserDetailsResponseDto {
+  role: UserRole
+  hasPassword: boolean
+  id: string
+  clientId: string
+  requiresCodeResolution: boolean
+  name: string
+  /** @nullable */
+  phoneNumber: string | null
+}
+
 export interface GetUserResponseDto {
   role: UserRole
   id: string
@@ -990,8 +1001,8 @@ export const getGetUserUrl = (userId: string) => {
 export const getUser = async (
   userId: string,
   options?: RequestInit
-): Promise<GetUserResponseDto> => {
-  return customFetch<GetUserResponseDto>(getGetUserUrl(userId), {
+): Promise<GetUserDetailsResponseDto> => {
+  return customFetch<GetUserDetailsResponseDto>(getGetUserUrl(userId), {
     ...options,
     method: 'GET',
   })
