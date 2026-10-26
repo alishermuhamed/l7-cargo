@@ -59,36 +59,11 @@ export interface PhoneResetPasswordDto {
   /** @minLength 6 */
   otp: string
   phoneNumber: string
-  /** @minLength 8 */
+  /**
+   * @minLength 8
+   * @maxLength 128
+   */
   newPassword: string
-}
-
-export interface MergeCandidateResponseDto {
-  id: string
-  code: number
-  aliases: number[]
-  /** @nullable */
-  name: string | null
-  /** @nullable */
-  phone: string | null
-  parcelCount: number
-}
-
-export interface ClientMergePreviewResponseDto {
-  /** @nullable */
-  name: string | null
-  /** @nullable */
-  phone: string | null
-  code: number
-  aliases: number[]
-  parcelCount: number
-  version: string
-}
-
-export interface MergeClientsRequestDto {
-  sourceId: string
-  /** @pattern ^[a-f0-9]{64}$ */
-  version: string
 }
 
 export interface LinkedUserDto {
@@ -134,6 +109,34 @@ export interface AddClientAliasRequestDto {
    * @maximum 2147483647
    */
   code: number
+}
+
+export interface MergeCandidateResponseDto {
+  id: string
+  code: number
+  aliases: number[]
+  /** @nullable */
+  name: string | null
+  /** @nullable */
+  phone: string | null
+  parcelCount: number
+}
+
+export interface ClientMergePreviewResponseDto {
+  /** @nullable */
+  name: string | null
+  /** @nullable */
+  phone: string | null
+  code: number
+  aliases: number[]
+  parcelCount: number
+  version: string
+}
+
+export interface MergeClientsRequestDto {
+  sourceId: string
+  /** @pattern ^[a-f0-9]{64}$ */
+  version: string
 }
 
 export interface CreateParcelRequestDto {
@@ -230,6 +233,23 @@ export interface UpdateParcelRequestDto {
   comments?: string | null
 }
 
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
+export const UserRole = {
+  admin: 'admin',
+  client: 'client',
+} as const
+
+export interface GetUserResponseDto {
+  role: UserRole
+  id: string
+  clientId: string
+  requiresCodeResolution: boolean
+  name: string
+  /** @nullable */
+  phoneNumber: string | null
+}
+
 export interface CreateParcelsImportRequestDto {
   file: Blob
   parcelStatus: ParcelStatus
@@ -308,37 +328,8 @@ export interface GetParcelsImportResponseDto {
   parsedData: ParsedParcelsImportDataDto
 }
 
-export type UserRole = (typeof UserRole)[keyof typeof UserRole]
-
-export const UserRole = {
-  admin: 'admin',
-  client: 'client',
-} as const
-
-export interface GetUserResponseDto {
-  role: UserRole
-  id: string
-  clientId: string
-  requiresCodeResolution: boolean
-  name: string
-  /** @nullable */
-  phoneNumber: string | null
-}
-
 export type GetSignInMethodParams = {
   phoneNumber: string
-}
-
-export type FindMergeCandidatesParams = {
-  /**
-   * @minimum -2147483648
-   * @maximum 2147483647
-   */
-  code: number
-}
-
-export type PreviewClientMergeParams = {
-  sourceId: string
 }
 
 export type GetClientsParams = {
@@ -351,6 +342,18 @@ export type GetClientsParams = {
    */
   offset?: number
   search?: string
+}
+
+export type FindMergeCandidatesParams = {
+  /**
+   * @minimum -2147483648
+   * @maximum 2147483647
+   */
+  code: number
+}
+
+export type PreviewClientMergeParams = {
+  sourceId: string
 }
 
 export type GetParcelsParams = {
@@ -367,17 +370,6 @@ export type GetParcelsParams = {
   clientId?: string
 }
 
-export type GetParcelsImportsParams = {
-  /**
-   * @minimum 0
-   */
-  limit?: number
-  /**
-   * @minimum 0
-   */
-  offset?: number
-}
-
 export type GetUsersParams = {
   /**
    * @minimum 0
@@ -389,6 +381,17 @@ export type GetUsersParams = {
   offset?: number
   role?: UserRole
   search?: string
+}
+
+export type GetParcelsImportsParams = {
+  /**
+   * @minimum 0
+   */
+  limit?: number
+  /**
+   * @minimum 0
+   */
+  offset?: number
 }
 
 export const getGetHealthUrl = () => {
@@ -565,89 +568,6 @@ export const signOut = async (options?: RequestInit): Promise<void> => {
   })
 }
 
-export const getFindMergeCandidatesUrl = (
-  clientId: string,
-  params: FindMergeCandidatesParams
-) => {
-  const normalizedParams = new URLSearchParams()
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  })
-
-  const stringifiedParams = normalizedParams.toString()
-
-  return stringifiedParams.length > 0
-    ? `/clients/${clientId}/merge/candidates?${stringifiedParams}`
-    : `/clients/${clientId}/merge/candidates`
-}
-
-export const findMergeCandidates = async (
-  clientId: string,
-  params: FindMergeCandidatesParams,
-  options?: RequestInit
-): Promise<MergeCandidateResponseDto[]> => {
-  return customFetch<MergeCandidateResponseDto[]>(
-    getFindMergeCandidatesUrl(clientId, params),
-    {
-      ...options,
-      method: 'GET',
-    }
-  )
-}
-
-export const getPreviewClientMergeUrl = (
-  clientId: string,
-  params: PreviewClientMergeParams
-) => {
-  const normalizedParams = new URLSearchParams()
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  })
-
-  const stringifiedParams = normalizedParams.toString()
-
-  return stringifiedParams.length > 0
-    ? `/clients/${clientId}/merge/preview?${stringifiedParams}`
-    : `/clients/${clientId}/merge/preview`
-}
-
-export const previewClientMerge = async (
-  clientId: string,
-  params: PreviewClientMergeParams,
-  options?: RequestInit
-): Promise<ClientMergePreviewResponseDto> => {
-  return customFetch<ClientMergePreviewResponseDto>(
-    getPreviewClientMergeUrl(clientId, params),
-    {
-      ...options,
-      method: 'GET',
-    }
-  )
-}
-
-export const getMergeClientsUrl = (clientId: string) => {
-  return `/clients/${clientId}/merge`
-}
-
-export const mergeClients = async (
-  clientId: string,
-  mergeClientsRequestDto: MergeClientsRequestDto,
-  options?: RequestInit
-): Promise<SuccessResponseDto> => {
-  return customFetch<SuccessResponseDto>(getMergeClientsUrl(clientId), {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(mergeClientsRequestDto),
-  })
-}
-
 export const getGetClientsUrl = (params?: GetClientsParams) => {
   const normalizedParams = new URLSearchParams()
 
@@ -737,6 +657,89 @@ export const getClient = async (
   return customFetch<GetClientResponseDto>(getGetClientUrl(clientId), {
     ...options,
     method: 'GET',
+  })
+}
+
+export const getFindMergeCandidatesUrl = (
+  clientId: string,
+  params: FindMergeCandidatesParams
+) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0
+    ? `/clients/${clientId}/merge/candidates?${stringifiedParams}`
+    : `/clients/${clientId}/merge/candidates`
+}
+
+export const findMergeCandidates = async (
+  clientId: string,
+  params: FindMergeCandidatesParams,
+  options?: RequestInit
+): Promise<MergeCandidateResponseDto[]> => {
+  return customFetch<MergeCandidateResponseDto[]>(
+    getFindMergeCandidatesUrl(clientId, params),
+    {
+      ...options,
+      method: 'GET',
+    }
+  )
+}
+
+export const getPreviewClientMergeUrl = (
+  clientId: string,
+  params: PreviewClientMergeParams
+) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0
+    ? `/clients/${clientId}/merge/preview?${stringifiedParams}`
+    : `/clients/${clientId}/merge/preview`
+}
+
+export const previewClientMerge = async (
+  clientId: string,
+  params: PreviewClientMergeParams,
+  options?: RequestInit
+): Promise<ClientMergePreviewResponseDto> => {
+  return customFetch<ClientMergePreviewResponseDto>(
+    getPreviewClientMergeUrl(clientId, params),
+    {
+      ...options,
+      method: 'GET',
+    }
+  )
+}
+
+export const getMergeClientsUrl = (clientId: string) => {
+  return `/clients/${clientId}/merge`
+}
+
+export const mergeClients = async (
+  clientId: string,
+  mergeClientsRequestDto: MergeClientsRequestDto,
+  options?: RequestInit
+): Promise<SuccessResponseDto> => {
+  return customFetch<SuccessResponseDto>(getMergeClientsUrl(clientId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(mergeClientsRequestDto),
   })
 }
 
@@ -880,6 +883,44 @@ export const putParcelStatusHistory = async (
   )
 }
 
+export const getGetUserUrl = (userId: string) => {
+  return `/users/${userId}`
+}
+
+export const getUser = async (
+  userId: string,
+  options?: RequestInit
+): Promise<GetUserResponseDto> => {
+  return customFetch<GetUserResponseDto>(getGetUserUrl(userId), {
+    ...options,
+    method: 'GET',
+  })
+}
+
+export const getGetUsersUrl = (params?: GetUsersParams) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0 ? `/users?${stringifiedParams}` : `/users`
+}
+
+export const getUsers = async (
+  params?: GetUsersParams,
+  options?: RequestInit
+): Promise<GetUserResponseDto[]> => {
+  return customFetch<GetUserResponseDto[]>(getGetUsersUrl(params), {
+    ...options,
+    method: 'GET',
+  })
+}
+
 export const getCreateParcelsImportUrl = () => {
   return `/parcels-imports`
 }
@@ -982,42 +1023,4 @@ export const deleteParcelsImport = async (
       method: 'DELETE',
     }
   )
-}
-
-export const getGetUserUrl = (userId: string) => {
-  return `/users/${userId}`
-}
-
-export const getUser = async (
-  userId: string,
-  options?: RequestInit
-): Promise<GetUserResponseDto> => {
-  return customFetch<GetUserResponseDto>(getGetUserUrl(userId), {
-    ...options,
-    method: 'GET',
-  })
-}
-
-export const getGetUsersUrl = (params?: GetUsersParams) => {
-  const normalizedParams = new URLSearchParams()
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  })
-
-  const stringifiedParams = normalizedParams.toString()
-
-  return stringifiedParams.length > 0 ? `/users?${stringifiedParams}` : `/users`
-}
-
-export const getUsers = async (
-  params?: GetUsersParams,
-  options?: RequestInit
-): Promise<GetUserResponseDto[]> => {
-  return customFetch<GetUserResponseDto[]>(getGetUsersUrl(params), {
-    ...options,
-    method: 'GET',
-  })
 }
