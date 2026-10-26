@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto'
+
 import { BadGatewayException, Injectable, Logger } from '@nestjs/common'
 
 import { ConfigService } from '../../config/config.service'
@@ -23,38 +25,53 @@ export class OtpDeliveryService {
     phoneNumber: string
     code: string
   }): Promise<void> {
-    let lastError: unknown
+    const deliveryId = randomUUID()
+    let configuredProviders = 0
+    this.logger.log({ event: 'otp.delivery.started', deliveryId, phoneNumber })
 
     for (const provider of this.providers) {
       if (!provider.isConfigured) {
+        this.logger.warn({
+          event: 'otp.provider.skipped',
+          deliveryId,
+          provider: provider.name,
+          cause: 'not_configured',
+        })
         continue
       }
 
+      configuredProviders += 1
       try {
-        await provider.send({ phoneNumber, code })
+        await provider.send({ phoneNumber, code, deliveryId })
         return
-      } catch (error: unknown) {
-        lastError = error
-
-        this.logger.warn(
-          `OTP delivery failed via ${provider.name} for ${phoneNumber}`,
-          error instanceof Error
-            ? (error.stack ?? error.message)
-            : String(error)
-        )
+      } catch {
+        this.logger.warn({
+          event: 'otp.provider.failed',
+          deliveryId,
+          provider: provider.name,
+        })
       }
     }
 
-    this.logger.error(
-      `Unable to deliver OTP to ${phoneNumber} using configured providers`,
-      lastError instanceof Error
-        ? (lastError.stack ?? lastError.message)
-        : String(lastError)
-    )
+    this.logger.warn({
+      event: 'otp.fallback.started',
+      deliveryId,
+      cause:
+        configuredProviders === 0
+          ? 'no_configured_providers'
+          : 'providers_failed',
+    })
 
     const telegramFallbackSent = await this.sendTelegramFallback({
       phoneNumber,
       code,
+      deliveryId,
+    })
+
+    this.logger.log({
+      event: 'otp.fallback.completed',
+      deliveryId,
+      sent: telegramFallbackSent,
     })
 
     if (telegramFallbackSent) {
@@ -67,16 +84,22 @@ export class OtpDeliveryService {
   private async sendTelegramFallback({
     phoneNumber,
     code,
+    deliveryId,
   }: {
     phoneNumber: string
     code: string
+    deliveryId: string
   }): Promise<boolean> {
     const botToken = this.configService.get('otp.telegramFallback.botToken')
     const rawChatIds = this.configService.get('otp.telegramFallback.chatIds')
     const envName = this.configService.get('env.name')
 
     if (typeof botToken !== 'string' || typeof rawChatIds !== 'string') {
-      this.logger.warn('Telegram OTP fallback is not configured')
+      this.logger.warn({
+        event: 'otp.fallback.unavailable',
+        deliveryId,
+        cause: 'not_configured',
+      })
       return false
     }
 
@@ -86,7 +109,11 @@ export class OtpDeliveryService {
       .filter((chatId) => chatId.length > 0)
 
     if (chatIds.length === 0) {
-      this.logger.warn('Telegram OTP fallback is not configured')
+      this.logger.warn({
+        event: 'otp.fallback.unavailable',
+        deliveryId,
+        cause: 'not_configured',
+      })
       return false
     }
 
@@ -109,25 +136,32 @@ export class OtpDeliveryService {
           )
 
           const responseJson = (await response.json()) as {
-            description?: string
+            error_code?: number
             ok?: boolean
           }
 
           if (!response.ok || responseJson.ok !== true) {
-            this.logger.error(
-              `Telegram OTP fallback failed for ${phoneNumber} in chat ${chatId}: ${JSON.stringify(responseJson)}`
-            )
+            this.logger.error({
+              event: 'otp.fallback.chat_failed',
+              deliveryId,
+              chatId,
+              httpStatus: response.status,
+              errorCode:
+                typeof responseJson.error_code === 'number'
+                  ? responseJson.error_code
+                  : null,
+            })
             return false
           }
 
           return true
-        } catch (error: unknown) {
-          this.logger.error(
-            `Telegram OTP fallback request failed for ${phoneNumber} in chat ${chatId}`,
-            error instanceof Error
-              ? (error.stack ?? error.message)
-              : String(error)
-          )
+        } catch {
+          this.logger.error({
+            event: 'otp.fallback.chat_failed',
+            deliveryId,
+            chatId,
+            cause: 'request_failed',
+          })
           return false
         }
       })

@@ -5,7 +5,11 @@ export abstract class OtpProvider {
 
   abstract get isConfigured(): boolean
 
-  abstract send(request: { phoneNumber: string; code: string }): Promise<void>
+  abstract send(request: {
+    phoneNumber: string
+    code: string
+    deliveryId?: string
+  }): Promise<void>
 
   protected buildMessage(code: string): string {
     return `L7 Cargo: ${code}`
