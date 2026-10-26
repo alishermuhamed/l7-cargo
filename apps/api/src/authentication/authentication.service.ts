@@ -101,6 +101,7 @@ export class AuthenticationService {
     return this.otpDeliveryService.send({
       phoneNumber,
       code,
+      reason: 'sign in / sign up',
     })
   }
 
@@ -114,6 +115,7 @@ export class AuthenticationService {
     return this.otpDeliveryService.send({
       phoneNumber,
       code,
+      reason: 'password reset',
     })
   }
 
