@@ -12,7 +12,7 @@ export class OtpDeliveryService {
     this.providers = [this.autocallOtpProvider]
   }
 
-  async send({
+  send({
     phoneNumber,
     code,
     reason,
@@ -28,7 +28,11 @@ export class OtpDeliveryService {
         continue
       }
 
-      await provider.send({ phoneNumber, code })
+      void provider.send({ phoneNumber, code }).catch((error: unknown) => {
+        this.logger.error(`OTP delivery failed via ${provider.name}`, error)
+      })
     }
+
+    return Promise.resolve()
   }
 }

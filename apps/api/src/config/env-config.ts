@@ -38,10 +38,6 @@ export function envConfig() {
       sendpulse: {
         apiKey: process.env.SENDPULSE_API_KEY,
       },
-      telegramFallback: {
-        botToken: process.env.TELEGRAM_FALLBACK_BOT_TOKEN,
-        chatIds: process.env.TELEGRAM_FALLBACK_CHAT_IDS,
-      },
     },
     registrationNotifications: {
       botToken: process.env.TELEGRAM_REGISTRATION_BOT_TOKEN,

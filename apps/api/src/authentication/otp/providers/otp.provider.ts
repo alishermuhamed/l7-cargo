@@ -20,13 +20,41 @@ export abstract class OtpProvider {
     return parsedPhoneNumber?.format('E.164') ?? phoneNumber
   }
 
+  protected async get({
+    abortAfterMs = 10_000,
+    headers,
+    url,
+  }: {
+    abortAfterMs?: number
+    headers: Record<string, string>
+    url: string
+  }): Promise<Response> {
+    const abortController = new AbortController()
+
+    const timeoutId = setTimeout(() => {
+      abortController.abort()
+    }, abortAfterMs)
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers,
+        signal: abortController.signal,
+      })
+
+      return response
+    } finally {
+      clearTimeout(timeoutId)
+    }
+  }
+
   protected async post({
-    abortAfterMs,
+    abortAfterMs = 10_000,
     body,
     headers,
     url,
   }: {
-    abortAfterMs: number
+    abortAfterMs?: number
     body: string
     headers: Record<string, string>
     url: string
