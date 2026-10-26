@@ -3,6 +3,7 @@ import { APIError } from 'better-auth/api'
 import { fromNodeHeaders } from 'better-auth/node'
 import type { IncomingHttpHeaders } from 'http'
 import parsePhoneNumberFromString from 'libphonenumber-js'
+import { IsNull, Not } from 'typeorm'
 
 import { ClientsService } from '../clients/clients.service'
 import { ConfigService } from '../config/config.service'
@@ -34,8 +35,8 @@ export class AuthenticationService {
       validatePhoneNumber: (input) => this.validatePhoneNumber(input),
       sendOTP: (data) => this.sendOTP(data),
       sendPasswordResetOTP: (data) => this.sendPasswordResetOTP(data),
-      resolveClientIdForNewUser: async (phoneNumber) =>
-        (await this.clientsService.resolveForNewUser(phoneNumber)).id,
+      resolveClientIdForNewUser: (phoneNumber) =>
+        this.resolveClientIdForNewUser(phoneNumber),
       notifyRegistration: (user): Promise<void> =>
         this.registrationNotificationService.send(user),
     })
@@ -74,11 +75,15 @@ export class AuthenticationService {
       throw new BadRequestException('INVALID_PHONE_NUMBER')
     }
 
-    const hasPassword = await this.accountsRepository.hasPasswordForPhoneNumber(
-      phoneNumber.number
-    )
+    const accountWithPassword = await this.accountsRepository.findOne({
+      where: {
+        providerId: 'credential',
+        password: Not(IsNull()),
+        user: { phoneNumber: phoneNumber.number },
+      },
+    })
 
-    return hasPassword ? 'password' : 'otp'
+    return accountWithPassword ? 'password' : 'otp'
   }
 
   private validatePhoneNumber(input: string): boolean {
@@ -110,5 +115,12 @@ export class AuthenticationService {
       phoneNumber,
       code,
     })
+  }
+
+  private async resolveClientIdForNewUser(
+    phoneNumber: unknown
+  ): Promise<string> {
+    const client = await this.clientsService.resolveForNewUser(phoneNumber)
+    return client.id
   }
 }
