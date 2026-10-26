@@ -3,7 +3,12 @@ import {
   ConflictException,
   Injectable,
 } from '@nestjs/common'
-import { FindManyOptions, FindOneOptions, FindOptionsRelations } from 'typeorm'
+import {
+  FindManyOptions,
+  FindOneOptions,
+  FindOptionsRelations,
+  IsNull,
+} from 'typeorm'
 
 import { ClientsService } from '../clients/clients.service'
 import { addMoneyAmounts } from '../common/money'
@@ -54,9 +59,25 @@ export class ParcelsService {
     comments?: string | null
   }): Promise<Parcel['id']> {
     const normalizedTrackingNumber = trackingNumber.trim()
-    const existingParcel = await this.parcelsRepository.findOne({
+    let existingParcel = await this.parcelsRepository.findOne({
       where: { trackingNumber: normalizedTrackingNumber },
     })
+
+    if (existingParcel?.clientId === null && clientId !== null) {
+      // Claim only an unassigned parcel, even if another request races us.
+      const affected = await this.parcelsRepository.update(
+        { id: existingParcel.id, clientId: IsNull() },
+        { clientId, clientDeletedAt: null, source, description }
+      )
+
+      if (affected > 0) {
+        return existingParcel.id
+      }
+
+      existingParcel = await this.parcelsRepository.findOne({
+        where: { trackingNumber: normalizedTrackingNumber },
+      })
+    }
 
     if (existingParcel) {
       if (clientId !== null && existingParcel.clientId === clientId) {
