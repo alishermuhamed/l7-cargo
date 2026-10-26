@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 
-import { SIGN_IN_METHODS, type SignInMethod } from '../sign-in-method'
+import { SIGN_IN_METHODS, type SignInMethod } from '../authentication.types'
 
 export class GetSignInMethodResponseDto {
   @ApiProperty({

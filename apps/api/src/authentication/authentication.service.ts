@@ -14,9 +14,9 @@ import { ConfigService } from '../config/config.service'
 import { BetterAuthTypeOrmAdapter } from '../db/adapters/better-auth-typeorm.adapter'
 import { DEFAULT_USER_ROLE } from '../users/user-role'
 import { AccountsRepository } from './accounts.repository'
+import type { SignInMethod } from './authentication.types'
 import { OtpDeliveryService } from './otp/otp-delivery.service'
 import { RegistrationNotificationService } from './registration-notification.service'
-import type { SignInMethod } from './sign-in-method'
 
 function createBetterAuth({
   typeOrmAdapter,
