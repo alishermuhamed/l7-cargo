@@ -1,6 +1,6 @@
 import { Module, ValidationPipe } from '@nestjs/common'
 import { APP_GUARD, APP_PIPE } from '@nestjs/core'
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
+import { ThrottlerModule } from '@nestjs/throttler'
 
 import { AppController } from './app.controller'
 import { AuthenticationModule } from './authentication/authentication.module'
@@ -9,6 +9,7 @@ import { ClientMergesModule } from './client-merges/client-merges.module'
 import { ClientsModule } from './clients/clients.module'
 import { AuthenticationGuard } from './common/guards/authentication.guard'
 import { ClientAccessGuard } from './common/guards/client-access.guard'
+import { LoggingThrottlerGuard } from './common/guards/logging-throttler.guard'
 import { ConfigModule } from './config/config.module'
 import { ContextModule } from './context/context.module'
 import { DbModule } from './db/db.module'
@@ -39,7 +40,7 @@ import { UsersModule } from './users/users.module'
   providers: [
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
+      useClass: LoggingThrottlerGuard,
     },
     {
       provide: APP_GUARD,
