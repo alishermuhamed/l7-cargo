@@ -17,18 +17,26 @@ export class UsersService {
   }
 
   async find<R extends FindOptionsRelations<User>>(
-    options?: Omit<FindManyOptions<User>, 'relations'> & {
-      relations?: R
+    options: Omit<FindManyOptions<User>, 'relations'> & {
+      relations: R
     }
-  ): Promise<WithRelations<User, R>[]> {
+  ): Promise<WithRelations<User, NoInfer<R>>[]>
+  async find(options?: FindManyOptions<User>): Promise<User[]>
+  async find<R extends FindOptionsRelations<User>>(
+    options?: FindManyOptions<User>
+  ): Promise<(User | WithRelations<User, R>)[]> {
     return this.usersRepository.find(options)
   }
 
   async findOneOrThrow<R extends FindOptionsRelations<User>>(
     options: Omit<FindOneOptions<User>, 'relations'> & {
-      relations?: R
+      relations: R
     }
-  ): Promise<WithRelations<User, R>> {
+  ): Promise<WithRelations<User, NoInfer<R>>>
+  async findOneOrThrow(options: FindOneOptions<User>): Promise<User>
+  async findOneOrThrow<R extends FindOptionsRelations<User>>(
+    options: FindOneOptions<User>
+  ): Promise<User | WithRelations<User, R>> {
     return this.usersRepository.findOneOrThrow(options)
   }
 }

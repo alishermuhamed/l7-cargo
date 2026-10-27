@@ -66,10 +66,16 @@ export class ParcelStatusHistoryService {
   }
 
   async find<R extends FindOptionsRelations<ParcelStatusHistory>>(
-    options?: Omit<FindManyOptions<ParcelStatusHistory>, 'relations'> & {
-      relations?: R
+    options: Omit<FindManyOptions<ParcelStatusHistory>, 'relations'> & {
+      relations: R
     }
-  ): Promise<WithRelations<ParcelStatusHistory, R>[]> {
+  ): Promise<WithRelations<ParcelStatusHistory, NoInfer<R>>[]>
+  async find(
+    options?: FindManyOptions<ParcelStatusHistory>
+  ): Promise<ParcelStatusHistory[]>
+  async find<R extends FindOptionsRelations<ParcelStatusHistory>>(
+    options?: FindManyOptions<ParcelStatusHistory>
+  ): Promise<(ParcelStatusHistory | WithRelations<ParcelStatusHistory, R>)[]> {
     return this.parcelStatusHistoryRepository.find(options)
   }
 

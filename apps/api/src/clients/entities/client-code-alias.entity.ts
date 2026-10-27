@@ -16,6 +16,9 @@ export class ClientCodeAlias extends BaseEntity {
   @UUIDColumn()
   clientId!: string
 
-  @ManyToOne(() => Client, { nullable: false, onDelete: 'RESTRICT' })
+  @ManyToOne(() => Client, (client) => client.codeAliases, {
+    nullable: false,
+    onDelete: 'RESTRICT',
+  })
   client?: Client
 }

@@ -15,16 +15,23 @@ import {
 
 import { INT32_MAX } from '../common/integer.constants'
 import { WithRelations } from '../db/db.types'
-import { ClientCodeAliasRepository } from './client-code-alias.repository'
+import { ClientCodeAliasesRepository } from './client-code-aliases.repository'
 import { ClientsRepository } from './clients.repository'
+import { GetClientsOptions } from './clients.types'
 import { Client } from './entities/client.entity'
 
 @Injectable()
 export class ClientsService {
   constructor(
     private readonly clientsRepository: ClientsRepository,
-    private readonly clientCodeAliasRepository: ClientCodeAliasRepository
+    private readonly clientCodeAliasRepository: ClientCodeAliasesRepository
   ) {}
+
+  async getClients(
+    options: GetClientsOptions
+  ): Promise<WithRelations<Client, { user: true; codeAliases: true }>[]> {
+    return this.clientsRepository.getClients(options)
+  }
 
   async lockForMerge(ids: string[]): Promise<void> {
     await this.clientsRepository.lockCodeAllocation()
@@ -174,10 +181,14 @@ export class ClientsService {
   }
 
   async find<R extends FindOptionsRelations<Client>>(
-    options?: Omit<FindManyOptions<Client>, 'relations'> & {
-      relations?: R
+    options: Omit<FindManyOptions<Client>, 'relations'> & {
+      relations: R
     }
-  ): Promise<WithRelations<Client, R>[]> {
+  ): Promise<WithRelations<Client, NoInfer<R>>[]>
+  async find(options?: FindManyOptions<Client>): Promise<Client[]>
+  async find<R extends FindOptionsRelations<Client>>(
+    options?: FindManyOptions<Client>
+  ): Promise<(Client | WithRelations<Client, R>)[]> {
     return this.clientsRepository.find(options)
   }
 
@@ -244,9 +255,13 @@ export class ClientsService {
 
   async findOneOrThrow<R extends FindOptionsRelations<Client>>(
     options: Omit<FindOneOptions<Client>, 'relations'> & {
-      relations?: R
+      relations: R
     }
-  ): Promise<WithRelations<Client, R>> {
+  ): Promise<WithRelations<Client, NoInfer<R>>>
+  async findOneOrThrow(options: FindOneOptions<Client>): Promise<Client>
+  async findOneOrThrow<R extends FindOptionsRelations<Client>>(
+    options: FindOneOptions<Client>
+  ): Promise<Client | WithRelations<Client, R>> {
     return this.clientsRepository.findOneOrThrow(options)
   }
 

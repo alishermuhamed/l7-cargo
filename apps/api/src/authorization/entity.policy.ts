@@ -1,4 +1,5 @@
 import { AbilityBuilder } from '@casl/ability'
+import { ForbiddenException } from '@nestjs/common'
 
 import { ContextService } from '../context/context.service'
 import { BaseEntity } from '../db/base.entity'
@@ -12,6 +13,14 @@ export abstract class EntityPolicy<Entity extends BaseEntity> {
   ) {}
 
   abstract defineRules(builder: AbilityBuilder<Ability>, user: User): void
+
+  protected checkIsAdmin(): void {
+    const user = this.contextService.getUserOrThrow()
+
+    if (user.role !== 'admin') {
+      throw new ForbiddenException()
+    }
+  }
 
   get ability(): Ability {
     return this.contextService.getAbilityOrThrow()

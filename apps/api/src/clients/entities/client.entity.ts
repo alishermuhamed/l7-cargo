@@ -1,9 +1,10 @@
-import { Entity, Index, OneToOne } from 'typeorm'
+import { Entity, Index, OneToMany, OneToOne } from 'typeorm'
 
 import { BaseEntity } from '../../db/base.entity'
 import { IntegerColumn } from '../../db/columns/integer-column'
 import { TextColumn } from '../../db/columns/text-column'
 import { User } from '../../users/entities/user.entity'
+import { ClientCodeAlias } from './client-code-alias.entity'
 
 @Entity()
 export class Client extends BaseEntity {
@@ -20,4 +21,7 @@ export class Client extends BaseEntity {
 
   @OneToOne(() => User, (user) => user.client)
   user?: User | null
+
+  @OneToMany(() => ClientCodeAlias, (alias) => alias.client)
+  codeAliases?: ClientCodeAlias[]
 }

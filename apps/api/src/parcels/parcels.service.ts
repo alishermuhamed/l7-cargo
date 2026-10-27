@@ -107,26 +107,38 @@ export class ParcelsService {
   }
 
   async find<R extends FindOptionsRelations<Parcel>>(
-    options?: Omit<FindManyOptions<Parcel>, 'relations'> & {
-      relations?: R
+    options: Omit<FindManyOptions<Parcel>, 'relations'> & {
+      relations: R
     }
-  ): Promise<WithRelations<Parcel, R>[]> {
+  ): Promise<WithRelations<Parcel, NoInfer<R>>[]>
+  async find(options?: FindManyOptions<Parcel>): Promise<Parcel[]>
+  async find<R extends FindOptionsRelations<Parcel>>(
+    options?: FindManyOptions<Parcel>
+  ): Promise<(Parcel | WithRelations<Parcel, R>)[]> {
     return this.parcelsRepository.find(options)
   }
 
   async findOne<R extends FindOptionsRelations<Parcel>>(
     options: Omit<FindOneOptions<Parcel>, 'relations'> & {
-      relations?: R
+      relations: R
     }
-  ): Promise<WithRelations<Parcel, R> | null> {
+  ): Promise<WithRelations<Parcel, NoInfer<R>> | null>
+  async findOne(options: FindOneOptions<Parcel>): Promise<Parcel | null>
+  async findOne<R extends FindOptionsRelations<Parcel>>(
+    options: FindOneOptions<Parcel>
+  ): Promise<Parcel | WithRelations<Parcel, R> | null> {
     return this.parcelsRepository.findOne(options)
   }
 
   async findOneOrThrow<R extends FindOptionsRelations<Parcel>>(
     options: Omit<FindOneOptions<Parcel>, 'relations'> & {
-      relations?: R
+      relations: R
     }
-  ): Promise<WithRelations<Parcel, R>> {
+  ): Promise<WithRelations<Parcel, NoInfer<R>>>
+  async findOneOrThrow(options: FindOneOptions<Parcel>): Promise<Parcel>
+  async findOneOrThrow<R extends FindOptionsRelations<Parcel>>(
+    options: FindOneOptions<Parcel>
+  ): Promise<Parcel | WithRelations<Parcel, R>> {
     return this.parcelsRepository.findOneOrThrow(options)
   }
 

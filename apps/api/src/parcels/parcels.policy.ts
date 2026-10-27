@@ -90,11 +90,7 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
   }
 
   checkCanManageStatusHistory(): void {
-    const user = this.contextService.getUserOrThrow()
-
-    if (user.role !== 'admin') {
-      throw new ForbiddenException()
-    }
+    this.checkIsAdmin()
   }
 
   checkCanReadReadyForPickupBalance(): void {

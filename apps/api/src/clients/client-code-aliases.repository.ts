@@ -8,7 +8,7 @@ import { BaseRepository } from '../db/base.repository'
 import { ClientCodeAlias } from './entities/client-code-alias.entity'
 
 @Injectable()
-export class ClientCodeAliasRepository extends BaseRepository<ClientCodeAlias> {
+export class ClientCodeAliasesRepository extends BaseRepository<ClientCodeAlias> {
   constructor(
     protected readonly txHost: TransactionHost<TransactionalAdapterTypeOrm>,
     protected readonly contextService: ContextService

@@ -67,33 +67,45 @@ export abstract class BaseRepository<Entity extends BaseEntity> {
   }
 
   async find<R extends FindOptionsRelations<Entity>>(
-    options?: Omit<FindManyOptions<Entity>, 'relations'> & {
-      relations?: R
+    options: Omit<FindManyOptions<Entity>, 'relations'> & {
+      relations: R
     }
-  ): Promise<WithRelations<Entity, R>[]> {
+  ): Promise<WithRelations<Entity, NoInfer<R>>[]>
+  async find(options?: FindManyOptions<Entity>): Promise<Entity[]>
+  async find<R extends FindOptionsRelations<Entity>>(
+    options?: FindManyOptions<Entity>
+  ): Promise<(Entity | WithRelations<Entity, R>)[]> {
     const result = await this.repository.find(options)
-    return result as WithRelations<Entity, R>[]
+    return result
   }
 
   async findOne<R extends FindOptionsRelations<Entity>>(
     options: Omit<FindOneOptions<Entity>, 'relations'> & {
-      relations?: R
+      relations: R
     }
-  ): Promise<WithRelations<Entity, R> | null> {
+  ): Promise<WithRelations<Entity, NoInfer<R>> | null>
+  async findOne(options: FindOneOptions<Entity>): Promise<Entity | null>
+  async findOne<R extends FindOptionsRelations<Entity>>(
+    options: FindOneOptions<Entity>
+  ): Promise<Entity | WithRelations<Entity, R> | null> {
     const result = await this.repository.findOne(options)
 
     if (!result) {
       return null
     }
 
-    return result as WithRelations<Entity, R>
+    return result
   }
 
   async findOneOrThrow<R extends FindOptionsRelations<Entity>>(
     options: Omit<FindOneOptions<Entity>, 'relations'> & {
-      relations?: R
+      relations: R
     }
-  ): Promise<WithRelations<Entity, R>> {
+  ): Promise<WithRelations<Entity, NoInfer<R>>>
+  async findOneOrThrow(options: FindOneOptions<Entity>): Promise<Entity>
+  async findOneOrThrow<R extends FindOptionsRelations<Entity>>(
+    options: FindOneOptions<Entity>
+  ): Promise<Entity | WithRelations<Entity, R>> {
     const result = await this.findOne(options)
 
     if (!result) {

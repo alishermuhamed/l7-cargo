@@ -30,11 +30,7 @@ export class UsersPolicy extends EntityPolicy<User> {
   }
 
   checkCanList(): void {
-    const user = this.contextService.getUserOrThrow()
-
-    if (user.role !== 'admin') {
-      throw new ForbiddenException()
-    }
+    this.checkIsAdmin()
   }
 
   async checkCanRead(userId: string): Promise<void> {

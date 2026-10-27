@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 
-import { ClientCodeAliasRepository } from './client-code-alias.repository'
+import { ClientCodeAliasesRepository } from './client-code-aliases.repository'
 import { ClientsController } from './clients.controller'
 import { ClientsPolicy } from './clients.policy'
 import { ClientsRepository } from './clients.repository'
@@ -10,7 +10,7 @@ import { ClientsService } from './clients.service'
   controllers: [ClientsController],
   providers: [
     ClientsRepository,
-    ClientCodeAliasRepository,
+    ClientCodeAliasesRepository,
     ClientsService,
     ClientsPolicy,
   ],

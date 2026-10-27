@@ -31,15 +31,11 @@ export class ClientsPolicy extends EntityPolicy<Client> {
   }
 
   checkCanManageCodes(): void {
-    if (this.contextService.getUserOrThrow().role !== 'admin') {
-      throw new ForbiddenException()
-    }
+    this.checkIsAdmin()
   }
 
   checkCanList(): void {
-    if (this.contextService.getUserOrThrow().role !== 'admin') {
-      throw new ForbiddenException()
-    }
+    this.checkIsAdmin()
   }
 
   async checkCanRead(clientId: string): Promise<void> {

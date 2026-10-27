@@ -10,7 +10,6 @@ import {
   Post,
   Query,
 } from '@nestjs/common'
-import { ILike, Raw } from 'typeorm'
 
 import { SuccessResponseDto } from '../common/dtos/success-response.dto'
 import { ClientsMapper } from './clients.mapper'
@@ -22,11 +21,6 @@ import { GetClientsQueryDto } from './dtos/get-clients-query.dto'
 import { UpdateClientCodeRequestDto } from './dtos/update-client-code-request.dto'
 
 const CLIENT_ID_PARAM = 'clientId'
-
-function formattedClientCodeSql(column: string): string {
-  const digits = `CAST(ABS(CAST(${column} AS bigint)) AS text)`
-  return `(CASE WHEN ${column} < 0 THEN '-' ELSE '' END || LPAD(${digits}, GREATEST(3, LENGTH(${digits})), '0'))`
-}
 
 @Controller('clients')
 export class ClientsController {
@@ -41,46 +35,13 @@ export class ClientsController {
   ): Promise<GetClientResponseDto[]> {
     this.clientsPolicy.checkCanList()
 
-    const where = search
-      ? [
-          {
-            code: Raw(
-              (alias) => `${formattedClientCodeSql(alias)} ILIKE :search`,
-              {
-                search: `%${search}%`,
-              }
-            ),
-          },
-          {
-            id: Raw(
-              (alias) =>
-                `EXISTS (SELECT 1 FROM "client_code_alias" "codeAlias" WHERE "codeAlias"."clientId" = ${alias} AND ${formattedClientCodeSql('"codeAlias"."code"')} ILIKE :search)`,
-              { search: `%${search}%` }
-            ),
-          },
-          { legacyPhoneRaw: ILike(`%${search}%`) },
-          { user: { name: ILike(`%${search}%`) } },
-          { user: { phoneNumber: ILike(`%${search}%`) } },
-        ]
-      : undefined
-
-    const clients = await this.clientsService.find({
-      where,
-      relations: { user: true },
-      order: { createdAt: 'DESC', id: 'DESC' },
-      take: limit,
-      skip: offset,
+    const clients = await this.clientsService.getClients({
+      search,
+      limit,
+      offset,
     })
-    const aliasesByClientId = await this.clientsService.findAliasesByClientIds(
-      clients.map((client) => client.id)
-    )
 
-    return clients.map((client) =>
-      ClientsMapper.toGetClientResponseDto(
-        client,
-        aliasesByClientId.get(client.id) ?? []
-      )
-    )
+    return clients.map((client) => ClientsMapper.toGetClientResponseDto(client))
   }
 
   @Patch(`:${CLIENT_ID_PARAM}/code`)
@@ -121,15 +82,8 @@ export class ClientsController {
 
     const client = await this.clientsService.findOneOrThrow({
       where: { id: clientId },
-      relations: { user: true },
+      relations: { user: true, codeAliases: true },
     })
-    const aliasesByClientId = await this.clientsService.findAliasesByClientIds([
-      client.id,
-    ])
-
-    return ClientsMapper.toGetClientResponseDto(
-      client,
-      aliasesByClientId.get(client.id) ?? []
-    )
+    return ClientsMapper.toGetClientResponseDto(client)
   }
 }
