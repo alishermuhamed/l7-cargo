@@ -33,6 +33,15 @@ export class ClientsService {
     return this.clientsRepository.getClients(options)
   }
 
+  async getClient(
+    clientId: string
+  ): Promise<WithRelations<Client, { user: true; codeAliases: true }>> {
+    return this.clientsRepository.findOneOrThrow({
+      where: { id: clientId },
+      relations: { user: true, codeAliases: true },
+    })
+  }
+
   async lockForMerge(ids: string[]): Promise<void> {
     await this.clientsRepository.lockCodeAllocation()
     for (const id of [...ids].sort()) {

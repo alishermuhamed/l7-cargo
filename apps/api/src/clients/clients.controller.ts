@@ -21,6 +21,7 @@ import { GetClientsQueryDto } from './dtos/get-clients-query.dto'
 import { UpdateClientCodeRequestDto } from './dtos/update-client-code-request.dto'
 
 const CLIENT_ID_PARAM = 'clientId'
+const CODE_PARAM = 'code'
 
 @Controller('clients')
 export class ClientsController {
@@ -50,7 +51,9 @@ export class ClientsController {
     @Body() body: UpdateClientCodeRequestDto
   ): Promise<SuccessResponseDto> {
     this.clientsPolicy.checkCanManageCodes()
+
     await this.clientsService.updateCode(clientId, body.code, body.expectedCode)
+
     return new SuccessResponseDto()
   }
 
@@ -60,17 +63,21 @@ export class ClientsController {
     @Body() body: AddClientAliasRequestDto
   ): Promise<SuccessResponseDto> {
     this.clientsPolicy.checkCanManageCodes()
+
     await this.clientsService.addAlias(clientId, body.code)
+
     return new SuccessResponseDto()
   }
 
-  @Delete(`:${CLIENT_ID_PARAM}/aliases/:code`)
+  @Delete(`:${CLIENT_ID_PARAM}/aliases/:${CODE_PARAM}`)
   async removeClientAlias(
     @Param(CLIENT_ID_PARAM, ParseUUIDPipe) clientId: string,
-    @Param('code', ParseIntPipe) code: number
+    @Param(CODE_PARAM, ParseIntPipe) code: number
   ): Promise<SuccessResponseDto> {
     this.clientsPolicy.checkCanManageCodes()
+
     await this.clientsService.removeAlias(clientId, code)
+
     return new SuccessResponseDto()
   }
 
@@ -80,10 +87,8 @@ export class ClientsController {
   ): Promise<GetClientResponseDto> {
     await this.clientsPolicy.checkCanRead(clientId)
 
-    const client = await this.clientsService.findOneOrThrow({
-      where: { id: clientId },
-      relations: { user: true, codeAliases: true },
-    })
+    const client = await this.clientsService.getClient(clientId)
+
     return ClientsMapper.toGetClientResponseDto(client)
   }
 }
