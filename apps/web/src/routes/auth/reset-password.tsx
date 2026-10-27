@@ -31,10 +31,11 @@ import { TextField } from '../../components/text-field'
 import { authClient } from '../../lib/auth-client'
 import i18n from '../../lib/i18n'
 import { formatPhoneNumber } from '../../lib/phone-number'
+import { phoneNumberSchema } from '../../lib/phone-number-schema'
 
 export const Route = createFileRoute('/auth/reset-password')({
   validateSearch: z.object({
-    phoneNumber: z.string().trim().min(1).catch(''),
+    phoneNumber: phoneNumberSchema.optional().catch(undefined),
     redirectTo: z.string().optional(),
   }),
   beforeLoad: ({ search }) => {
@@ -44,6 +45,8 @@ export const Route = createFileRoute('/auth/reset-password')({
         search: { redirectTo: search.redirectTo },
       })
     }
+
+    return { phoneNumber: search.phoneNumber }
   },
   component: ResetPasswordPage,
 })
@@ -67,7 +70,8 @@ const RESEND_OTP_DELAY_SECONDS = 60
 
 function ResetPasswordPage() {
   const navigate = useNavigate()
-  const { phoneNumber, redirectTo } = Route.useSearch()
+  const { redirectTo } = Route.useSearch()
+  const { phoneNumber } = Route.useRouteContext()
 
   const [secondsUntilResend, setSecondsUntilResend] = useState(
     RESEND_OTP_DELAY_SECONDS

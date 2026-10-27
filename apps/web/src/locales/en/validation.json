@@ -1,6 +1,7 @@
 {
   "phoneNumber": {
-    "required": "Phone number is required"
+    "required": "Phone number is required",
+    "invalid": "Enter a valid phone number with country code"
   },
   "password": {
     "required": "Password is required",

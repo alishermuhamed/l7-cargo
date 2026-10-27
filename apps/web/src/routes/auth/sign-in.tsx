@@ -32,20 +32,18 @@ import { TextField } from '../../components/text-field'
 import { getSignInMethod, SignInMethod } from '../../lib/api/api.gen'
 import { authClient } from '../../lib/auth-client'
 import i18n from '../../lib/i18n'
+import { phoneNumberSchema } from '../../lib/phone-number-schema'
 
 export const Route = createFileRoute('/auth/sign-in')({
   validateSearch: z.object({
-    phoneNumber: z.string().trim().optional(),
+    phoneNumber: phoneNumberSchema.optional().catch(undefined),
     redirectTo: z.string().optional(),
   }),
   component: SignInPage,
 })
 
 const signInSchema = z.object({
-  phoneNumber: z
-    .string(i18n.t('validation:phoneNumber.required'))
-    .trim()
-    .min(1, i18n.t('validation:phoneNumber.required')),
+  phoneNumber: phoneNumberSchema,
   password: z.string().optional(),
 })
 

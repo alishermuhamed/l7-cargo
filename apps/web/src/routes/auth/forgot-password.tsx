@@ -22,20 +22,18 @@ import {
 import { TextField } from '../../components/text-field'
 import { authClient } from '../../lib/auth-client'
 import i18n from '../../lib/i18n'
+import { phoneNumberSchema } from '../../lib/phone-number-schema'
 
 export const Route = createFileRoute('/auth/forgot-password')({
   validateSearch: z.object({
-    phoneNumber: z.string().trim().optional(),
+    phoneNumber: phoneNumberSchema.optional().catch(undefined),
     redirectTo: z.string().optional(),
   }),
   component: ForgotPasswordPage,
 })
 
 const forgotPasswordSchema = z.object({
-  phoneNumber: z
-    .string(i18n.t('validation:phoneNumber.required'))
-    .trim()
-    .min(1, i18n.t('validation:phoneNumber.required')),
+  phoneNumber: phoneNumberSchema,
 })
 
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
