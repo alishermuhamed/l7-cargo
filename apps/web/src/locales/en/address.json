@@ -6,5 +6,13 @@
   "exampleScreenshotsTitle": "Example of a correctly entered address on {{marketplace}}:",
   "exampleScreenshotAlt": "{{marketplace}} example screenshot {{index}}",
   "logoAlt": "{{marketplace}} logo",
-  "wechatInvoiceNote": "If you are buying from a seller on WeChat, ask them to print these details on the invoice"
+  "wechatInvoiceNote": "If you are buying from a seller on WeChat, ask them to print these details on the invoice",
+  "communityTitle": "Please join one of the L7 Cargo groups",
+  "communityDescription": "Get updates on cargo arrivals, office hours, and other news on WhatsApp or Telegram.",
+  "whatsappGroupLabel": "WhatsApp group",
+  "telegramChannelLabel": "Telegram channel",
+  "groupFullNotice": "If the WhatsApp group is full —",
+  "secondGroupLabel": "second group",
+  "specialGoodsNotice": "When ordering food, electronics, or fragile items, please contact a manager.",
+  "contactManagerLabel": "Contact a manager"
 }

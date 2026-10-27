@@ -13,6 +13,7 @@ import {
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import toast from 'react-hot-toast'
 
+import { AddressCommunityCard } from '../../../../components/address-community-card'
 import { Button } from '../../../../components/button'
 import { CopyButton } from '../../../../components/copy-button'
 import { useClientContext } from '../../../../hooks/use-client-context'
@@ -79,12 +80,29 @@ function MarketplaceAddressPage() {
             <InfoCircledIcon />
           </Callout.Icon>
 
-          <Callout.Text>
-            {i18n.t('address:addressHelpCallout')}{' '}
-            <Link href={MANAGER_WHATSAPP_URL} rel="noreferrer" target="_blank">
-              {i18n.t('address:whatsappLinkLabel')}
-            </Link>
-          </Callout.Text>
+          <Flex direction="column" gap="2">
+            <Callout.Text>
+              {i18n.t('address:addressHelpCallout')}{' '}
+              <Link
+                href={MANAGER_WHATSAPP_URL}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {i18n.t('address:whatsappLinkLabel')}
+              </Link>
+            </Callout.Text>
+            <Callout.Text weight="medium">
+              {i18n.t('address:specialGoodsNotice')}{' '}
+              <Link
+                href={MANAGER_WHATSAPP_URL}
+                rel="noreferrer"
+                target="_blank"
+                underline="always"
+              >
+                {i18n.t('address:contactManagerLabel')}
+              </Link>
+            </Callout.Text>
+          </Flex>
         </Callout.Root>
 
         <Flex align="center" gap="2">
@@ -132,6 +150,8 @@ function MarketplaceAddressPage() {
             <CopyIcon /> {i18n.t('address:copyFullAddress')}
           </Button>
         </Flex>
+
+        <AddressCommunityCard compact />
 
         {screenshotUrls.length > 0 && (
           <>

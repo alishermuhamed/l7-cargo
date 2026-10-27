@@ -6,5 +6,13 @@
   "exampleScreenshotsTitle": "Пример правильно заполненного адреса на {{marketplace}}:",
   "exampleScreenshotAlt": "Пример скриншота {{marketplace}} {{index}}",
   "logoAlt": "Логотип {{marketplace}}",
-  "wechatInvoiceNote": "Если вы покупаете у продавца в WeChat, попросите его распечатать эти данные в накладной"
+  "wechatInvoiceNote": "Если вы покупаете у продавца в WeChat, попросите его распечатать эти данные в накладной",
+  "communityTitle": "Обязательно присоединитесь к одной из групп L7 Cargo",
+  "communityDescription": "Узнавайте о приходах грузов, графике работы офиса и других новостях в WhatsApp или Telegram.",
+  "whatsappGroupLabel": "WhatsApp-группа",
+  "telegramChannelLabel": "Telegram-канал",
+  "groupFullNotice": "Если WhatsApp-группа переполнена —",
+  "secondGroupLabel": "вторая группа",
+  "specialGoodsNotice": "При заказе продуктов питания, техники и хрупких предметов, пожалуйста, обратитесь к менеджеру.",
+  "contactManagerLabel": "Написать менеджеру"
 }

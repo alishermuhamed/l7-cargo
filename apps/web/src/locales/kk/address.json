@@ -6,5 +6,13 @@
   "exampleScreenshotsTitle": "{{marketplace}} сервисінде мекенжайды дұрыс толтыру мысалы:",
   "exampleScreenshotAlt": "{{marketplace}} скриншот мысалы {{index}}",
   "logoAlt": "{{marketplace}} логотипі",
-  "wechatInvoiceNote": "WeChat-та сатушыдан сатып алсаңыз, осы деректерді жүкқұжатқа басып шығаруды сұраңыз"
+  "wechatInvoiceNote": "WeChat-та сатушыдан сатып алсаңыз, осы деректерді жүкқұжатқа басып шығаруды сұраңыз",
+  "communityTitle": "L7 Cargo топтарының біріне міндетті түрде қосылыңыз",
+  "communityDescription": "Жүктің келуі, кеңсенің жұмыс кестесі және басқа жаңалықтар туралы WhatsApp немесе Telegram арқылы біліп отырыңыз.",
+  "whatsappGroupLabel": "WhatsApp тобы",
+  "telegramChannelLabel": "Telegram арнасы",
+  "groupFullNotice": "WhatsApp тобы толып қалса —",
+  "secondGroupLabel": "екінші топ",
+  "specialGoodsNotice": "Азық-түлік, техника және сынғыш заттарға тапсырыс бергенде, менеджерге хабарласыңыз.",
+  "contactManagerLabel": "Менеджерге жазу"
 }
