@@ -1,6 +1,6 @@
-import { IsPhoneNumber } from 'class-validator'
+import { IsE164PhoneNumber } from '../../common/validators/is-e164-phone-number'
 
 export class GetSignInMethodQueryDto {
-  @IsPhoneNumber()
+  @IsE164PhoneNumber()
   phoneNumber!: string
 }

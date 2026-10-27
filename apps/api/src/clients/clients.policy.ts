@@ -39,9 +39,7 @@ export class ClientsPolicy extends EntityPolicy<Client> {
   }
 
   async checkCanRead(clientId: string): Promise<void> {
-    const client = await this.clientsService.findOneOrThrow({
-      where: { id: clientId },
-    })
+    const client = await this.clientsService.findOneByIdOrThrow(clientId)
 
     if (!this.ability.can('read', client)) {
       throw new ForbiddenException()

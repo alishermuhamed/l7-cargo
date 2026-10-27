@@ -29,9 +29,7 @@ export class RegistrationNotificationService {
     }
 
     try {
-      const client = await this.clientsService.findOneOrThrow({
-        where: { user: { id: user.id } },
-      })
+      const client = await this.clientsService.findOneByUserIdOrThrow(user.id)
       const aliasesByClientId =
         await this.clientsService.findAliasesByClientIds([client.id])
       const aliases = aliasesByClientId.get(client.id) ?? []

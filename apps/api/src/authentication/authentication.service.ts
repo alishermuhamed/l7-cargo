@@ -1,8 +1,7 @@
-import { BadRequestException, HttpException, Injectable } from '@nestjs/common'
+import { HttpException, Injectable } from '@nestjs/common'
 import { APIError } from 'better-auth/api'
 import { fromNodeHeaders } from 'better-auth/node'
 import type { IncomingHttpHeaders } from 'http'
-import parsePhoneNumberFromString from 'libphonenumber-js'
 import { IsNull, Not } from 'typeorm'
 
 import { ClientsService } from '../clients/clients.service'
@@ -32,7 +31,6 @@ export class AuthenticationService {
       baseURL: this.configService.getOrThrow('betterAuth.baseUrl'),
       cookiesDomain: this.configService.get('betterAuth.cookiesDomain'),
       webUrl: this.configService.get('web.url'),
-      validatePhoneNumber: (input) => this.validatePhoneNumber(input),
       sendOTP: (data) => this.sendOTP(data),
       sendPasswordResetOTP: (data) => this.sendPasswordResetOTP(data),
       resolveClientIdForNewUser: (phoneNumber) =>
@@ -68,27 +66,16 @@ export class AuthenticationService {
     }
   }
 
-  async getSignInMethod(input: string): Promise<SignInMethod> {
-    const phoneNumber = parsePhoneNumberFromString(input)
-
-    if (!phoneNumber?.isValid()) {
-      throw new BadRequestException('INVALID_PHONE_NUMBER')
-    }
-
+  async getSignInMethod(phoneNumber: string): Promise<SignInMethod> {
     const accountWithPassword = await this.accountsRepository.findOne({
       where: {
         providerId: 'credential',
         password: Not(IsNull()),
-        user: { phoneNumber: phoneNumber.number },
+        user: { phoneNumber },
       },
     })
 
     return accountWithPassword ? 'password' : 'otp'
-  }
-
-  private validatePhoneNumber(input: string): boolean {
-    const phoneNumber = parsePhoneNumberFromString(input)
-    return phoneNumber?.isValid() ?? false
   }
 
   private sendOTP({
@@ -120,7 +107,7 @@ export class AuthenticationService {
   }
 
   private async resolveClientIdForNewUser(
-    phoneNumber: unknown
+    phoneNumber: string
   ): Promise<string> {
     const client = await this.clientsService.resolveForNewUser(phoneNumber)
     return client.id

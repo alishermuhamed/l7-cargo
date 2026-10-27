@@ -47,10 +47,7 @@ export class ClientMergesService {
   ): Promise<MergeCandidate[]> {
     const found = await this.clients.findOneByClientCode(code)
     if (!found || found.id === targetId) return []
-    const client = await this.clients.findOneOrThrow({
-      where: { id: found.id },
-      relations: { user: true },
-    })
+    const client = await this.clients.findOneWithUserByIdOrThrow(found.id)
     const aliases = await this.clients.findAliasesByClientIds([client.id])
     return [
       {
@@ -72,14 +69,8 @@ export class ClientMergesService {
     if (targetId === sourceId)
       throw new BadRequestException('CLIENT_MERGE_SAME_CLIENT')
     await this.clients.lockForMerge([targetId, sourceId])
-    const target = await this.clients.findOneOrThrow({
-      where: { id: targetId },
-      relations: { user: true },
-    })
-    const source = await this.clients.findOneOrThrow({
-      where: { id: sourceId },
-      relations: { user: true },
-    })
+    const target = await this.clients.findOneWithUserByIdOrThrow(targetId)
+    const source = await this.clients.findOneWithUserByIdOrThrow(sourceId)
     if (target.user && source.user) {
       throw new ConflictException('CLIENT_MERGE_REVIEW_REQUIRED')
     }
@@ -134,12 +125,8 @@ export class ClientMergesService {
     const preview = await this.preview(targetId, sourceId)
     if (preview.version !== version)
       throw new ConflictException('CLIENT_MERGE_CHANGED')
-    const target = await this.clients.findOneOrThrow({
-      where: { id: targetId },
-    })
-    const source = await this.clients.findOneOrThrow({
-      where: { id: sourceId },
-    })
+    const target = await this.clients.findOneByIdOrThrow(targetId)
+    const source = await this.clients.findOneByIdOrThrow(sourceId)
     await this.users.transferClient(sourceId, targetId)
     await this.parcels.transferClient(sourceId, targetId)
     await this.clients.absorbClient(target, source)

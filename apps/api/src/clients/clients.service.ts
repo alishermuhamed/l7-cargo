@@ -5,13 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { Transactional } from '@nestjs-cls/transactional'
-import parsePhoneNumberFromString from 'libphonenumber-js'
-import {
-  FindManyOptions,
-  FindOneOptions,
-  FindOptionsRelations,
-  In,
-} from 'typeorm'
+import { In } from 'typeorm'
 
 import { INT32_MAX } from '../common/integer.constants'
 import { WithRelations } from '../db/db.types'
@@ -44,6 +38,7 @@ export class ClientsService {
 
   async lockForMerge(ids: string[]): Promise<void> {
     await this.clientsRepository.lockCodeAllocation()
+
     for (const id of [...ids].sort()) {
       await this.clientsRepository.findOneOrThrow({
         where: { id },
@@ -57,18 +52,12 @@ export class ClientsService {
       { clientId: source.id },
       { clientId: target.id }
     )
+
     await this.clientsRepository.delete({ id: source.id })
+
     if (source.code > 0) {
       await this.insertAlias(target.id, source.code)
     }
-  }
-
-  @Transactional()
-  async createWithGeneratedCode(): Promise<Client> {
-    await this.clientsRepository.lockCodeAllocation()
-
-    const code = await this.clientsRepository.getNextCode()
-    return this.insertWithCode(code)
   }
 
   @Transactional()
@@ -87,25 +76,24 @@ export class ClientsService {
   }
 
   @Transactional()
-  async resolveForNewUser(phoneNumber: unknown): Promise<Client> {
-    const normalizedPhone = this.normalizePhoneNumber(phoneNumber)
+  async resolveForNewUser(phoneNumber: string): Promise<Client> {
+    const matchingClient = await this.clientsRepository.findOne({
+      where: { legacyPhoneNormalized: phoneNumber },
+      relations: { user: true },
+    })
 
-    if (normalizedPhone) {
-      const matchingClient = await this.clientsRepository.findOne({
-        where: { legacyPhoneNormalized: normalizedPhone },
-        relations: { user: true },
-      })
-
-      if (matchingClient?.user) {
-        throw new ConflictException('CLIENT_ALREADY_LINKED')
-      }
-
-      if (matchingClient) {
-        return matchingClient
-      }
+    if (matchingClient?.user) {
+      throw new ConflictException('CLIENT_ALREADY_LINKED')
     }
 
-    return this.createWithGeneratedCode()
+    if (matchingClient) {
+      return matchingClient
+    }
+
+    await this.clientsRepository.lockCodeAllocation()
+
+    const code = await this.clientsRepository.getNextCode()
+    return this.insertWithCode(code)
   }
 
   @Transactional()
@@ -115,16 +103,22 @@ export class ClientsService {
     expectedCode: number
   ): Promise<void> {
     this.validatePositiveCode(code)
+
     const client = await this.getClientForCodeChange(clientId)
+
     if (client.code !== expectedCode) {
       throw new ConflictException('CLIENT_CODES_CHANGED')
     }
+
     if (client.code === code) {
       return
     }
+
     await this.assertCodeAvailable(clientId, code)
+
     await this.clientCodeAliasRepository.delete({ clientId, code })
     await this.clientsRepository.update({ id: clientId }, { code })
+
     if (client.code > 0) {
       await this.insertAlias(clientId, client.code)
     }
@@ -133,10 +127,13 @@ export class ClientsService {
   @Transactional()
   async addAlias(clientId: string, code: number): Promise<void> {
     this.validatePositiveCode(code)
+
     const client = await this.getClientForCodeChange(clientId)
+
     if (client.code === code) {
       throw new ConflictException('CLIENT_CODE_IS_PRIMARY')
     }
+
     await this.assertCodeAvailable(clientId, code)
     await this.insertAlias(clientId, code)
   }
@@ -144,10 +141,13 @@ export class ClientsService {
   @Transactional()
   async removeAlias(clientId: string, code: number): Promise<void> {
     this.validatePositiveCode(code)
+
     const client = await this.getClientForCodeChange(clientId)
+
     if (client.code === code) {
       throw new ConflictException('CLIENT_CODE_IS_PRIMARY')
     }
+
     await this.clientCodeAliasRepository.delete({ clientId, code })
   }
 
@@ -159,12 +159,15 @@ export class ClientsService {
 
   private async getClientForCodeChange(clientId: string): Promise<Client> {
     await this.clientsRepository.lockCodeAllocation()
+
     const client = await this.clientsRepository.findOne({
       where: { id: clientId },
     })
+
     if (!client) {
       throw new NotFoundException('CLIENT_NOT_FOUND')
     }
+
     return client
   }
 
@@ -173,6 +176,7 @@ export class ClientsService {
     code: number
   ): Promise<void> {
     const owner = await this.findOneByClientCode(code)
+
     if (owner && owner.id !== clientId) {
       throw new ConflictException('CLIENT_CODE_IN_USE')
     }
@@ -182,23 +186,12 @@ export class ClientsService {
     const existing = await this.clientCodeAliasRepository.findOne({
       where: { clientId, code },
     })
+
     if (!existing) {
       await this.clientCodeAliasRepository.insert(
         this.clientCodeAliasRepository.create({ clientId, code })
       )
     }
-  }
-
-  async find<R extends FindOptionsRelations<Client>>(
-    options: Omit<FindManyOptions<Client>, 'relations'> & {
-      relations: R
-    }
-  ): Promise<WithRelations<Client, NoInfer<R>>[]>
-  async find(options?: FindManyOptions<Client>): Promise<Client[]>
-  async find<R extends FindOptionsRelations<Client>>(
-    options?: FindManyOptions<Client>
-  ): Promise<(Client | WithRelations<Client, R>)[]> {
-    return this.clientsRepository.find(options)
   }
 
   async findOneByClientCode(code: number): Promise<Client | null> {
@@ -245,8 +238,10 @@ export class ClientsService {
   async findAliasesByClientIds(
     clientIds: string[]
   ): Promise<Map<string, number[]>> {
-    const aliases =
-      await this.clientCodeAliasRepository.findByClientIds(clientIds)
+    const aliases = await this.clientCodeAliasRepository.find({
+      where: { clientId: In(clientIds) },
+    })
+
     const codesByClientId = new Map<string, number[]>()
 
     for (const alias of aliases) {
@@ -262,35 +257,27 @@ export class ClientsService {
     return codesByClientId
   }
 
-  async findOneOrThrow<R extends FindOptionsRelations<Client>>(
-    options: Omit<FindOneOptions<Client>, 'relations'> & {
-      relations: R
-    }
-  ): Promise<WithRelations<Client, NoInfer<R>>>
-  async findOneOrThrow(options: FindOneOptions<Client>): Promise<Client>
-  async findOneOrThrow<R extends FindOptionsRelations<Client>>(
-    options: FindOneOptions<Client>
-  ): Promise<Client | WithRelations<Client, R>> {
-    return this.clientsRepository.findOneOrThrow(options)
+  async findOneByIdOrThrow(clientId: string): Promise<Client> {
+    return this.clientsRepository.findOneOrThrow({ where: { id: clientId } })
   }
 
-  private normalizePhoneNumber(phoneNumber: unknown): string | null {
-    if (typeof phoneNumber !== 'string') {
-      return null
-    }
+  async findOneByUserIdOrThrow(userId: string): Promise<Client> {
+    return this.clientsRepository.findOneOrThrow({
+      where: { user: { id: userId } },
+    })
+  }
 
-    const parsedPhoneNumber = parsePhoneNumberFromString(phoneNumber)
-
-    return parsedPhoneNumber?.isValid() ? parsedPhoneNumber.number : null
+  async findOneWithUserByIdOrThrow(
+    clientId: string
+  ): Promise<WithRelations<Client, { user: true }>> {
+    return this.clientsRepository.findOneOrThrow({
+      where: { id: clientId },
+      relations: { user: true },
+    })
   }
 
   private async insertWithCode(code: number): Promise<Client> {
-    const client = this.clientsRepository.create({
-      code,
-      legacyPhoneRaw: null,
-      legacyPhoneNormalized: null,
-    })
-
+    const client = this.clientsRepository.create({ code })
     await this.clientsRepository.insert(client)
     return client
   }

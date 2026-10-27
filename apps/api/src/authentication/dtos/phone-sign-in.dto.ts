@@ -1,7 +1,9 @@
-import { IsBoolean, IsOptional, IsPhoneNumber, IsString } from 'class-validator'
+import { IsBoolean, IsOptional, IsString } from 'class-validator'
+
+import { IsE164PhoneNumber } from '../../common/validators/is-e164-phone-number'
 
 export class PhoneSignInDto {
-  @IsPhoneNumber()
+  @IsE164PhoneNumber()
   phoneNumber!: string
 
   @IsString()

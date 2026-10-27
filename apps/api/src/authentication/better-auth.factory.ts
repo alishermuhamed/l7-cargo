@@ -2,8 +2,10 @@ import {
   betterAuth as betterAuthFactory,
   type BetterAuthOptions,
 } from 'better-auth'
+import { APIError } from 'better-auth/api'
 import { phoneNumber } from 'better-auth/plugins'
 
+import { isE164PhoneNumber } from '../common/phone-number'
 import type { BetterAuthTypeOrmAdapter } from '../db/adapters/better-auth-typeorm.adapter'
 import { DEFAULT_USER_ROLE } from '../users/user-role'
 
@@ -13,13 +15,12 @@ interface CreateBetterAuthOptions {
   baseURL: string
   cookiesDomain: string | undefined
   webUrl: string | undefined
-  validatePhoneNumber: (input: string) => boolean
   sendOTP: (data: { phoneNumber: string; code: string }) => Promise<void>
   sendPasswordResetOTP: (data: {
     phoneNumber: string
     code: string
   }) => Promise<void>
-  resolveClientIdForNewUser: (phoneNumber: unknown) => Promise<string>
+  resolveClientIdForNewUser: (phoneNumber: string) => Promise<string>
   notifyRegistration: (user: {
     id: string
     name: string
@@ -33,7 +34,6 @@ export function createBetterAuth({
   baseURL,
   cookiesDomain,
   webUrl,
-  validatePhoneNumber,
   sendOTP,
   sendPasswordResetOTP,
   resolveClientIdForNewUser,
@@ -50,7 +50,7 @@ export function createBetterAuth({
     },
     plugins: [
       phoneNumber({
-        phoneNumberValidator: validatePhoneNumber,
+        phoneNumberValidator: isE164PhoneNumber,
         sendOTP,
         sendPasswordResetOTP,
         signUpOnVerification: {
@@ -77,12 +77,22 @@ export function createBetterAuth({
     databaseHooks: {
       user: {
         create: {
-          before: async (user) => ({
-            data: {
-              ...user,
-              clientId: await resolveClientIdForNewUser(user.phoneNumber),
-            },
-          }),
+          before: async (user) => {
+            const userPhoneNumber = user.phoneNumber
+
+            if (!isE164PhoneNumber(userPhoneNumber)) {
+              throw new APIError('BAD_REQUEST', {
+                message: 'INVALID_PHONE_NUMBER',
+              })
+            }
+
+            return {
+              data: {
+                ...user,
+                clientId: await resolveClientIdForNewUser(userPhoneNumber),
+              },
+            }
+          },
           after: notifyRegistration,
         },
       },
