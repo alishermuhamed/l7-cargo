@@ -1,5 +1,9 @@
 import type { QueryClient } from '@tanstack/react-query'
-import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
+import {
+  createRootRouteWithContext,
+  Navigate,
+  Outlet,
+} from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
 interface RouterContext {
@@ -8,6 +12,7 @@ interface RouterContext {
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootLayout,
+  notFoundComponent: () => <Navigate to="/auth/sign-in" replace />,
 })
 
 function RootLayout() {
