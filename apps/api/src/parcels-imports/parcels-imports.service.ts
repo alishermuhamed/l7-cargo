@@ -133,15 +133,13 @@ export class ParcelsImportsService {
     file: Express.Multer.File,
     withHeader: boolean
   ): Promise<ParsedParcelsImportData> {
-    const { rows, errors: parseErrors } = this.parseFile(file, withHeader)
-    const { warnings, errors: validationErrors } = await this.buildIssues(rows)
+    const { rows, errors } = this.parseFile(file, withHeader)
+    const warnings = await this.buildWarnings(rows)
 
     return {
       rows,
       warnings,
-      errors: [...parseErrors, ...validationErrors].sort(
-        (a, b) => a.rowNumber - b.rowNumber
-      ),
+      errors: errors.sort((a, b) => a.rowNumber - b.rowNumber),
     }
   }
 
@@ -307,15 +305,13 @@ export class ParcelsImportsService {
     return cell.trim()
   }
 
-  private async buildIssues(rows: ParsedParcelsImportRow[]): Promise<{
-    warnings: ParsedParcelsImportWarning[]
-    errors: ParsedParcelsImportError[]
-  }> {
+  private async buildWarnings(
+    rows: ParsedParcelsImportRow[]
+  ): Promise<ParsedParcelsImportWarning[]> {
     const { existingClientsByCodes, existingParcelsByTrackingNumbers } =
       await this.loadExistingData(rows)
 
     const warnings: ParsedParcelsImportWarning[] = []
-    const errors: ParsedParcelsImportError[] = []
 
     rows.forEach((row) => {
       const existingParcel = existingParcelsByTrackingNumbers.get(
@@ -323,13 +319,6 @@ export class ParcelsImportsService {
       )
 
       if (row.clientCode === undefined) {
-        if (!existingParcel) {
-          errors.push({
-            rowNumber: row.rowNumber,
-            code: 'CLIENT_CODE_REQUIRED',
-          })
-        }
-
         return
       }
 
@@ -354,7 +343,7 @@ export class ParcelsImportsService {
       }
     })
 
-    return { warnings, errors }
+    return warnings
   }
 
   private async commitParsedRows(
@@ -386,23 +375,25 @@ export class ParcelsImportsService {
         continue
       }
 
-      if (row.clientCode === undefined) {
-        continue
-      }
+      let clientId: string | null = null
 
-      let matchingClient = existingClientsByCodes.get(row.clientCode)
+      if (row.clientCode !== undefined) {
+        let matchingClient = existingClientsByCodes.get(row.clientCode)
 
-      if (!matchingClient) {
-        matchingClient = await this.clientsService.findOrCreateByCode(
-          row.clientCode
-        )
+        if (!matchingClient) {
+          matchingClient = await this.clientsService.findOrCreateByCode(
+            row.clientCode
+          )
 
-        existingClientsByCodes.set(row.clientCode, matchingClient)
+          existingClientsByCodes.set(row.clientCode, matchingClient)
+        }
+
+        clientId = matchingClient.id
       }
 
       const parcelId = await this.parcelsService.createOrClaim({
         trackingNumber: row.trackingNumber,
-        clientId: matchingClient.id,
+        clientId,
         weightKg: row.weightKg?.toFixed(3),
         deliveryFee: row.deliveryFee?.toFixed(),
         comments: row.comments,
