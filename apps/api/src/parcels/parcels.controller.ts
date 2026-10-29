@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common'
 import { ILike } from 'typeorm'
 
-import { ClientsService } from '../clients/clients.service'
 import { SuccessResponseDto } from '../common/dtos/success-response.dto'
 import { ContextService } from '../context/context.service'
 import { CreateParcelRequestDto } from './dtos/create-parcel-request.dto'
@@ -35,7 +34,6 @@ const PARCEL_ID_PARAM = 'parcelId'
 export class ParcelsController {
   constructor(
     private readonly contextService: ContextService,
-    private readonly clientsService: ClientsService,
     private readonly parcelsPolicy: ParcelsPolicy,
     private readonly parcelsService: ParcelsService,
     private readonly parcelStatusHistoryService: ParcelStatusHistoryService
@@ -49,37 +47,10 @@ export class ParcelsController {
 
     const user = this.contextService.getUserOrThrow()
 
-    const {
-      clientCode,
-      trackingNumber,
-      source,
-      description,
-      weightKg,
-      deliveryFee,
-      comments,
-    } = createParcelRequestDto
-
-    let clientId: string | null
-
-    if (user.role === 'client') {
-      clientId = user.clientId
-    } else {
-      if (clientCode !== undefined) {
-        clientId = (await this.clientsService.findOrCreateByCode(clientCode)).id
-      } else {
-        clientId = null
-      }
-    }
-
-    const id = await this.parcelsService.create({
-      clientId,
-      trackingNumber,
-      source,
-      description,
-      weightKg,
-      deliveryFee,
-      comments,
-    })
+    const id = await this.parcelsService.createParcel(
+      createParcelRequestDto,
+      user
+    )
 
     return ParcelsMapper.toCreateParcelResponseDto(id)
   }

@@ -13,6 +13,7 @@ import {
 import { ClientsService } from '../clients/clients.service'
 import { addMoneyAmounts } from '../common/money'
 import { WithRelations } from '../db/db.types'
+import type { User } from '../users/entities/user.entity'
 import { Parcel } from './entities/parcel.entity'
 import type { ParcelStatus } from './parcel-status'
 import { ParcelsRepository } from './parcels.repository'
@@ -39,7 +40,49 @@ export class ParcelsService {
     )
   }
 
-  async create({
+  async createParcel(
+    {
+      clientCode,
+      trackingNumber,
+      source,
+      description,
+      weightKg,
+      deliveryFee,
+      comments,
+    }: {
+      clientCode?: number
+      trackingNumber: string
+      source?: string
+      description?: string
+      weightKg?: string
+      deliveryFee?: string
+      comments?: string
+    },
+    user: User
+  ): Promise<Parcel['id']> {
+    let clientId: string | null
+
+    if (user.role === 'client') {
+      clientId = user.clientId
+    } else if (clientCode !== undefined) {
+      const client = await this.clientsService.findOrCreateByCode(clientCode)
+      clientId = client.id
+    } else {
+      clientId = null
+    }
+
+    return this.createOrClaim({
+      clientId,
+      trackingNumber,
+      source,
+      description,
+      weightKg,
+      deliveryFee,
+      comments,
+    })
+  }
+
+  async createOrClaim({
     clientId,
     trackingNumber,
     status,

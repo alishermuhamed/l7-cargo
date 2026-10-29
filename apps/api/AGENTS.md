@@ -15,6 +15,7 @@ This file defines instructions for coding agents working in `apps/api`.
 - Use repositories only inside the module where the entity lives.
 - Do not inject or call another module's repository directly.
 - To expose module behavior to other modules, export and consume services.
+- Use `ContextService` only in controllers and policies. It depends on the request or execution context and must not be used in services. Pass required user or context data to service methods explicitly.
 - DTO classes and mappers are scoped to their module.
 - Do not import another module's DTOs or mappers.
 - Import DTO classes and mappers only at controller level within their own module.

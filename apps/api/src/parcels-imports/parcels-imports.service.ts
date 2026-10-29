@@ -400,7 +400,7 @@ export class ParcelsImportsService {
         existingClientsByCodes.set(row.clientCode, matchingClient)
       }
 
-      const parcelId = await this.parcelsService.create({
+      const parcelId = await this.parcelsService.createOrClaim({
         trackingNumber: row.trackingNumber,
         clientId: matchingClient.id,
         weightKg: row.weightKg?.toFixed(3),
