@@ -72,6 +72,7 @@ export class ParcelsController {
     this.parcelsPolicy.checkCanReadReadyForPickupBalance()
 
     const user = this.contextService.getUserOrThrow()
+
     const totalDeliveryFee = await this.parcelsService.getReadyForPickupBalance(
       user.clientId
     )
@@ -133,10 +134,8 @@ export class ParcelsController {
   ): Promise<GetParcelStatusHistoryResponseDto[]> {
     await this.parcelsPolicy.checkCanGetParcel(parcelId)
 
-    const statusHistory = await this.parcelStatusHistoryService.find({
-      where: { parcelId },
-      order: { createdAt: 'ASC' },
-    })
+    const statusHistory =
+      await this.parcelStatusHistoryService.getParcelStatusHistory(parcelId)
 
     return statusHistory.map((history) =>
       ParcelStatusHistoryMapper.toGetParcelStatusHistoryResponseDto(history)

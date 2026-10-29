@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Transactional } from '@nestjs-cls/transactional'
-import { FindManyOptions, FindOptionsRelations } from 'typeorm'
 
-import { WithRelations } from '../db/db.types'
 import { ParcelStatusHistory } from './entities/parcel-status-history.entity'
 import { PARCEL_STATUSES, type ParcelStatus } from './parcel-status'
 import { ParcelStatusHistoryRepository } from './parcel-status-history.repository'
@@ -25,7 +23,9 @@ export class ParcelStatusHistoryService {
     status: ParcelStatus
     achievedAt: string
   }): Promise<void> {
-    const history = await this.find({ where: { parcelId } })
+    const history = await this.parcelStatusHistoryRepository.find({
+      where: { parcelId },
+    })
 
     const existingEntry = history.find((entry) => entry.status === status)
 
@@ -35,13 +35,13 @@ export class ParcelStatusHistoryService {
         { achievedAt }
       )
     } else {
-      const historyEntry = this.parcelStatusHistoryRepository.create({
-        parcelId,
-        status,
-        achievedAt,
-      })
-
-      await this.parcelStatusHistoryRepository.insert(historyEntry)
+      await this.parcelStatusHistoryRepository.insert(
+        this.parcelStatusHistoryRepository.create({
+          parcelId,
+          status,
+          achievedAt,
+        })
+      )
     }
 
     await this.refreshParcelStatus(parcelId)
@@ -65,22 +65,19 @@ export class ParcelStatusHistoryService {
     await this.refreshParcelStatus(parcelId)
   }
 
-  async find<R extends FindOptionsRelations<ParcelStatusHistory>>(
-    options: Omit<FindManyOptions<ParcelStatusHistory>, 'relations'> & {
-      relations: R
-    }
-  ): Promise<WithRelations<ParcelStatusHistory, NoInfer<R>>[]>
-  async find(
-    options?: FindManyOptions<ParcelStatusHistory>
-  ): Promise<ParcelStatusHistory[]>
-  async find<R extends FindOptionsRelations<ParcelStatusHistory>>(
-    options?: FindManyOptions<ParcelStatusHistory>
-  ): Promise<(ParcelStatusHistory | WithRelations<ParcelStatusHistory, R>)[]> {
-    return this.parcelStatusHistoryRepository.find(options)
+  async getParcelStatusHistory(
+    parcelId: string
+  ): Promise<ParcelStatusHistory[]> {
+    return this.parcelStatusHistoryRepository.find({
+      where: { parcelId },
+      order: { createdAt: 'ASC' },
+    })
   }
 
   private async refreshParcelStatus(parcelId: string): Promise<void> {
-    const history = await this.find({ where: { parcelId } })
+    const history = await this.parcelStatusHistoryRepository.find({
+      where: { parcelId },
+    })
 
     let finalStatus: ParcelStatus | null = null
 
