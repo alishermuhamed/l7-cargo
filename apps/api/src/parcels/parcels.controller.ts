@@ -122,11 +122,7 @@ export class ParcelsController {
 
     const user = this.contextService.getUserOrThrow()
 
-    if (user.role === 'admin') {
-      await this.parcelsService.delete(parcelId)
-    } else {
-      await this.parcelsService.hideFromClient(parcelId)
-    }
+    await this.parcelsService.deleteParcel(parcelId, user)
 
     return new SuccessResponseDto()
   }

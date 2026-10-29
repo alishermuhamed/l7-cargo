@@ -323,8 +323,15 @@ export class ParcelsService {
     )
   }
 
-  async delete(parcelId: string): Promise<void> {
-    await this.parcelsRepository.delete({ id: parcelId })
+  async deleteParcel(parcelId: string, user: User): Promise<void> {
+    if (user.role === 'admin') {
+      await this.parcelsRepository.delete({ id: parcelId })
+    } else {
+      await this.parcelsRepository.update(
+        { id: parcelId },
+        { clientDeletedAt: new Date() }
+      )
+    }
   }
 
   async getReadyForPickupBalance(clientId: string): Promise<string> {
@@ -338,12 +345,5 @@ export class ParcelsService {
       .filter((deliveryFee): deliveryFee is string => deliveryFee !== null)
 
     return addMoneyAmounts(deliveryFees)
-  }
-
-  async hideFromClient(parcelId: string): Promise<void> {
-    await this.parcelsRepository.update(
-      { id: parcelId },
-      { clientDeletedAt: new Date() }
-    )
   }
 }
