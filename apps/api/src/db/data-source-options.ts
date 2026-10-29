@@ -29,6 +29,7 @@ import { AddClientDeletedAtToParcel1791713298338 } from './migrations/1791713298
 import { MakeParcelClientNullable1792252874197 } from './migrations/1792252874197-make-parcel-client-nullable'
 import { AddLegacyClientCodeAlias1792260357130 } from './migrations/1792260357130-add-legacy-client-code-alias'
 import { RenameClientCodeAlias1792852621834 } from './migrations/1792852621834-rename-client-code-alias'
+import { DropParcelStatusHistoryCreatedAtIndex1793271648373 } from './migrations/1793271648373-drop-parcel-status-history-created-at-index'
 
 export function buildDataSourceOptions(
   db: EnvConfig['database']
@@ -74,6 +75,7 @@ export function buildDataSourceOptions(
       MakeParcelClientNullable1792252874197,
       AddLegacyClientCodeAlias1792260357130,
       RenameClientCodeAlias1792852621834,
+      DropParcelStatusHistoryCreatedAtIndex1793271648373,
     ],
   }
 }
