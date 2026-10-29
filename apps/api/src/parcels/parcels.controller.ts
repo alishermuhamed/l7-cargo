@@ -67,6 +67,18 @@ export class ParcelsController {
     return parcels.map((p) => ParcelsMapper.toGetParcelResponseDto(p))
   }
 
+  @Get('ready-for-pickup-balance')
+  async getReadyForPickupBalance(): Promise<GetReadyForPickupBalanceResponseDto> {
+    this.parcelsPolicy.checkCanReadReadyForPickupBalance()
+
+    const user = this.contextService.getUserOrThrow()
+    const totalDeliveryFee = await this.parcelsService.getReadyForPickupBalance(
+      user.clientId
+    )
+
+    return { totalDeliveryFee }
+  }
+
   @Get(`:${PARCEL_ID_PARAM}`)
   async getParcel(
     @Param(PARCEL_ID_PARAM, ParseUUIDPipe) parcelId: string
@@ -145,17 +157,5 @@ export class ParcelsController {
     await this.parcelStatusHistoryService.replace(parcelId, entries)
 
     return new SuccessResponseDto()
-  }
-
-  @Get('ready-for-pickup-balance')
-  async getReadyForPickupBalance(): Promise<GetReadyForPickupBalanceResponseDto> {
-    this.parcelsPolicy.checkCanReadReadyForPickupBalance()
-
-    const user = this.contextService.getUserOrThrow()
-    const totalDeliveryFee = await this.parcelsService.getReadyForPickupBalance(
-      user.clientId
-    )
-
-    return { totalDeliveryFee }
   }
 }
