@@ -46,11 +46,16 @@
     "results": "Matching clients",
     "submit": "Merge",
     "saved": "Clients merged",
-    "reviewRequired": "These clients require manual review before merging.",
     "changed": "Client data has changed. Review the updated result and confirm again.",
     "notFound": "One of the clients is no longer available. Select a client again.",
     "failed": "Could not merge clients. Please try again.",
     "searchFailed": "Could not find the client. Please try again.",
-    "invalidCode": "Enter a nonzero integer code from -2147483648 to 2147483647."
+    "invalidCode": "Enter a nonzero integer code from -2147483648 to 2147483647.",
+    "chooseAccount": "Which account should be kept?",
+    "accountDescription": "The selected account will have access to all parcels. The primary client code will stay the same.",
+    "accountClosed": "Account {{phone}} will be deleted. Its active sessions will end and it will no longer be possible to sign in to this account.",
+    "samePerson": "I have verified that both clients belong to the same person",
+    "adminAccount": "An administrator account cannot be deleted during a merge. Select it as the account to keep.",
+    "confirmationRequired": "Select an account to keep and confirm that both clients belong to the same person."
   }
 }

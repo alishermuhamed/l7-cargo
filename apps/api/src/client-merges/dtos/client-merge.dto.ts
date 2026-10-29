@@ -1,5 +1,14 @@
 import { Type } from 'class-transformer'
-import { IsInt, IsUUID, Matches, Max, Min, NotEquals } from 'class-validator'
+import {
+  IsBoolean,
+  IsInt,
+  IsOptional,
+  IsUUID,
+  Matches,
+  Max,
+  Min,
+  NotEquals,
+} from 'class-validator'
 
 import { INT32_MAX, INT32_MIN } from '../../common/integer.constants'
 
@@ -18,6 +27,14 @@ export class PreviewClientMergeQueryDto {
 }
 
 export class MergeClientsRequestDto extends PreviewClientMergeQueryDto {
+  @IsOptional()
+  @IsUUID()
+  declare retainedUserId?: string
+
+  @IsOptional()
+  @IsBoolean()
+  declare confirmedSamePerson?: boolean
+
   @Matches(/^[a-f0-9]{64}$/)
   declare version: string
 }
@@ -31,7 +48,16 @@ export class MergeCandidateResponseDto {
   declare parcelCount: number
 }
 
+export class MergeUserResponseDto {
+  declare id: string
+  declare name: string
+  declare phone: string | null
+  declare clientCode: number
+  declare parcelCount: number
+}
+
 export class ClientMergePreviewResponseDto {
+  declare users: MergeUserResponseDto[]
   declare name: string | null
   declare phone: string | null
   declare code: number

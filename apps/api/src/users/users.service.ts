@@ -1,5 +1,10 @@
-import { Injectable } from '@nestjs/common'
-import { FindManyOptions, FindOneOptions, FindOptionsRelations } from 'typeorm'
+import { ConflictException, Injectable } from '@nestjs/common'
+import {
+  FindManyOptions,
+  FindOneOptions,
+  FindOptionsRelations,
+  In,
+} from 'typeorm'
 
 import { WithRelations } from '../db/db.types'
 import { User } from './entities/user.entity'
@@ -8,6 +13,25 @@ import { UsersRepository } from './users.repository'
 @Injectable()
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
+
+  async lockForClientMerge(clientIds: string[]): Promise<void> {
+    await this.usersRepository.find({
+      where: { clientId: In(clientIds) },
+      order: { id: 'ASC' },
+      lock: { mode: 'pessimistic_write' },
+    })
+  }
+
+  async deleteForClientMerge(userId: string): Promise<void> {
+    const user = await this.usersRepository.findOneOrThrow({
+      where: { id: userId },
+    })
+    if (user.role !== 'client') {
+      throw new ConflictException('CLIENT_MERGE_ADMIN_ACCOUNT')
+    }
+    // Account and session foreign keys cascade on user deletion.
+    await this.usersRepository.delete({ id: userId })
+  }
 
   async transferClient(sourceId: string, targetId: string): Promise<void> {
     await this.usersRepository.update(

@@ -8,7 +8,6 @@ import { Transactional } from '@nestjs-cls/transactional'
 import { createHash } from 'crypto'
 
 import { ClientsService } from '../clients/clients.service'
-import { ContextService } from '../context/context.service'
 import { ParcelsService } from '../parcels/parcels.service'
 import { UsersService } from '../users/users.service'
 
@@ -21,7 +20,16 @@ type MergeCandidate = {
   parcelCount: number
 }
 
+type MergeUser = {
+  id: string
+  name: string
+  phone: string | null
+  clientCode: number
+  parcelCount: number
+}
+
 type MergePreview = {
+  users: MergeUser[]
   name: string | null
   phone: string | null
   code: number
@@ -37,8 +45,7 @@ export class ClientMergesService {
   constructor(
     private readonly clients: ClientsService,
     private readonly parcels: ParcelsService,
-    private readonly users: UsersService,
-    private readonly context: ContextService
+    private readonly users: UsersService
   ) {}
 
   async findCandidates(
@@ -69,11 +76,9 @@ export class ClientMergesService {
     if (targetId === sourceId)
       throw new BadRequestException('CLIENT_MERGE_SAME_CLIENT')
     await this.clients.lockForMerge([targetId, sourceId])
+    await this.users.lockForClientMerge([targetId, sourceId])
     const target = await this.clients.findOneWithUserByIdOrThrow(targetId)
     const source = await this.clients.findOneWithUserByIdOrThrow(sourceId)
-    if (target.user && source.user) {
-      throw new ConflictException('CLIENT_MERGE_REVIEW_REQUIRED')
-    }
     const aliases = await this.clients.findAliasesByClientIds([
       targetId,
       sourceId,
@@ -102,13 +107,26 @@ export class ClientMergesService {
         })
       )
       .digest('hex')
-    const user = target.user ?? source.user
+    const users: MergeUser[] = []
+    for (const [client, parcelCount] of [
+      [target, targetCount],
+      [source, sourceCount],
+    ] as const) {
+      if (client.user)
+        users.push({
+          id: client.user.id,
+          name: client.user.name,
+          phone: client.user.phoneNumber,
+          clientCode: client.code,
+          parcelCount,
+        })
+    }
+    const user = users.length === 1 ? users[0] : undefined
     return {
+      users,
       name: user?.name ?? null,
       phone:
-        user?.phoneNumber ??
-        target.legacyPhoneNormalized ??
-        target.legacyPhoneRaw,
+        user?.phone ?? target.legacyPhoneNormalized ?? target.legacyPhoneRaw,
       code: target.code,
       aliases: codes,
       parcelCount: targetCount + sourceCount,
@@ -120,11 +138,36 @@ export class ClientMergesService {
   async merge(
     targetId: string,
     sourceId: string,
-    version: string
+    version: string,
+    options: {
+      actorId: string
+      retainedUserId?: string
+      confirmedSamePerson?: boolean
+    }
   ): Promise<void> {
     const preview = await this.preview(targetId, sourceId)
     if (preview.version !== version)
       throw new ConflictException('CLIENT_MERGE_CHANGED')
+    const retainedUserId =
+      options.retainedUserId ??
+      (preview.users.length === 1 ? preview.users[0]?.id : undefined)
+    if (
+      options.retainedUserId &&
+      !preview.users.some((user) => user.id === retainedUserId)
+    ) {
+      throw new BadRequestException('CLIENT_MERGE_INVALID_USER')
+    }
+    if (
+      preview.users.length === 2 &&
+      (!retainedUserId || options.confirmedSamePerson !== true)
+    ) {
+      throw new BadRequestException('CLIENT_MERGE_CONFIRMATION_REQUIRED')
+    }
+    const removedUser =
+      preview.users.length === 2
+        ? preview.users.find((user) => user.id !== retainedUserId)
+        : undefined
+    if (removedUser) await this.users.deleteForClientMerge(removedUser.id)
     const target = await this.clients.findOneByIdOrThrow(targetId)
     const source = await this.clients.findOneByIdOrThrow(sourceId)
     await this.users.transferClient(sourceId, targetId)
@@ -132,7 +175,9 @@ export class ClientMergesService {
     await this.clients.absorbClient(target, source)
     this.logger.log({
       action: 'client_merge',
-      actorId: this.context.getUserOrThrow().id,
+      actorId: options.actorId,
+      retainedUserId,
+      removedUserId: removedUser?.id,
       targetId,
       sourceId,
       code: preview.code,

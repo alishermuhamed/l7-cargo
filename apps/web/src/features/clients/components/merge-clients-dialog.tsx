@@ -1,4 +1,13 @@
-import { Box, Card, Dialog, Flex, Text, TextField } from '@radix-ui/themes'
+import {
+  Box,
+  Card,
+  Checkbox,
+  Dialog,
+  Flex,
+  RadioGroup,
+  Text,
+  TextField,
+} from '@radix-ui/themes'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -22,8 +31,13 @@ function mergeError(error: unknown): string {
   if (error instanceof ApiError) {
     const data = error.data
     if (typeof data === 'object' && data !== null && 'message' in data) {
-      if (data.message === 'CLIENT_MERGE_REVIEW_REQUIRED')
-        return i18n.t('clients:merge.reviewRequired')
+      if (data.message === 'CLIENT_MERGE_ADMIN_ACCOUNT')
+        return i18n.t('clients:merge.adminAccount')
+      if (
+        data.message === 'CLIENT_MERGE_INVALID_USER' ||
+        data.message === 'CLIENT_MERGE_CONFIRMATION_REQUIRED'
+      )
+        return i18n.t('clients:merge.confirmationRequired')
       if (data.message === 'CLIENT_MERGE_CHANGED')
         return i18n.t('clients:merge.changed')
     }
@@ -67,6 +81,8 @@ export function MergeClientsDialog({
   const [selected, setSelected] = useState<MergeCandidateResponseDto | null>(
     null
   )
+  const [retainedUserId, setRetainedUserId] = useState('')
+  const [confirmedVersion, setConfirmedVersion] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const submitting = useRef(false)
   const input = useRef<HTMLInputElement>(null)
@@ -96,13 +112,32 @@ export function MergeClientsDialog({
   })
   const mutation = useMutation({
     mutationFn: (version: string) =>
-      mergeClients(client.id, { sourceId, version }),
+      mergeClients(client.id, {
+        sourceId,
+        version,
+        retainedUserId: retainedUserId || undefined,
+        confirmedSamePerson: confirmedVersion === version,
+      }),
   })
+  const requiresChoice = (preview.data?.users.length ?? 0) === 2
+  const retainedUser = preview.data?.users.find(
+    (user) => user.id === retainedUserId
+  )
+  const removedUser =
+    requiresChoice && retainedUser
+      ? preview.data?.users.find((user) => user.id !== retainedUserId)
+      : undefined
+  const choiceReady =
+    !requiresChoice ||
+    (Boolean(retainedUser) && confirmedVersion === preview.data?.version)
+  const resultName = requiresChoice ? retainedUser?.name : preview.data?.name
+  const resultPhone = requiresChoice ? retainedUser?.phone : preview.data?.phone
   const pending = mutation.isPending
   const searching = search.trim() !== debouncedSearch || candidates.isFetching
   const submit = async () => {
     if (
       !selected ||
+      !choiceReady ||
       !preview.data ||
       preview.isFetching ||
       preview.isError ||
@@ -116,6 +151,7 @@ export function MergeClientsDialog({
       toast.success(i18n.t('clients:merge.saved'))
       onClose()
     } catch (cause: unknown) {
+      setConfirmedVersion(null)
       setError(mergeError(cause))
       await preview.refetch()
     } finally {
@@ -159,6 +195,8 @@ export function MergeClientsDialog({
                       disabled={pending}
                       onClick={() => {
                         setSelected(null)
+                        setRetainedUserId('')
+                        setConfirmedVersion(null)
                         setError(null)
                         requestAnimationFrame(() => input.current?.focus())
                       }}
@@ -180,6 +218,44 @@ export function MergeClientsDialog({
               )}
               {preview.data && !preview.isError && !preview.isFetching && (
                 <Box aria-live="polite">
+                  {requiresChoice && (
+                    <Flex direction="column" gap="3" mb="4">
+                      <Text weight="bold" id="merge-account-label">
+                        {i18n.t('clients:merge.chooseAccount')}
+                      </Text>
+                      <Text size="2">
+                        {i18n.t('clients:merge.accountDescription')}
+                      </Text>
+                      <RadioGroup.Root
+                        aria-labelledby="merge-account-label"
+                        value={retainedUserId}
+                        disabled={pending}
+                        onValueChange={(value) => {
+                          setRetainedUserId(value)
+                          setConfirmedVersion(null)
+                          setError(null)
+                        }}
+                      >
+                        {preview.data.users.map((user) => (
+                          <Card key={user.id}>
+                            <RadioGroup.Item value={user.id}>
+                              <Text as="div" weight="bold">
+                                {user.name || '—'} ·{' '}
+                                {formatPhoneNumber(user.phone ?? '') ||
+                                  user.phone ||
+                                  '—'}
+                              </Text>
+                              <Text as="div" size="2">
+                                {i18n.t('clients:code')}{' '}
+                                {formatClientCode(user.clientCode)} ·{' '}
+                                {i18n.t('parcels:parcels')}: {user.parcelCount}
+                              </Text>
+                            </RadioGroup.Item>
+                          </Card>
+                        ))}
+                      </RadioGroup.Root>
+                    </Flex>
+                  )}
                   <Text>{i18n.t('clients:merge.after')}</Text>
                   <Box asChild mt="2" pl="5">
                     <ul>
@@ -201,18 +277,46 @@ export function MergeClientsDialog({
                       </li>
                       <li>
                         {i18n.t('profile:name')} -{' '}
-                        <strong>{preview.data.name || '—'}</strong>
+                        <strong>{resultName || '—'}</strong>
                       </li>
                       <li>
                         {i18n.t('auth:phoneNumber')} -{' '}
                         <strong>
-                          {formatPhoneNumber(preview.data.phone ?? '') ||
-                            preview.data.phone ||
+                          {formatPhoneNumber(resultPhone ?? '') ||
+                            resultPhone ||
                             '—'}
                         </strong>
                       </li>
                     </ul>
                   </Box>
+                  {removedUser && (
+                    <Flex direction="column" gap="3" mt="3">
+                      <Text size="2" color="red" role="status">
+                        {i18n.t('clients:merge.accountClosed', {
+                          phone:
+                            formatPhoneNumber(removedUser.phone ?? '') ||
+                            removedUser.phone ||
+                            removedUser.name,
+                        })}
+                      </Text>
+                      <Text as="label" size="2">
+                        <Flex gap="2" align="start">
+                          <Checkbox
+                            checked={confirmedVersion === preview.data.version}
+                            disabled={pending}
+                            onCheckedChange={(checked) =>
+                              setConfirmedVersion(
+                                checked === true
+                                  ? (preview.data?.version ?? null)
+                                  : null
+                              )
+                            }
+                          />
+                          {i18n.t('clients:merge.samePerson')}
+                        </Flex>
+                      </Text>
+                    </Flex>
+                  )}
                 </Box>
               )}
             </>
@@ -264,6 +368,8 @@ export function MergeClientsDialog({
                         type="button"
                         onClick={() => {
                           setSelected(candidate)
+                          setRetainedUserId('')
+                          setConfirmedVersion(null)
                           setError(null)
                         }}
                       >
@@ -293,6 +399,7 @@ export function MergeClientsDialog({
               loading={pending}
               disabled={
                 !selected ||
+                !choiceReady ||
                 !preview.data ||
                 preview.isFetching ||
                 preview.isError

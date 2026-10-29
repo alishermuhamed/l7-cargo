@@ -122,7 +122,17 @@ export interface MergeCandidateResponseDto {
   parcelCount: number
 }
 
+export interface MergeUserResponseDto {
+  id: string
+  name: string
+  /** @nullable */
+  phone: string | null
+  clientCode: number
+  parcelCount: number
+}
+
 export interface ClientMergePreviewResponseDto {
+  users: MergeUserResponseDto[]
   /** @nullable */
   name: string | null
   /** @nullable */
@@ -135,6 +145,8 @@ export interface ClientMergePreviewResponseDto {
 
 export interface MergeClientsRequestDto {
   sourceId: string
+  retainedUserId?: string
+  confirmedSamePerson?: boolean
   /** @pattern ^[a-f0-9]{64}$ */
   version: string
 }
@@ -198,23 +210,6 @@ export interface GetReadyForPickupBalanceResponseDto {
   totalDeliveryFee: string
 }
 
-export interface GetParcelStatusHistoryResponseDto {
-  status: ParcelStatus
-  id: string
-  parcelId: string
-  createdAt: string
-  achievedAt: string
-}
-
-export interface PutParcelStatusHistoryEntryRequestDto {
-  status: ParcelStatus
-  achievedAt: string
-}
-
-export interface PutParcelStatusHistoryRequestDto {
-  entries: PutParcelStatusHistoryEntryRequestDto[]
-}
-
 export interface UpdateParcelRequestDto {
   /**
    * @minimum 1
@@ -231,6 +226,23 @@ export interface UpdateParcelRequestDto {
   deliveryFee?: string | null
   /** @nullable */
   comments?: string | null
+}
+
+export interface GetParcelStatusHistoryResponseDto {
+  status: ParcelStatus
+  id: string
+  parcelId: string
+  createdAt: string
+  achievedAt: string
+}
+
+export interface PutParcelStatusHistoryEntryRequestDto {
+  status: ParcelStatus
+  achievedAt: string
+}
+
+export interface PutParcelStatusHistoryRequestDto {
+  entries: PutParcelStatusHistoryEntryRequestDto[]
 }
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]

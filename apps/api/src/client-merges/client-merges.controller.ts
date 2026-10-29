@@ -56,7 +56,11 @@ export class ClientMergesController {
     @Body() body: MergeClientsRequestDto
   ): Promise<SuccessResponseDto> {
     this.checkAdmin()
-    await this.service.merge(clientId, body.sourceId, body.version)
+    await this.service.merge(clientId, body.sourceId, body.version, {
+      actorId: this.context.getUserOrThrow().id,
+      retainedUserId: body.retainedUserId,
+      confirmedSamePerson: body.confirmedSamePerson,
+    })
     return new SuccessResponseDto()
   }
 }
