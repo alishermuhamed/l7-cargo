@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterTypeOrm } from '@nestjs-cls/transactional-adapter-typeorm'
-import { In } from 'typeorm'
+import { In, SelectQueryBuilder } from 'typeorm'
 
 import { ContextService } from '../context/context.service'
 import { BaseRepository } from '../db/base.repository'
@@ -9,6 +9,10 @@ import { Parcel } from './entities/parcel.entity'
 
 @Injectable()
 export class ParcelsRepository extends BaseRepository<Parcel> {
+  createQueryBuilder(): SelectQueryBuilder<Parcel> {
+    return this.repository.createQueryBuilder('parcel')
+  }
+
   async lockForClientMerge(clientIds: string[]): Promise<void> {
     await this.repository.find({
       where: { clientId: In(clientIds) },

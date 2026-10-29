@@ -10,7 +10,6 @@ import {
   Put,
   Query,
 } from '@nestjs/common'
-import { ILike } from 'typeorm'
 
 import { SuccessResponseDto } from '../common/dtos/success-response.dto'
 import { ContextService } from '../context/context.service'
@@ -57,31 +56,13 @@ export class ParcelsController {
 
   @Get()
   async getParcels(
-    @Query() { search, status, clientId, limit, offset }: GetParcelsQueryDto
+    @Query() query: GetParcelsQueryDto
   ): Promise<GetParcelResponseDto[]> {
-    const policyWhere = this.parcelsPolicy.getFindOptionsWhere()
+    this.parcelsPolicy.checkCanGetParcels(query)
 
-    const baseWhere = { status, clientId, ...policyWhere }
+    const user = this.contextService.getUserOrThrow()
 
-    const where = search
-      ? [
-          {
-            trackingNumber: ILike(`%${search}%`),
-            ...baseWhere,
-          },
-          {
-            description: ILike(`%${search}%`),
-            ...baseWhere,
-          },
-        ]
-      : baseWhere
-
-    const parcels = await this.parcelsService.find({
-      where,
-      order: { createdAt: 'DESC' },
-      take: limit,
-      skip: offset,
-    })
+    const parcels = await this.parcelsService.getParcels(query, user)
 
     return parcels.map((p) => ParcelsMapper.toGetParcelResponseDto(p))
   }
@@ -102,11 +83,11 @@ export class ParcelsController {
   async getParcel(
     @Param(PARCEL_ID_PARAM, ParseUUIDPipe) parcelId: string
   ): Promise<GetParcelResponseDto> {
-    const policyWhere = this.parcelsPolicy.getFindOptionsWhere()
+    await this.parcelsPolicy.checkCanGetParcel(parcelId)
 
-    const parcel = await this.parcelsService.findOneOrThrow({
-      where: { id: parcelId, ...policyWhere },
-    })
+    const user = this.contextService.getUserOrThrow()
+
+    const parcel = await this.parcelsService.getParcel(parcelId, user)
 
     return ParcelsMapper.toGetParcelResponseDto(parcel)
   }
@@ -115,7 +96,7 @@ export class ParcelsController {
   async getParcelStatusHistory(
     @Param(PARCEL_ID_PARAM, ParseUUIDPipe) parcelId: string
   ): Promise<GetParcelStatusHistoryResponseDto[]> {
-    await this.parcelsPolicy.checkCanRead(parcelId)
+    await this.parcelsPolicy.checkCanGetParcel(parcelId)
 
     const statusHistory = await this.parcelStatusHistoryService.find({
       where: { parcelId },

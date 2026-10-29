@@ -2,12 +2,15 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common'
 import {
+  Brackets,
   FindManyOptions,
   FindOneOptions,
   FindOptionsRelations,
   IsNull,
+  SelectQueryBuilder,
 } from 'typeorm'
 
 import { ClientsService } from '../clients/clients.service'
@@ -147,6 +150,76 @@ export class ParcelsService {
     await this.parcelsRepository.insert(parcel)
 
     return parcel.id
+  }
+
+  async getParcels(
+    {
+      search,
+      status,
+      clientId,
+      limit,
+      offset,
+    }: {
+      search?: string
+      status?: ParcelStatus
+      clientId?: string
+      limit?: number
+      offset?: number
+    },
+    user: User
+  ): Promise<Parcel[]> {
+    const query = this.createVisibleParcelsQuery(user)
+
+    if (status !== undefined) {
+      query.andWhere('parcel.status = :status', { status })
+    }
+
+    if (clientId !== undefined) {
+      query.andWhere('parcel.clientId = :clientId', { clientId })
+    }
+
+    if (search) {
+      query.andWhere(
+        new Brackets((searchQuery): void => {
+          searchQuery
+            .where('parcel.trackingNumber ILIKE :search')
+            .orWhere('parcel.description ILIKE :search')
+        }),
+        { search: `%${search}%` }
+      )
+    }
+
+    return query
+      .orderBy('parcel.createdAt', 'DESC')
+      .take(limit)
+      .skip(offset)
+      .getMany()
+  }
+
+  async getParcel(parcelId: string, user: User): Promise<Parcel> {
+    const parcel = await this.createVisibleParcelsQuery(user)
+      .andWhere('parcel.id = :parcelId', { parcelId })
+      .getOne()
+
+    if (!parcel) {
+      throw new NotFoundException()
+    }
+
+    return parcel
+  }
+
+  private createVisibleParcelsQuery(user: User): SelectQueryBuilder<Parcel> {
+    const query = this.parcelsRepository.createQueryBuilder()
+
+    if (user.role !== 'admin') {
+      query
+        .andWhere('parcel.clientId = :visibleClientId', {
+          visibleClientId: user.clientId,
+        })
+        .andWhere('parcel.clientDeletedAt IS NULL')
+    }
+
+    return query
   }
 
   async find<R extends FindOptionsRelations<Parcel>>(

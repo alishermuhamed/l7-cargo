@@ -1,10 +1,5 @@
 import { AbilityBuilder } from '@casl/ability'
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common'
-import { FindOptionsWhere, IsNull } from 'typeorm'
+import { ForbiddenException, Injectable } from '@nestjs/common'
 
 import { Ability } from '../authorization/authorization.types'
 import { EntityPolicyProvider } from '../authorization/decorators/entity-policy-provider.decorator'
@@ -12,6 +7,7 @@ import { EntityPolicy } from '../authorization/entity.policy'
 import { ContextService } from '../context/context.service'
 import { User } from '../users/entities/user.entity'
 import { CreateParcelRequestDto } from './dtos/create-parcel-request.dto'
+import { GetParcelsQueryDto } from './dtos/get-parcels-query.dto'
 import { UpdateParcelRequestDto } from './dtos/update-parcel-request.dto'
 import { Parcel } from './entities/parcel.entity'
 import { ParcelsService } from './parcels.service'
@@ -55,8 +51,25 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
     }
   }
 
-  async checkCanRead(parcelId: string): Promise<void> {
-    const parcel = await this.findVisibleParcelOrThrow(parcelId)
+  checkCanGetParcels({ clientId }: GetParcelsQueryDto): void {
+    if (!this.ability.can('read', Parcel)) {
+      throw new ForbiddenException()
+    }
+
+    const user = this.contextService.getUserOrThrow()
+
+    if (
+      user.role !== 'admin' &&
+      clientId !== undefined &&
+      clientId !== user.clientId
+    ) {
+      throw new ForbiddenException()
+    }
+  }
+
+  async checkCanGetParcel(parcelId: string): Promise<void> {
+    const user = this.contextService.getUserOrThrow()
+    const parcel = await this.parcelsService.getParcel(parcelId, user)
 
     if (!this.ability.can('read', parcel)) {
       throw new ForbiddenException()
@@ -67,7 +80,8 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
     parcelId: string,
     updateParcelRequestDto: UpdateParcelRequestDto
   ): Promise<void> {
-    const parcel = await this.findVisibleParcelOrThrow(parcelId)
+    const user = this.contextService.getUserOrThrow()
+    const parcel = await this.parcelsService.getParcel(parcelId, user)
 
     for (const field of Object.keys(updateParcelRequestDto) as Array<
       keyof UpdateParcelRequestDto
@@ -82,7 +96,8 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
   }
 
   async checkCanDelete(parcelId: string): Promise<void> {
-    const parcel = await this.findVisibleParcelOrThrow(parcelId)
+    const user = this.contextService.getUserOrThrow()
+    const parcel = await this.parcelsService.getParcel(parcelId, user)
 
     if (!this.ability.can('delete', parcel)) {
       throw new ForbiddenException()
@@ -99,29 +114,5 @@ export class ParcelsPolicy extends EntityPolicy<Parcel> {
     if (user.role !== 'client') {
       throw new ForbiddenException()
     }
-  }
-
-  getFindOptionsWhere(): FindOptionsWhere<Parcel> {
-    const user = this.contextService.getUserOrThrow()
-
-    if (user.role === 'admin') {
-      return {}
-    }
-
-    return { clientId: user.clientId, clientDeletedAt: IsNull() }
-  }
-
-  private async findVisibleParcelOrThrow(parcelId: string): Promise<Parcel> {
-    const parcel = await this.parcelsService.findOneOrThrow({
-      where: { id: parcelId },
-    })
-
-    const user = this.contextService.getUserOrThrow()
-
-    if (user.role !== 'admin' && parcel.clientDeletedAt !== null) {
-      throw new NotFoundException()
-    }
-
-    return parcel
   }
 }
