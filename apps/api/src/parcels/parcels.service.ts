@@ -10,6 +10,7 @@ import {
   FindOneOptions,
   FindOptionsRelations,
   IsNull,
+  Not,
   SelectQueryBuilder,
 } from 'typeorm'
 
@@ -127,6 +128,21 @@ export class ParcelsService {
 
     if (existingParcel) {
       if (clientId !== null && existingParcel.clientId === clientId) {
+        if (existingParcel.clientDeletedAt !== null) {
+          const affected = await this.parcelsRepository.update(
+            {
+              id: existingParcel.id,
+              clientId,
+              clientDeletedAt: Not(IsNull()),
+            },
+            { clientDeletedAt: null, source, description }
+          )
+
+          if (affected > 0) {
+            return existingParcel.id
+          }
+        }
+
         throw new ConflictException({
           message: 'PARCEL_ALREADY_OWNED_BY_CLIENT',
           parcelId: existingParcel.id,
