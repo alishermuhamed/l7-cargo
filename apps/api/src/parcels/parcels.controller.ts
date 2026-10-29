@@ -67,18 +67,6 @@ export class ParcelsController {
     return parcels.map((p) => ParcelsMapper.toGetParcelResponseDto(p))
   }
 
-  @Get('ready-for-pickup-balance')
-  async getReadyForPickupBalance(): Promise<GetReadyForPickupBalanceResponseDto> {
-    this.parcelsPolicy.checkCanReadReadyForPickupBalance()
-
-    const user = this.contextService.getUserOrThrow()
-    const totalDeliveryFee = await this.parcelsService.getReadyForPickupBalance(
-      user.clientId
-    )
-
-    return { totalDeliveryFee }
-  }
-
   @Get(`:${PARCEL_ID_PARAM}`)
   async getParcel(
     @Param(PARCEL_ID_PARAM, ParseUUIDPipe) parcelId: string
@@ -90,34 +78,6 @@ export class ParcelsController {
     const parcel = await this.parcelsService.getParcel(parcelId, user)
 
     return ParcelsMapper.toGetParcelResponseDto(parcel)
-  }
-
-  @Get(`:${PARCEL_ID_PARAM}/status-history`)
-  async getParcelStatusHistory(
-    @Param(PARCEL_ID_PARAM, ParseUUIDPipe) parcelId: string
-  ): Promise<GetParcelStatusHistoryResponseDto[]> {
-    await this.parcelsPolicy.checkCanGetParcel(parcelId)
-
-    const statusHistory = await this.parcelStatusHistoryService.find({
-      where: { parcelId },
-      order: { createdAt: 'ASC' },
-    })
-
-    return statusHistory.map((history) =>
-      ParcelStatusHistoryMapper.toGetParcelStatusHistoryResponseDto(history)
-    )
-  }
-
-  @Put(`:${PARCEL_ID_PARAM}/status-history`)
-  async putParcelStatusHistory(
-    @Param(PARCEL_ID_PARAM, ParseUUIDPipe) parcelId: string,
-    @Body() { entries }: PutParcelStatusHistoryRequestDto
-  ): Promise<SuccessResponseDto> {
-    this.parcelsPolicy.checkCanManageStatusHistory()
-
-    await this.parcelStatusHistoryService.replace(parcelId, entries)
-
-    return new SuccessResponseDto()
   }
 
   @Patch(`:${PARCEL_ID_PARAM}`)
@@ -157,5 +117,45 @@ export class ParcelsController {
     }
 
     return new SuccessResponseDto()
+  }
+
+  @Get(`:${PARCEL_ID_PARAM}/status-history`)
+  async getParcelStatusHistory(
+    @Param(PARCEL_ID_PARAM, ParseUUIDPipe) parcelId: string
+  ): Promise<GetParcelStatusHistoryResponseDto[]> {
+    await this.parcelsPolicy.checkCanGetParcel(parcelId)
+
+    const statusHistory = await this.parcelStatusHistoryService.find({
+      where: { parcelId },
+      order: { createdAt: 'ASC' },
+    })
+
+    return statusHistory.map((history) =>
+      ParcelStatusHistoryMapper.toGetParcelStatusHistoryResponseDto(history)
+    )
+  }
+
+  @Put(`:${PARCEL_ID_PARAM}/status-history`)
+  async putParcelStatusHistory(
+    @Param(PARCEL_ID_PARAM, ParseUUIDPipe) parcelId: string,
+    @Body() { entries }: PutParcelStatusHistoryRequestDto
+  ): Promise<SuccessResponseDto> {
+    this.parcelsPolicy.checkCanManageStatusHistory()
+
+    await this.parcelStatusHistoryService.replace(parcelId, entries)
+
+    return new SuccessResponseDto()
+  }
+
+  @Get('ready-for-pickup-balance')
+  async getReadyForPickupBalance(): Promise<GetReadyForPickupBalanceResponseDto> {
+    this.parcelsPolicy.checkCanReadReadyForPickupBalance()
+
+    const user = this.contextService.getUserOrThrow()
+    const totalDeliveryFee = await this.parcelsService.getReadyForPickupBalance(
+      user.clientId
+    )
+
+    return { totalDeliveryFee }
   }
 }
