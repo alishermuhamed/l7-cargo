@@ -38,6 +38,9 @@ export class User extends BaseEntity {
   @BooleanColumn({ nullable: true })
   phoneNumberVerified!: boolean | null
 
+  @BooleanColumn({ default: false })
+  mustChangePassword!: boolean
+
   @TextColumn({ default: DEFAULT_USER_ROLE })
   role!: UserRole
 }

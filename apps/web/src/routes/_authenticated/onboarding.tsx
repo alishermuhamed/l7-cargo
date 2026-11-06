@@ -17,7 +17,7 @@ import {
 } from '../../components/form'
 import { IconButton } from '../../components/icon-button'
 import { TextField } from '../../components/text-field'
-import { setPassword } from '../../lib/api/api.gen'
+import { getSignInMethod, setPassword } from '../../lib/api/api.gen'
 import { authClient } from '../../lib/auth-client'
 import i18n from '../../lib/i18n'
 
@@ -25,40 +25,51 @@ export const Route = createFileRoute('/_authenticated/onboarding')({
   validateSearch: z.object({
     redirectTo: z.string().optional(),
   }),
+  loader: async ({ context: { session } }) => {
+    const phoneNumber = session.user.phoneNumber
+    const hasPassword = phoneNumber
+      ? (await getSignInMethod({ phoneNumber })).method === 'password'
+      : false
+    return { hasPassword }
+  },
   component: OnboardingPage,
 })
 
-const onboardingSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, i18n.t('validation:name.required'))
-    .max(100, i18n.t('validation:name.tooLong')),
-  password: z
-    .string(i18n.t('validation:password.required'))
-    .min(1, i18n.t('validation:password.required'))
-    .min(8, i18n.t('validation:password.tooShort'))
-    .max(128, i18n.t('validation:password.tooLong')),
-})
+const createOnboardingSchema = (hasPassword: boolean) =>
+  z.object({
+    name: z
+      .string()
+      .trim()
+      .min(1, i18n.t('validation:name.required'))
+      .max(100, i18n.t('validation:name.tooLong')),
+    password: hasPassword
+      ? z.string().optional()
+      : z
+          .string(i18n.t('validation:password.required'))
+          .min(1, i18n.t('validation:password.required'))
+          .min(8, i18n.t('validation:password.tooShort'))
+          .max(128, i18n.t('validation:password.tooLong')),
+  })
 
-type OnboardingFormValues = z.infer<typeof onboardingSchema>
+type OnboardingFormValues = z.infer<ReturnType<typeof createOnboardingSchema>>
 
 function OnboardingPage() {
   const navigate = useNavigate()
+  const { hasPassword } = Route.useLoaderData()
 
   const { redirectTo } = Route.useSearch()
 
-  const [hasSetPassword, setHasSetPassword] = useState(false)
+  const [hasSetPassword, setHasSetPassword] = useState(hasPassword)
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
   const form = useForm<OnboardingFormValues>({
-    resolver: zodResolver(onboardingSchema),
+    resolver: zodResolver(createOnboardingSchema(hasPassword)),
     defaultValues: { name: '', password: '' },
   })
 
   const onSubmit = async ({ name, password }: OnboardingFormValues) => {
     try {
-      if (!hasSetPassword) {
+      if (!hasSetPassword && password) {
         await setPassword({ newPassword: password })
         setHasSetPassword(true)
       }
@@ -102,56 +113,58 @@ function OnboardingPage() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormFieldItem>
-                    <FormFieldLabel>{i18n.t('auth:password')}</FormFieldLabel>
+              {!hasPassword && (
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormFieldItem>
+                      <FormFieldLabel>{i18n.t('auth:password')}</FormFieldLabel>
 
-                    <FormFieldControl>
-                      <TextField.Root
-                        type={isPasswordVisible ? 'text' : 'password'}
-                        placeholder={i18n.t('auth:passwordPlaceholder')}
-                        autoComplete="new-password"
-                        {...field}
-                        readOnly={hasSetPassword}
-                      >
-                        <TextField.Slot side="right">
-                          <IconButton
-                            type="button"
-                            size="1"
-                            variant="ghost"
-                            color="gray"
-                            tooltip={i18n.t(
-                              isPasswordVisible
-                                ? 'auth:hidePassword'
-                                : 'auth:showPassword'
-                            )}
-                            aria-label={i18n.t(
-                              isPasswordVisible
-                                ? 'auth:hidePassword'
-                                : 'auth:showPassword'
-                            )}
-                            disabled={hasSetPassword}
-                            onClick={() =>
-                              setIsPasswordVisible((isVisible) => !isVisible)
-                            }
-                          >
-                            {isPasswordVisible ? (
-                              <EyeClosedIcon />
-                            ) : (
-                              <EyeOpenIcon />
-                            )}
-                          </IconButton>
-                        </TextField.Slot>
-                      </TextField.Root>
-                    </FormFieldControl>
+                      <FormFieldControl>
+                        <TextField.Root
+                          type={isPasswordVisible ? 'text' : 'password'}
+                          placeholder={i18n.t('auth:passwordPlaceholder')}
+                          autoComplete="new-password"
+                          {...field}
+                          readOnly={hasSetPassword}
+                        >
+                          <TextField.Slot side="right">
+                            <IconButton
+                              type="button"
+                              size="1"
+                              variant="ghost"
+                              color="gray"
+                              tooltip={i18n.t(
+                                isPasswordVisible
+                                  ? 'auth:hidePassword'
+                                  : 'auth:showPassword'
+                              )}
+                              aria-label={i18n.t(
+                                isPasswordVisible
+                                  ? 'auth:hidePassword'
+                                  : 'auth:showPassword'
+                              )}
+                              disabled={hasSetPassword}
+                              onClick={() =>
+                                setIsPasswordVisible((isVisible) => !isVisible)
+                              }
+                            >
+                              {isPasswordVisible ? (
+                                <EyeClosedIcon />
+                              ) : (
+                                <EyeOpenIcon />
+                              )}
+                            </IconButton>
+                          </TextField.Slot>
+                        </TextField.Root>
+                      </FormFieldControl>
 
-                    <FormFieldError />
-                  </FormFieldItem>
-                )}
-              />
+                      <FormFieldError />
+                    </FormFieldItem>
+                  )}
+                />
+              )}
 
               <Button type="submit" loading={form.formState.isSubmitting}>
                 {i18n.t('common:continue')}
