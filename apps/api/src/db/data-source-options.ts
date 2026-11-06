@@ -13,6 +13,7 @@ import { ParcelStatusHistory } from '../parcels/entities/parcel-status-history.e
 import { ParcelsImport } from '../parcels-imports/entities/parcels-import.entity'
 
 // Migrations
+import { AddUserMustChangePassword1793988693167 } from './migrations/1793988693167-add-user-must-change-password'
 import { AddBetterAuthEntities1777914172901 } from './migrations/1777914172901-add-better-auth-entities'
 import { AddParcels1777992156801 } from './migrations/1777992156801-add-parcels'
 import { AddParcelStatusHistory1778165216012 } from './migrations/1778165216012-add-parcel-status-history'
@@ -76,6 +77,7 @@ export function buildDataSourceOptions(
       AddLegacyClientCodeAlias1792260357130,
       RenameClientCodeAlias1792852621834,
       DropParcelStatusHistoryCreatedAtIndex1793271648373,
+      AddUserMustChangePassword1793988693167,
     ],
   }
 }

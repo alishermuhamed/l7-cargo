@@ -14,6 +14,20 @@ import { UsersRepository } from './users.repository'
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
+  async lockForPasswordChange(userId: string): Promise<User> {
+    return this.usersRepository.findOneOrThrow({
+      where: { id: userId },
+      lock: { mode: 'pessimistic_write' },
+    })
+  }
+
+  async setMustChangePassword(userId: string, value: boolean): Promise<void> {
+    await this.usersRepository.update(
+      { id: userId },
+      { mustChangePassword: value }
+    )
+  }
+
   async lockForClientMerge(clientIds: string[]): Promise<void> {
     await this.usersRepository.find({
       where: { clientId: In(clientIds) },

@@ -66,6 +66,10 @@ export interface PhoneResetPasswordDto {
   newPassword: string
 }
 
+export interface TemporaryPasswordResponseDto {
+  temporaryPassword: string
+}
+
 export interface LinkedUserDto {
   id: string
   name: string
@@ -109,6 +113,23 @@ export interface AddClientAliasRequestDto {
    * @maximum 2147483647
    */
   code: number
+}
+
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
+export const UserRole = {
+  admin: 'admin',
+  client: 'client',
+} as const
+
+export interface GetUserResponseDto {
+  role: UserRole
+  id: string
+  clientId: string
+  requiresCodeResolution: boolean
+  name: string
+  /** @nullable */
+  phoneNumber: string | null
 }
 
 export interface MergeCandidateResponseDto {
@@ -245,23 +266,6 @@ export interface PutParcelStatusHistoryRequestDto {
   entries: PutParcelStatusHistoryEntryRequestDto[]
 }
 
-export type UserRole = (typeof UserRole)[keyof typeof UserRole]
-
-export const UserRole = {
-  admin: 'admin',
-  client: 'client',
-} as const
-
-export interface GetUserResponseDto {
-  role: UserRole
-  id: string
-  clientId: string
-  requiresCodeResolution: boolean
-  name: string
-  /** @nullable */
-  phoneNumber: string | null
-}
-
 export interface CreateParcelsImportRequestDto {
   file: Blob
   parcelStatus: ParcelStatus
@@ -356,6 +360,19 @@ export type GetClientsParams = {
   search?: string
 }
 
+export type GetUsersParams = {
+  /**
+   * @minimum 0
+   */
+  limit?: number
+  /**
+   * @minimum 0
+   */
+  offset?: number
+  role?: UserRole
+  search?: string
+}
+
 export type FindMergeCandidatesParams = {
   /**
    * @minimum -2147483648
@@ -380,19 +397,6 @@ export type GetParcelsParams = {
   status?: ParcelStatus
   search?: string
   clientId?: string
-}
-
-export type GetUsersParams = {
-  /**
-   * @minimum 0
-   */
-  limit?: number
-  /**
-   * @minimum 0
-   */
-  offset?: number
-  role?: UserRole
-  search?: string
 }
 
 export type GetParcelsImportsParams = {
@@ -580,6 +584,39 @@ export const signOut = async (options?: RequestInit): Promise<void> => {
   })
 }
 
+export const getIssueTemporaryPasswordUrl = (userId: string) => {
+  return `/auth/users/${userId}/temporary-password`
+}
+
+export const issueTemporaryPassword = async (
+  userId: string,
+  options?: RequestInit
+): Promise<TemporaryPasswordResponseDto> => {
+  return customFetch<TemporaryPasswordResponseDto>(
+    getIssueTemporaryPasswordUrl(userId),
+    {
+      ...options,
+      method: 'POST',
+    }
+  )
+}
+
+export const getChangeTemporaryPasswordUrl = () => {
+  return `/auth/change-temporary-password`
+}
+
+export const changeTemporaryPassword = async (
+  setPasswordDto: SetPasswordDto,
+  options?: RequestInit
+): Promise<SuccessResponseDto> => {
+  return customFetch<SuccessResponseDto>(getChangeTemporaryPasswordUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(setPasswordDto),
+  })
+}
+
 export const getGetClientsUrl = (params?: GetClientsParams) => {
   const normalizedParams = new URLSearchParams()
 
@@ -667,6 +704,44 @@ export const getClient = async (
   options?: RequestInit
 ): Promise<GetClientResponseDto> => {
   return customFetch<GetClientResponseDto>(getGetClientUrl(clientId), {
+    ...options,
+    method: 'GET',
+  })
+}
+
+export const getGetUserUrl = (userId: string) => {
+  return `/users/${userId}`
+}
+
+export const getUser = async (
+  userId: string,
+  options?: RequestInit
+): Promise<GetUserResponseDto> => {
+  return customFetch<GetUserResponseDto>(getGetUserUrl(userId), {
+    ...options,
+    method: 'GET',
+  })
+}
+
+export const getGetUsersUrl = (params?: GetUsersParams) => {
+  const normalizedParams = new URLSearchParams()
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  })
+
+  const stringifiedParams = normalizedParams.toString()
+
+  return stringifiedParams.length > 0 ? `/users?${stringifiedParams}` : `/users`
+}
+
+export const getUsers = async (
+  params?: GetUsersParams,
+  options?: RequestInit
+): Promise<GetUserResponseDto[]> => {
+  return customFetch<GetUserResponseDto[]>(getGetUsersUrl(params), {
     ...options,
     method: 'GET',
   })
@@ -893,44 +968,6 @@ export const putParcelStatusHistory = async (
       body: JSON.stringify(putParcelStatusHistoryRequestDto),
     }
   )
-}
-
-export const getGetUserUrl = (userId: string) => {
-  return `/users/${userId}`
-}
-
-export const getUser = async (
-  userId: string,
-  options?: RequestInit
-): Promise<GetUserResponseDto> => {
-  return customFetch<GetUserResponseDto>(getGetUserUrl(userId), {
-    ...options,
-    method: 'GET',
-  })
-}
-
-export const getGetUsersUrl = (params?: GetUsersParams) => {
-  const normalizedParams = new URLSearchParams()
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  })
-
-  const stringifiedParams = normalizedParams.toString()
-
-  return stringifiedParams.length > 0 ? `/users?${stringifiedParams}` : `/users`
-}
-
-export const getUsers = async (
-  params?: GetUsersParams,
-  options?: RequestInit
-): Promise<GetUserResponseDto[]> => {
-  return customFetch<GetUserResponseDto[]>(getGetUsersUrl(params), {
-    ...options,
-    method: 'GET',
-  })
 }
 
 export const getCreateParcelsImportUrl = () => {

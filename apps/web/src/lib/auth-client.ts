@@ -12,6 +12,7 @@ export const authClient = createAuthClient({
     inferAdditionalFields({
       user: {
         role: { type: 'string' },
+        mustChangePassword: { type: 'boolean' },
         clientId: { type: 'string' },
       },
     }),

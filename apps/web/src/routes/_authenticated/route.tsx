@@ -7,6 +7,8 @@ import { authClient } from '../../lib/auth-client'
 
 const CODE_RESOLUTION_PATH = '/code-resolution'
 
+const CHANGE_PASSWORD_PATH = '/change-password'
+
 const ONBOARDING_PATH = '/onboarding'
 
 export const Route = createFileRoute('/_authenticated')({
@@ -21,6 +23,17 @@ export const Route = createFileRoute('/_authenticated')({
     }
 
     const { user } = session.data
+
+    if (user.mustChangePassword) {
+      if (location.pathname !== CHANGE_PASSWORD_PATH) {
+        throw redirect({ to: CHANGE_PASSWORD_PATH, replace: true })
+      }
+      return { session: session.data }
+    }
+
+    if (location.pathname === CHANGE_PASSWORD_PATH) {
+      throw redirect({ to: '/', replace: true })
+    }
 
     const requiresCodeResolution =
       user.role !== UserRole.admin &&

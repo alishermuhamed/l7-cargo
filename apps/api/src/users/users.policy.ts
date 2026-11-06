@@ -29,6 +29,10 @@ export class UsersPolicy extends EntityPolicy<User> {
     can('read', User, { id: user.id })
   }
 
+  checkCanIssueTemporaryPassword(): void {
+    this.checkIsAdmin()
+  }
+
   checkCanList(): void {
     this.checkIsAdmin()
   }

@@ -21,6 +21,7 @@ interface CreateBetterAuthOptions {
     code: string
   }) => Promise<void>
   resolveClientIdForNewUser: (phoneNumber: string) => Promise<string>
+  onPasswordReset: (data: { user: { id: string } }) => Promise<void>
   notifyRegistration: (user: {
     id: string
     name: string
@@ -38,6 +39,7 @@ export function createBetterAuth({
   sendPasswordResetOTP,
   resolveClientIdForNewUser,
   notifyRegistration,
+  onPasswordReset,
 }: CreateBetterAuthOptions) {
   return betterAuthFactory({
     basePath: '/auth',
@@ -47,6 +49,7 @@ export function createBetterAuth({
     emailAndPassword: {
       enabled: false,
       revokeSessionsOnPasswordReset: true,
+      onPasswordReset,
     },
     plugins: [
       phoneNumber({
@@ -61,6 +64,12 @@ export function createBetterAuth({
     ],
     user: {
       additionalFields: {
+        mustChangePassword: {
+          type: 'boolean',
+          defaultValue: false,
+          required: false,
+          input: false,
+        },
         role: {
           type: 'string',
           defaultValue: DEFAULT_USER_ROLE,

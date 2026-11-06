@@ -1,17 +1,30 @@
-import { HttpException, Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  HttpException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common'
+import { Transactional } from '@nestjs-cls/transactional'
 import { APIError } from 'better-auth/api'
+import { hashPassword, verifyPassword } from 'better-auth/crypto'
 import { fromNodeHeaders } from 'better-auth/node'
+import { randomInt } from 'crypto'
 import type { IncomingHttpHeaders } from 'http'
 import { IsNull, Not } from 'typeorm'
 
 import { ClientsService } from '../clients/clients.service'
 import { ConfigService } from '../config/config.service'
 import { BetterAuthTypeOrmAdapter } from '../db/adapters/better-auth-typeorm.adapter'
+import { UsersService } from '../users/users.service'
 import { AccountsRepository } from './accounts.repository'
 import type { SignInMethod } from './authentication.types'
 import { createBetterAuth } from './better-auth.factory'
 import { OtpDeliveryService } from './otp/otp-delivery.service'
 import { RegistrationNotificationService } from './registration-notification.service'
+import { SessionsRepository } from './sessions.repository'
+
+const TEMPORARY_PASSWORD_ALPHABET = 'abcdefghjkmnpqrstuvwxyz23456789'
+const TEMPORARY_PASSWORD_LENGTH = 8
 
 @Injectable()
 export class AuthenticationService {
@@ -23,6 +36,8 @@ export class AuthenticationService {
     private readonly otpDeliveryService: OtpDeliveryService,
     private readonly clientsService: ClientsService,
     private readonly registrationNotificationService: RegistrationNotificationService,
+    private readonly usersService: UsersService,
+    private readonly sessionsRepository: SessionsRepository,
     private readonly accountsRepository: AccountsRepository
   ) {
     this.betterAuth = createBetterAuth({
@@ -35,6 +50,8 @@ export class AuthenticationService {
       sendPasswordResetOTP: (data) => this.sendPasswordResetOTP(data),
       resolveClientIdForNewUser: (phoneNumber) =>
         this.resolveClientIdForNewUser(phoneNumber),
+      onPasswordReset: ({ user }): Promise<void> =>
+        this.usersService.setMustChangePassword(user.id, false),
       notifyRegistration: (user): Promise<void> =>
         this.registrationNotificationService.send(user),
     })
@@ -63,6 +80,77 @@ export class AuthenticationService {
       }
 
       throw error
+    }
+  }
+
+  @Transactional()
+  async issueTemporaryPassword(userId: string): Promise<string> {
+    await this.usersService.lockForPasswordChange(userId)
+    const password = Array.from({ length: TEMPORARY_PASSWORD_LENGTH }, () =>
+      TEMPORARY_PASSWORD_ALPHABET.charAt(
+        randomInt(TEMPORARY_PASSWORD_ALPHABET.length)
+      )
+    ).join('')
+    await this.saveCredentialPassword(userId, await hashPassword(password))
+    await this.usersService.setMustChangePassword(userId, true)
+    await this.sessionsRepository.delete({ userId })
+    return password
+  }
+
+  @Transactional()
+  async changeTemporaryPassword(
+    newPassword: string,
+    headers: IncomingHttpHeaders
+  ): Promise<void> {
+    const session = await this.getSessionFromHeaders(headers)
+    if (!session) throw new UnauthorizedException()
+
+    const user = await this.usersService.lockForPasswordChange(session.user.id)
+    // Recheck after acquiring the lock: an administrator may have reissued the password.
+    const activeSession = await this.sessionsRepository.findOne({
+      where: { id: session.session.id, userId: user.id },
+    })
+    if (!activeSession || activeSession.expiresAt.getTime() <= Date.now()) {
+      throw new UnauthorizedException()
+    }
+    if (!user.mustChangePassword) {
+      throw new BadRequestException('TEMPORARY_PASSWORD_NOT_REQUIRED')
+    }
+    const account = await this.accountsRepository.findOneOrThrow({
+      where: { userId: user.id, providerId: 'credential' },
+    })
+    if (
+      account.password &&
+      (await verifyPassword({ hash: account.password, password: newPassword }))
+    ) {
+      throw new BadRequestException('PASSWORD_MUST_DIFFER')
+    }
+    await this.saveCredentialPassword(user.id, await hashPassword(newPassword))
+    await this.usersService.setMustChangePassword(user.id, false)
+    await this.sessionsRepository.delete({
+      userId: user.id,
+      id: Not(activeSession.id),
+    })
+  }
+
+  private async saveCredentialPassword(
+    userId: string,
+    password: string
+  ): Promise<void> {
+    const account = await this.accountsRepository.findOne({
+      where: { userId, providerId: 'credential' },
+    })
+    if (account) {
+      await this.accountsRepository.update({ id: account.id }, { password })
+    } else {
+      await this.accountsRepository.insert(
+        this.accountsRepository.create({
+          userId,
+          accountId: userId,
+          providerId: 'credential',
+          password,
+        })
+      )
     }
   }
 

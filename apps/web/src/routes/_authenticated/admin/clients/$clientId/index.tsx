@@ -19,6 +19,7 @@ import { Select } from '../../../../../components/select/select'
 import { ChangeCodeDialog } from '../../../../../features/clients/components/change-code-dialog'
 import { ManageAlternativeCodesDialog } from '../../../../../features/clients/components/manage-alternative-codes-dialog'
 import { MergeClientsDialog } from '../../../../../features/clients/components/merge-clients-dialog'
+import { TemporaryPasswordDialog } from '../../../../../features/clients/components/temporary-password-dialog'
 import { ParcelCardsList } from '../../../../../features/parcels/components/parcel-cards-list'
 import { ParcelsTable } from '../../../../../features/parcels/components/parcels-table'
 import { PARCEL_STATUS_LABELS } from '../../../../../features/parcels/lib/parcel-status-labels'
@@ -50,6 +51,7 @@ export const Route = createFileRoute(
 function AdminClientDetailsPage() {
   const { initialClient } = Route.useLoaderData()
 
+  const [temporaryPasswordOpen, setTemporaryPasswordOpen] = useState(false)
   const [mergeOpen, setMergeOpen] = useState(false)
   const [changeCodeOpen, setChangeCodeOpen] = useState(false)
   const [manageAlternativeCodesOpen, setManageAlternativeCodesOpen] =
@@ -157,7 +159,15 @@ function AdminClientDetailsPage() {
               </DataList.Value>
             </DataList.Item>
           </DataList.Root>
-          <Flex mt="4" justify="end">
+          <Flex mt="4" justify="end" gap="3" wrap="wrap">
+            {client.user && (
+              <Button
+                variant="soft"
+                onClick={() => setTemporaryPasswordOpen(true)}
+              >
+                {i18n.t('auth:temporaryPassword.issueTitle')}
+              </Button>
+            )}
             <Button variant="soft" onClick={() => setMergeOpen(true)}>
               {i18n.t('clients:merge.title')}
             </Button>
@@ -213,6 +223,12 @@ function AdminClientDetailsPage() {
           </Box>
         </Flex>
       </Flex>
+      {temporaryPasswordOpen && client.user && (
+        <TemporaryPasswordDialog
+          userId={client.user.id}
+          onClose={() => setTemporaryPasswordOpen(false)}
+        />
+      )}
       {mergeOpen && (
         <MergeClientsDialog
           client={client}
