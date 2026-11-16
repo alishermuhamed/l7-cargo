@@ -1,10 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Card, Container, Flex, Heading, Text } from '@radix-ui/themes'
-import {
-  createFileRoute,
-  Link as RouterLink,
-  useNavigate,
-} from '@tanstack/react-router'
+import { Callout, Card, Container, Flex, Heading, Text } from '@radix-ui/themes'
+import { createFileRoute, Link as RouterLink } from '@tanstack/react-router'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import PhoneInput from 'react-phone-number-input/input'
@@ -39,7 +36,7 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
 
 function ForgotPasswordPage() {
-  const navigate = useNavigate()
+  const [confirmedPhoneNumber, setConfirmedPhoneNumber] = useState<string>()
   const { phoneNumber, redirectTo } = Route.useSearch()
 
   const form = useForm<ForgotPasswordFormValues>({
@@ -48,20 +45,24 @@ function ForgotPasswordPage() {
   })
 
   const onSubmit = async ({ phoneNumber }: ForgotPasswordFormValues) => {
+    setConfirmedPhoneNumber(undefined)
     try {
       const result = await authClient.phoneNumber.requestPasswordReset({
         phoneNumber,
       })
 
       if (result.error) {
+        if (result.error.status === 404) {
+          form.setError('phoneNumber', {
+            message: i18n.t('auth:recoveryAccountNotFound'),
+          })
+          return
+        }
         toast.error(i18n.t('errors:unableToRequestPasswordReset'))
         return
       }
 
-      await navigate({
-        to: '/auth/reset-password',
-        search: { phoneNumber, redirectTo },
-      })
+      setConfirmedPhoneNumber(phoneNumber)
     } catch {
       toast.error(i18n.t('errors:unableToRequestPasswordReset'))
     }
@@ -93,7 +94,11 @@ function ForgotPasswordPage() {
                       <PhoneInput
                         placeholder={i18n.t('auth:phoneNumberPlaceholder')}
                         value={field.value}
-                        onChange={field.onChange}
+                        onChange={(value) => {
+                          setConfirmedPhoneNumber(undefined)
+                          field.onChange(value)
+                        }}
+                        disabled={form.formState.isSubmitting}
                         inputComponent={TextField.Root}
                       />
                     </FormFieldControl>
@@ -103,9 +108,17 @@ function ForgotPasswordPage() {
                 )}
               />
 
+              {confirmedPhoneNumber && (
+                <Callout.Root role="status">
+                  <Callout.Text>
+                    {i18n.t('auth:recoveryContactManager')}
+                  </Callout.Text>
+                </Callout.Root>
+              )}
+
               <Flex direction="column" gap="3">
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  {i18n.t('auth:sendResetCode')}
+                  {i18n.t('common:continue')}
                 </Button>
 
                 <Button asChild variant="ghost" color="gray">

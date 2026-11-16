@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Query, Req, Res } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Post,
+  Query,
+  Req,
+  Res,
+} from '@nestjs/common'
 import { Throttle } from '@nestjs/throttler'
 import { toNodeHandler } from 'better-auth/node'
 import type { Request, Response } from 'express'
@@ -84,20 +93,16 @@ export class AuthenticationController {
   @Throttle({ default: { limit: 5, ttl: 60000 * 60 * 24 } })
   @Post('/phone-number/request-password-reset')
   async requestPhonePasswordReset(
-    @Req() req: Request,
     @Res() res: Response,
-    @Body() _: PhoneRequestPasswordResetDto
-  ) {
-    await toNodeHandler(this.authenticationService.betterAuth)(req, res)
+    @Body() { phoneNumber }: PhoneRequestPasswordResetDto
+  ): Promise<void> {
+    await this.authenticationService.requestPasswordRecovery(phoneNumber)
+    res.status(200).json({ status: true })
   }
 
   @Post('/phone-number/reset-password')
-  async resetPhonePassword(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Body() _: PhoneResetPasswordDto
-  ) {
-    await toNodeHandler(this.authenticationService.betterAuth)(req, res)
+  resetPhonePassword(@Body() _: PhoneResetPasswordDto): void {
+    throw new ForbiddenException('PASSWORD_RECOVERY_REQUIRES_MANAGER')
   }
 
   @Post('/sign-out')

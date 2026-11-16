@@ -16,10 +16,6 @@ interface CreateBetterAuthOptions {
   cookiesDomain: string | undefined
   webUrl: string | undefined
   sendOTP: (data: { phoneNumber: string; code: string }) => Promise<void>
-  sendPasswordResetOTP: (data: {
-    phoneNumber: string
-    code: string
-  }) => Promise<void>
   resolveClientIdForNewUser: (phoneNumber: string) => Promise<string>
   onPasswordReset: (data: { user: { id: string } }) => Promise<void>
   notifyRegistration: (user: {
@@ -36,7 +32,6 @@ export function createBetterAuth({
   cookiesDomain,
   webUrl,
   sendOTP,
-  sendPasswordResetOTP,
   resolveClientIdForNewUser,
   notifyRegistration,
   onPasswordReset,
@@ -55,7 +50,6 @@ export function createBetterAuth({
       phoneNumber({
         phoneNumberValidator: isE164PhoneNumber,
         sendOTP,
-        sendPasswordResetOTP,
         signUpOnVerification: {
           getTempEmail: (phoneNumber: string): string =>
             `${phoneNumber}@phone.local`,

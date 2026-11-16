@@ -47,7 +47,6 @@ export class AuthenticationService {
       cookiesDomain: this.configService.get('betterAuth.cookiesDomain'),
       webUrl: this.configService.get('web.url'),
       sendOTP: (data) => this.sendOTP(data),
-      sendPasswordResetOTP: (data) => this.sendPasswordResetOTP(data),
       resolveClientIdForNewUser: (phoneNumber) =>
         this.resolveClientIdForNewUser(phoneNumber),
       onPasswordReset: ({ user }): Promise<void> =>
@@ -180,17 +179,10 @@ export class AuthenticationService {
     })
   }
 
-  private sendPasswordResetOTP({
-    phoneNumber,
-    code,
-  }: {
-    phoneNumber: string
-    code: string
-  }): Promise<void> {
-    return this.otpDeliveryService.send({
-      phoneNumber,
-      code,
-      reason: 'password reset',
+  async requestPasswordRecovery(phoneNumber: string): Promise<void> {
+    await this.usersService.findOneOrThrow({
+      where: { phoneNumber },
+      select: { id: true },
     })
   }
 
